@@ -7,16 +7,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Search.Models;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
-using Dfc.ProviderPortal.Courses.Models;
-using Dfc.ProviderPortal.Courses.Services;
-using Dfc.ProviderPortal.Courses.Interfaces;
+using Dfc.ProviderPortal.FindACourse.Models;
+using Dfc.ProviderPortal.FindACourse.Services;
+using Dfc.ProviderPortal.FindACourse.Interfaces;
 using Dfc.ProviderPortal.Packages;
 using Dfc.ProviderPortal.Packages.AzureFunctions.DependencyInjection;
-using Dfc.ProviderPortal.Courses.Functions;
-using Dfc.ProviderPortal.Courses.Settings;
+using Dfc.ProviderPortal.FindACourse.Interfaces;
 
-
-namespace Dfc.ProviderPortal.Venues.API.Controllers
+namespace Dfc.ProviderPortal.FindACourse.Controllers
 {
     /// <summary>
     /// Controller class for Courses API
@@ -40,14 +38,14 @@ namespace Dfc.ProviderPortal.Venues.API.Controllers
         /// <param name="logger"></param>
         public CoursesController(
             ILogger<CoursesController> logger,
-            ICourseService service,
+            ICourseService service)
         //    ICosmosDbHelper cosmosDbHelper,
         //    //ISearchServiceWrapper searchServiceWrapper,
         //    IOptions<ProviderServiceSettings> providerServiceSettings,
         //    IOptions<VenueServiceSettings> venueServiceSettings,
         //    IOptions<SearchServiceSettings> searchServiceSettings,
         //    IOptions<CosmosDbCollectionSettings> settings)
-        //{
+        {
             Throw.IfNull<ILogger<CoursesController>>(logger, nameof(logger));
             Throw.IfNull<ICourseService>(service, nameof(service));
             //Throw.IfNull(cosmosDbHelper, nameof(cosmosDbHelper));

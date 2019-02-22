@@ -8,14 +8,14 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Dfc.ProviderPortal.Courses.Helpers;
-using Dfc.ProviderPortal.Courses.Interfaces;
-using Dfc.ProviderPortal.Courses.Services;
-using Dfc.ProviderPortal.Courses.Settings;
+using Dfc.ProviderPortal.FindACourse.Helpers;
+using Dfc.ProviderPortal.FindACourse.Interfaces;
+using Dfc.ProviderPortal.FindACourse.Services;
+using Dfc.ProviderPortal.FindACourse.Settings;
 using Swashbuckle.AspNetCore.Swagger;
 
 
-namespace Dfc.ProviderPortal.Courses.API
+namespace Dfc.ProviderPortal.FindACourse.API
 {
     public class Startup
     {
