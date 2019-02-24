@@ -1,0 +1,57 @@
+# dotnet code build
+
+resources:
+  repositories:
+  - repository: self
+
+variables:
+  BuildConfiguration: release
+  BuildPlatform: 'any cpu'
+  dotNetCoreProjects: 'src/**/*.csproj'
+  dotNetCoreTestProjects: '**/*[Tt]ests/*.csproj'
+
+trigger:
+  batch: true # batch if multiple checkins while build in progress
+  branches:
+    include: master
+
+pr:
+  branches:
+    include: master
+
+jobs:
+
+# Full build
+- job: BuildDotNetCore
+  displayName: Build dot net core project
+  pool:
+    name: Continuous Integration 02 - SSD - 160ACU
+    demands:
+    - msbuild
+    - visualstudio
+
+  steps:
+
+  # restore dependencies
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet restore'
+    inputs:
+      command: restore
+      projects: $(dotNetCoreProjects)
+
+  # build
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet build'
+    inputs:
+      command: build
+      projects: $(dotNetCoreProjects)
+      arguments: '--configuration $(BuildConfiguration)'
+
+  # run unit tests
+  - task: DotNetCoreCLI@2
+    displayName: Test
+    inputs:
+      command: test
+      projects: $(dotNetCoreTestProjects)
+      arguments: '--configuration $(BuildConfiguration)'
+    continueOnError: true
