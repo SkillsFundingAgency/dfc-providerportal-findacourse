@@ -13,11 +13,13 @@ variables:
 trigger:
   batch: true # batch if multiple checkins while build in progress
   branches:
-    include: master
+    include:
+    - master
 
 pr:
   branches:
-    include: master
+    include:
+    - master
 
 jobs:
 
