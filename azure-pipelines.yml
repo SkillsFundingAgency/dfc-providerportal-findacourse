@@ -68,4 +68,6 @@ jobs:
       projects: $(dotNetCorePublishProject)
       arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
 
-
+  # publish
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Artifact: drop'
