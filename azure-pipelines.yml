@@ -8,7 +8,7 @@ variables:
   BuildConfiguration: release
   BuildPlatform: 'any cpu'
   dotNetCoreProjects: 'src/**/*.csproj'
-  dotNetCorePublishProject: 'src/Dfc.ProviderPortal.Courses.API/Dfc.ProviderPortal.Courses.API.csproj'
+  dotNetCorePublishProject: 'src/dfc-providerportal-findacourse/dfc-providerportal-findacourse.csproj'
   dotNetCoreTestProjects: '**/*[Tt]ests/*.csproj'
 
 trigger:
