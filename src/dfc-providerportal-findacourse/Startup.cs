@@ -19,12 +19,17 @@ namespace Dfc.ProviderPortal.FindACourse.API
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private readonly IHostingEnvironment _env;
+
+        public Startup(IHostingEnvironment env, IConfiguration configuration)
         {
+            _env = env;
+
             Configuration = //configuration;
                 new ConfigurationBuilder()
                 .SetBasePath(Environment.CurrentDirectory)
-                .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{_env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables()
                 .Build();
         }
