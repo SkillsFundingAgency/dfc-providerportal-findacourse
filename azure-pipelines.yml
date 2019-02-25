@@ -8,6 +8,7 @@ variables:
   BuildConfiguration: release
   BuildPlatform: 'any cpu'
   dotNetCoreProjects: 'src/**/*.csproj'
+  dotNetCorePublishProject: 'src/Dfc.ProviderPortal.Courses.API/Dfc.ProviderPortal.Courses.API.csproj'
   dotNetCoreTestProjects: '**/*[Tt]ests/*.csproj'
 
 trigger:
@@ -63,7 +64,8 @@ jobs:
     displayName: Publish
     inputs:
       command: publish
-      publishWebProjects: True
+      publishWebProjects: false
+      projects: $(dotNetCorePublishProject)
       arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
-      zipAfterPublish: True
+
 
