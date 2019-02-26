@@ -2,7 +2,7 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "functionAppPrefix": {
+    "webAppPrefix": {
       "type": "string",
       "metadata": {
         "description": "Prefix for the function app resources, in the form dfc-env-proj-fnapp"
@@ -113,8 +113,8 @@
   },
   "variables": {
     "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/dfc-devops/master/ArmTemplates/",
-    "webAppName": "[concat(parameters('functionAppPrefix'),'-fa')]",
-    "appInsightName": "[concat(parameters('functionAppPrefix'),'-ai')]"
+    "webAppName": "[concat(parameters('webAppPrefix'),'-as')]",
+    "appInsightName": "[concat(parameters('webAppPrefix'),'-ai')]"
   },
   "resources": [{
       "apiVersion": "2017-05-10",
