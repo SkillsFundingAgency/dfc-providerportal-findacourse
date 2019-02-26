@@ -117,7 +117,6 @@ namespace Dfc.ProviderPortal.FindACourse.Tests.CoursesTests
             //AzureSearchCourseDetail detail = (AzureSearchCourseDetail)((OkObjectResult)response).Value;
 
             //Assert.True(detail != null && detail?.Course != null && detail?.Provider != null && detail?.Qualification != null);
-
             Assert.True(true);
         }
 
