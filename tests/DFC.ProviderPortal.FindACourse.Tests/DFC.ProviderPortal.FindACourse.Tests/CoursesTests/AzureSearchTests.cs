@@ -119,6 +119,5 @@ namespace Dfc.ProviderPortal.FindACourse.Tests.CoursesTests
             //Assert.True(detail != null && detail?.Course != null && detail?.Provider != null && detail?.Qualification != null);
             Assert.True(true);
         }
-
     }
 }
