@@ -26,6 +26,24 @@
         "description": "Connection string for the storage account to store function app files"
       }
     },
+    "ApimServiceName": {
+      "type": "string",
+      "metadata": {
+        "description": "APIM name"
+      }
+    },
+    "ApimResourceGroup": {
+      "type": "string",
+      "metadata": {
+        "description": "Resource group where the APIM is located"
+      }
+    },
+    "ApiName": {
+      "type": "string",
+      "metadata": {
+        "description": "API name"
+      }
+    },
     "cosmosDBfqdn": {
       "type": "string",
       "metadata": {
@@ -116,7 +134,8 @@
     "webAppName": "[concat(parameters('webAppPrefix'),'-as')]",
     "appInsightName": "[concat(parameters('webAppPrefix'),'-ai')]"
   },
-  "resources": [{
+  "resources": [
+    {
       "apiVersion": "2017-05-10",
       "name": "ppfindcourseAppInsights",
       "type": "Microsoft.Resources/deployments",
@@ -137,9 +156,9 @@
       }
     },
     {
-      "apiVersion": "2017-05-10",
       "name": "ppfindcourseAppService",
       "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2017-05-10",
       "dependsOn": [
         "ppfindcourseAppInsights"
       ],
@@ -261,6 +280,57 @@
           },
           "deployStagingSlot": {
             "value": false
+          }
+        }
+      }
+    },
+    {
+      "name": "ppfindcourseApimProduct",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2017-05-10",
+      "resourceGroup": "[parameters('ApimResourceGroup')]",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('deploymentUrlBase'), 'APIM/apim-product.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "allowAnonymousAccess": {
+            "value": true
+          },
+          "apimServiceName": {
+            "value": "[parameters('ApimServiceName')]"
+          },
+          "productDisplayName": {
+            "value": "Find a course"
+          }
+        }
+      }
+    },
+    {
+      "name": "ppfindcourseApimApi",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2017-05-10",
+      "resourceGroup": "[parameters('ApimResourceGroup')]",
+      "dependsOn": [
+        "ppfindcourseApimProduct"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('deploymentUrlBase'), 'APIM/apim-api.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "apimProductInstanceName": {
+            "value": "[reference('ppfindcourseApimProduct').outputs.ApimProductInstanceName.value]"
+          },
+          "apimServiceName": {
+            "value": "[parameters('ApimServiceName')]"
+          },
+          "apiName": {
+            "value": "[parameters('ApiName')]"
           }
         }
       }
