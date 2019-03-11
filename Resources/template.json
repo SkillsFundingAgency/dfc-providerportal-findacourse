@@ -44,6 +44,13 @@
         "description": "API name"
       }
     },
+    "apiSuffix": {
+      "type": "string",
+      "default": "",
+      "metadata": {
+        "description": "Suffix uniquely identifying this API and all of its resource paths within APIM, defaults to apiName"
+      }
+    },
     "cosmosDBfqdn": {
       "type": "string",
       "metadata": {
@@ -330,7 +337,10 @@
             "value": "[parameters('ApimServiceName')]"
           },
           "apiName": {
-            "value": "[parameters('ApiName')]"
+            "value": "[parameters('apiName')]"
+          },
+          "apiSuffix": {
+            "value": "[parameters('apiSuffix')]"
           }
         }
       }
@@ -348,6 +358,10 @@
     "appInsightInstrumentationKey": {
       "type": "string",
       "value": "[reference('ppfindcourseAppInsights').outputs.InstrumentationKey.value]"
+    },
+    "apimProductInstanceName": {
+      "type": "string",
+      "value": "[reference('ppfindcourseApimProduct').outputs.ApimProductInstanceName.value]"
     }
   }
 }
