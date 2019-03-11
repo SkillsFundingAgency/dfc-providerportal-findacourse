@@ -46,7 +46,7 @@
     },
     "apiSuffix": {
       "type": "string",
-      "default": "",
+      "defaultValue": "",
       "metadata": {
         "description": "Suffix uniquely identifying this API and all of its resource paths within APIM, defaults to apiName"
       }
