@@ -12,7 +12,6 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
     /// <summary>
     /// Controller class for Courses API
     /// </summary>
-    [Route("api/[controller]")]
     [ApiController]
     public class CoursesController : ControllerBase
     {
@@ -36,12 +35,12 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
 
         /// <summary>
         /// Search courses (aka Find A Course), for example:
-        /// POST api/courses/coursesearch
+        /// POST search
         /// </summary>
         /// <returns>Search results</returns>
-        [Route("~/api/courses/coursesearch")]
+        [Route("~/search")]
         [HttpPost]
-        public async Task<FACSearchResult> CourseSearch([FromBody]SearchCriteriaStructure criteria)
+        public async Task<FACSearchResult> Search([FromBody]SearchCriteriaStructure criteria)
         {
             try {
                 Task<FACSearchResult> task = _service.CourseSearch(_log, criteria);
