@@ -1,0 +1,367 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "webAppPrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Prefix for the function app resources, in the form dfc-env-proj-fnapp"
+      }
+    },
+    "appServicePlanName": {
+      "type": "string",
+      "metadata": {
+        "description": "App service plan to run the function app under"
+      }
+    },
+    "appServicePlanResourceGroup": {
+      "type": "string",
+      "metadata": {
+        "description": "Resource group the app service plan is in"
+      }
+    },
+    "storageConnectionString": {
+      "type": "string",
+      "metadata": {
+        "description": "Connection string for the storage account to store function app files"
+      }
+    },
+    "ApimServiceName": {
+      "type": "string",
+      "metadata": {
+        "description": "APIM name"
+      }
+    },
+    "ApimResourceGroup": {
+      "type": "string",
+      "metadata": {
+        "description": "Resource group where the APIM is located"
+      }
+    },
+    "ApiName": {
+      "type": "string",
+      "metadata": {
+        "description": "API name"
+      }
+    },
+    "apiSuffix": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Suffix uniquely identifying this API and all of its resource paths within APIM, defaults to apiName"
+      }
+    },
+    "cosmosDBfqdn": {
+      "type": "string",
+      "metadata": {
+        "description": "Cosmos DB account name in the format https://dfc-xxx-xxx-cdb.documents.azure.com/ for app settings"
+      }
+    },
+    "cosmosDBkey": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Cosmos DB access key for app settings"
+      }
+    },
+    "cosmosDBdatabase": {
+      "type": "string",
+      "metadata": {
+        "description": "Cosmos DB database name for app settings"
+      }
+    },
+    "cosmosDBcollection": {
+      "type": "string",
+      "metadata": {
+        "description": "Cosmos DB collection name for app settings"
+      }
+    },
+    "venueApiUrl": {
+      "type": "string",
+      "metadata": {
+        "description": "API URL for the venue search"
+      }
+    },
+    "venueApiKey": {
+      "type": "securestring",
+      "metadata": {
+        "description": "API host key (code) needed to access the venues function app (REST API)"
+      }
+    },
+    "providerApiUrl": {
+      "type": "string",
+      "metadata": {
+        "description": "API URL for the provider (ukrlp) search"
+      }
+    },
+    "providerApiKey": {
+      "type": "securestring",
+      "metadata": {
+        "description": "API host key (code) needed to access the provider (ukrlp) function app (REST API)"
+      }
+    },
+    "searchName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of search resource"
+      }
+    },
+    "qualIndex": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of qualification index"
+      }
+    },
+    "searchIndex": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of search index"
+      }
+    },
+    "onspdIndex": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of ONS postcode index"
+      }
+    },
+    "searchAdminKey": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Admin key for updating search"
+      }
+    },
+    "searchQueryKey": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Query key for accessing search"
+      }
+    }
+  },
+  "variables": {
+    "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/dfc-devops/master/ArmTemplates/",
+    "webAppName": "[concat(parameters('webAppPrefix'),'-as')]",
+    "appInsightName": "[concat(parameters('webAppPrefix'),'-ai')]"
+  },
+  "resources": [
+    {
+      "apiVersion": "2017-05-10",
+      "name": "ppfindcourseAppInsights",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('deploymentUrlBase'),'application-insights.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "appInsightsName": {
+            "value": "[variables('appInsightName')]"
+          },
+          "attachedService": {
+            "value": "[variables('webAppName')]"
+          }
+        }
+      }
+    },
+    {
+      "name": "ppfindcourseAppService",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2017-05-10",
+      "dependsOn": [
+        "ppfindcourseAppInsights"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('deploymentUrlBase'),'app-service.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "appServiceName": {
+            "value": "[variables('webAppName')]"
+          },
+          "appServicePlanName": {
+            "value": "[parameters('appServicePlanName')]"
+          },
+          "appServicePlanResourceGroup": {
+            "value": "[parameters('appServicePlanResourceGroup')]"
+          },
+          "appServiceAppSettings": {
+            "value": [
+              {
+                "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                "value": "[reference('ppfindcourseAppInsights').outputs.InstrumentationKey.value]"
+              },
+              {
+                "name": "AzureWebJobsStorage",
+                "value": "[parameters('storageConnectionString')]"
+              },
+              {
+                "name": "CosmosDbSettings__EndpointUri",
+                "value": "[parameters('cosmosDBfqdn')]"
+              },
+              {
+                "name": "CosmosDbSettings__PrimaryKey",
+                "value": "[parameters('cosmosDBkey')]"
+              },
+              {
+                "name": "CosmosDbSettings__DatabaseId",
+                "value": "[parameters('cosmosDBdatabase')]"
+              },
+              {
+                "name": "CosmosDbCollectionSettings__CoursesCollectionId",
+                "value": "[parameters('cosmosDBcollection')]"
+              },
+              {
+                "name": "VenueServiceSettings__ApiUrl",
+                "value": "[parameters('venueApiUrl')]"
+              },
+              {
+                "name": "VenueServiceSettings__ApiKey",
+                "value": "[parameters('venueApiKey')]"
+              },
+              {
+                "name": "ProviderServiceSettings__ApiUrl",
+                "value": "[parameters('providerApiUrl')]"
+              },
+              {
+                "name": "ProviderServiceSettings__ApiKey",
+                "value": "[parameters('providerApiKey')]"
+              },
+              {
+                "name": "QualificationServiceSettings__SearchService",
+                "value": "[parameters('searchName')]"
+              },
+              {
+                "name": "QualificationServiceSettings__QueryKey",
+                "value": "[parameters('searchQueryKey')]"
+              },
+              {
+                "name": "QualificationServiceSettings__Index",
+                "value": "[parameters('qualIndex')]"
+              },
+              {
+                "name": "QualificationServiceSettings__DefaultTop",
+                "value": "10"
+              },
+              {
+                "name": "SearchServiceSettings__SearchService",
+                "value": "[parameters('searchName')]"
+              },
+              {
+                "name": "SearchServiceSettings__ApiUrl",
+                "value": "[concat('https://', parameters('searchName'), '.windows.net/indexes/', parameters('searchIndex'), '/docs/search')]"
+              },
+              {
+                "name": "SearchServiceSettings__ApiVersion",
+                "value": "11/11/2017"
+              },
+              {
+                "name": "SearchServiceSettings__QueryKey",
+                "value": "[parameters('searchQueryKey')]"
+              },
+              {
+                "name": "SearchServiceSettings__AdminKey",
+                "value": "[parameters('searchAdminKey')]"
+              },
+              {
+                "name": "SearchServiceSettings__Index",
+                "value": "[parameters('searchIndex')]"
+              },
+              {
+                "name": "SearchServiceSettings__onspdIndex",
+                "value": "[parameters('onspdIndex')]"
+              },
+              {
+                "name": "SearchServiceSettings__DefaultTop",
+                "value": "10"
+              },
+              {
+                "name": "SearchServiceSettings__CoursesConnectionString",
+                "value": "[concat('AccountEndpoint=', parameters('cosmosDBfqdn'), ';AccountKey=', parameters('cosmosDBkey'), ';Database=', parameters('cosmosDBdatabase'), ';')]"
+              },
+              {
+                "name": "SearchServiceSettings__ThresholdVenueCount",
+                "value": "100"
+              }
+            ]
+          },
+          "deployStagingSlot": {
+            "value": false
+          }
+        }
+      }
+    },
+    {
+      "name": "ppfindcourseApimProduct",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2017-05-10",
+      "resourceGroup": "[parameters('ApimResourceGroup')]",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('deploymentUrlBase'), 'APIM/apim-product.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "allowAnonymousAccess": {
+            "value": true
+          },
+          "apimServiceName": {
+            "value": "[parameters('ApimServiceName')]"
+          },
+          "productDisplayName": {
+            "value": "Find a course"
+          }
+        }
+      }
+    },
+    {
+      "name": "ppfindcourseApimApi",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2017-05-10",
+      "resourceGroup": "[parameters('ApimResourceGroup')]",
+      "dependsOn": [
+        "ppfindcourseApimProduct"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('deploymentUrlBase'), 'APIM/apim-api.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "apimProductInstanceName": {
+            "value": "[reference('ppfindcourseApimProduct').outputs.ApimProductInstanceName.value]"
+          },
+          "apimServiceName": {
+            "value": "[parameters('ApimServiceName')]"
+          },
+          "apiName": {
+            "value": "[parameters('apiName')]"
+          },
+          "apiSuffix": {
+            "value": "[parameters('apiSuffix')]"
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "webAppName": {
+      "type": "string",
+      "value": "[variables('webAppName')]"
+    },
+    "appInsightName": {
+      "type": "string",
+      "value": "[variables('appInsightName')]"
+    },
+    "appInsightInstrumentationKey": {
+      "type": "string",
+      "value": "[reference('ppfindcourseAppInsights').outputs.InstrumentationKey.value]"
+    },
+    "apimProductInstanceName": {
+      "type": "string",
+      "value": "[reference('ppfindcourseApimProduct').outputs.ApimProductInstanceName.value]"
+    }
+  }
+}
