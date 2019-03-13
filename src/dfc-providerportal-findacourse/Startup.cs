@@ -40,6 +40,7 @@ namespace Dfc.ProviderPortal.FindACourse.API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddApplicationInsightsTelemetry(Configuration);
 
             services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new Info { Title = "Courses API", Version = "v1" }); });
 
