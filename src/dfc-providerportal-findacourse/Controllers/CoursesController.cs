@@ -43,6 +43,8 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
         public async Task<FACSearchResult> Search([FromBody]SearchCriteriaStructure criteria)
         {
             try {
+                _log.LogInformation($"FAC search started: {criteria}");
+                _log.LogInformation($"FAC search with keyword {criteria.SubjectKeyword}");
                 Task<FACSearchResult> task = _service.CourseSearch(_log, criteria);
                 return await task;
 
