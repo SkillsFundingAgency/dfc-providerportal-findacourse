@@ -8,11 +8,14 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Identity;
+using Swashbuckle.AspNetCore.Swagger;
 using Dfc.ProviderPortal.FindACourse.Helpers;
 using Dfc.ProviderPortal.FindACourse.Interfaces;
+using Dfc.ProviderPortal.FindACourse.Models;
 using Dfc.ProviderPortal.FindACourse.Services;
 using Dfc.ProviderPortal.FindACourse.Settings;
-using Swashbuckle.AspNetCore.Swagger;
+using Dfc.ProviderPortal.Identity.Data;
 
 
 namespace Dfc.ProviderPortal.FindACourse.API
@@ -49,10 +52,20 @@ namespace Dfc.ProviderPortal.FindACourse.API
                     .Configure<ProviderServiceSettings>(Configuration.GetSection(nameof(ProviderServiceSettings)))
                     .Configure<VenueServiceSettings>(Configuration.GetSection(nameof(VenueServiceSettings)))
                     .Configure<SearchServiceSettings>(Configuration.GetSection(nameof(SearchServiceSettings)))
+                    .Configure<FACAuthenticationSettings>(Configuration.GetSection(nameof(FACAuthenticationSettings)))
                     .AddScoped<ICourseService, CoursesService>()
                     .AddScoped<ICosmosDbHelper, CosmosDbHelper>()
                     .AddScoped<IProviderServiceWrapper, ProviderServiceWrapper>()
                     .AddScoped<IVenueServiceWrapper, VenueServiceWrapper>();
+                    //.AddScoped<UserManager<APIUser>, UserManager<APIUser>>()
+                    //.AddScoped<SignInManager<APIUser>, SignInManager<APIUser>>()
+
+                    //.AddIdentity<APIUser, IdentityRole>(options => {
+                    //     //options.Tokens.PasswordResetTokenProvider = TokenOptions.DefaultEmailProvider;
+                    //     options.SignIn.RequireConfirmedEmail = false; })
+                    //.AddEntityFrameworkStores<ApplicationDbContext>()
+                    //.AddDefaultTokenProviders();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -64,10 +77,13 @@ namespace Dfc.ProviderPortal.FindACourse.API
                 app.UseHsts();
             }
 
+            //app.UseAuthentication();
             app.UseHttpsRedirection();
             app.UseMvc();
 
-            app.UseSwagger();
+            app.UseSwagger(c => {
+                c.PreSerializeFilters.Add((swaggerDoc, httpReq) => swaggerDoc.Host = httpReq.Host.Value);
+            });
             app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "Courses API v1"); });
         }
     }
