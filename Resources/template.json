@@ -249,11 +249,11 @@
               },
               {
                 "name": "SearchServiceSettings__ApiUrl",
-                "value": "[concat('https://', parameters('searchName'), '.windows.net/indexes/', parameters('searchIndex'), '/docs/search')]"
+                "value": "[concat('https://', parameters('searchName'), '.search.windows.net/indexes/', parameters('searchIndex'), '/docs/search')]"
               },
               {
                 "name": "SearchServiceSettings__ApiVersion",
-                "value": "11/11/2017"
+                "value": "2017-11-11"
               },
               {
                 "name": "SearchServiceSettings__QueryKey",
