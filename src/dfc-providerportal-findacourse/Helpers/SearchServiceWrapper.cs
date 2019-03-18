@@ -251,13 +251,10 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
                 StringContent content = new StringContent(JsonConvert.SerializeObject(facCriteria, settings), Encoding.UTF8, "application/json");
 
                 // Do the search
+                _log.LogInformation("FAC search POST body", JsonConvert.SerializeObject(facCriteria, settings));
                 Task<HttpResponseMessage> task = _httpClient.PostAsync(_uri, content);
-                //https://dfc-dev-prov-sch.search.windows.net/indexes/course/docs?api-version=2017-11-11&queryType=full&$count=true&search=VenueAddress:evergreen AND QualificationCourseTitle:biology AND bell
-                //Task<HttpResponseMessage> task = _httpClient.GetAsync($"{_settings.ApiUrl}?api-version={_settings.ApiVersion}&queryType=full&$count={facCriteria.Count.ToString()}&search=VenueAddress:evergreen AND QualificationCourseTitle:biology AND {criteria.SubjectKeywordField}*");
-
                 task.Wait();
                 HttpResponseMessage response = task.Result;
-
                 _log.LogInformation("FAC search service http response.", response);
 
                 // Handle response and deserialize results

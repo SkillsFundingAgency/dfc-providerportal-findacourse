@@ -1,22 +1,41 @@
 ﻿
-using Dfc.ProviderPortal.FindACourse.Interfaces;
-using Dfc.ProviderPortal.FindACourse.Models;
-using Dfc.ProviderPortal.Packages;
+using System;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
+using Dfc.ProviderPortal.FindACourse.Interfaces;
+using Dfc.ProviderPortal.FindACourse.Models;
+using Dfc.ProviderPortal.FindACourse.Settings;
+using Dfc.ProviderPortal.Packages;
+using System.Collections.Generic;
+using System.Collections;
 
 namespace Dfc.ProviderPortal.FindACourse.Controllers
 {
     /// <summary>
     /// Controller class for Courses API
     /// </summary>
+    //[Authorize]
     [ApiController]
     public class CoursesController : ControllerBase
     {
+        public class APICredentials
+        {
+            public string UserName { get; set; }
+            public string Password{ get; set; }
+        }
+
         private ILogger _log = null;
         private ICourseService _service = null;
+        private readonly SignInManager<APIUser> _signInManager;
+        private readonly UserManager<APIUser> _userManager;
+        private readonly IFACAuthenticationSettings _authSettings;
 
         /// <summary>
         /// Constructor
@@ -24,13 +43,22 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
         /// <param name="logger"></param>
         public CoursesController(
             ILogger<CoursesController> logger,
-            ICourseService service)
+            //SignInManager<APIUser> signInManager,
+            //UserManager<APIUser> userManager,
+            ICourseService service,
+            IOptions<FACAuthenticationSettings> authSettings)
         {
             Throw.IfNull<ILogger<CoursesController>>(logger, nameof(logger));
             Throw.IfNull<ICourseService>(service, nameof(service));
+            Throw.IfNull<IOptions<FACAuthenticationSettings>>(authSettings, nameof(authSettings));
+            //Throw.IfNull<SignInManager<APIUser>>(signInManager, nameof(signInManager));
+            //Throw.IfNull<UserManager<APIUser>>(_userManager, nameof(_userManager));
 
             _log = logger;
             _service = service;
+            _authSettings = authSettings.Value;
+            //_signInManager = signInManager;
+            //_userManager = userManager;
         }
 
         /// <summary>
@@ -40,17 +68,58 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
         /// <returns>Search results</returns>
         [Route("~/search")]
         [HttpPost]
-        public async Task<FACSearchResult> Search([FromBody]SearchCriteriaStructure criteria)
+        public async Task<FACSearchResult> Search(
+            [FromBody]SearchCriteriaStructure criteria,
+            [FromHeader(Name = "UserName")]string UserName,
+            [FromHeader(Name = "Password")]string Password)
         {
+            //string UserName = "ian";
+            //string Password = "abc";
             try {
-                _log.LogInformation($"FAC search started: {criteria}");
-                _log.LogInformation($"FAC search with keyword {criteria.SubjectKeyword}");
-                Task<FACSearchResult> task = _service.CourseSearch(_log, criteria);
-                return await task;
+                //var result = await _signInManager.PasswordSignInAsync(UserName, Password, false, false);
+
+                //if (result.Succeeded)
+                //{
+                //    _log.LogInformation("User logged in.");
+
+                //    var principal = (ClaimsPrincipal)Thread.CurrentPrincipal;
+                //    ClaimsIdentity identity = (ClaimsIdentity)User.Identity;
+
+                //    var user = await _userManager.FindByEmailAsync(UserName);
+                //    if (user != null)
+                //    {
+                //        var claims = await _userManager.GetClaimsAsync(user);
+                //        foreach (var claim in claims)
+                //            identity.AddClaim(new Claim(claim.Type, claim.Value));
+                //    }
+
+                //    //return LocalRedirect(returnUrl);
+                //    //}
+
+                //    //if (result.RequiresTwoFactor)
+                //    //    return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, RememberMe = Input.RememberMe });
+
+                //} else if (result.IsLockedOut) {
+                //    _log.LogWarning($"User account for {UserName} locked out");
+                //    return null; // new FACSearchResult(); { Value = new List<FACSearchResultItem>() { new FACSearchResultItem() {  }  }
+
+                //} else {
+
+
+                if (!_authSettings.Users.Any(u => u.UserName == UserName && u.Password == Password)) {
+                    _log.LogWarning($"Login failed for {UserName}");
+                    return null;
+
+                } else {
+                    _log.LogInformation($"FAC search started: {criteria}");
+                    _log.LogInformation($"FAC search with keyword {criteria.SubjectKeyword}");
+                    Task<FACSearchResult> task = _service.CourseSearch(_log, criteria);
+                    return await task;
+                }
 
             } catch (Exception ex) {
                 //return new InternalServerErrorObjectResult(ex);
-                _log.LogError(ex, "Error in CourseSearch");
+                _log.LogError(ex, "Error in Search");
                 return null;
             }
         }
