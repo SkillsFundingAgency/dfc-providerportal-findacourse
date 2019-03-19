@@ -134,6 +134,13 @@
       "metadata": {
         "description": "Query key for accessing search"
       }
+    },
+    "userObject": {
+      "type": "string",
+      "defaultValue": "[]",
+      "metadata": {
+        "description": "JSON array of objects containing UserName and Password for authentication"
+      }
     }
   },
   "variables": {
@@ -282,6 +289,10 @@
               {
                 "name": "SearchServiceSettings__ThresholdVenueCount",
                 "value": "100"
+              },
+              {
+                "name": "FACAuthenticationSettings__Users",
+                "value": "[concat('\"FACAuthenticationSettings\": { \"Users\": ', parameters('userObject'), ' }')]"
               }
             ]
           },
