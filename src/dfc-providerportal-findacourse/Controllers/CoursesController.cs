@@ -25,12 +25,6 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
     [ApiController]
     public class CoursesController : ControllerBase
     {
-        public class APICredentials
-        {
-            public string UserName { get; set; }
-            public string Password{ get; set; }
-        }
-
         private ILogger _log = null;
         private ICourseService _service = null;
         private readonly SignInManager<APIUser> _signInManager;
@@ -68,7 +62,7 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
         /// <returns>Search results</returns>
         [Route("~/search")]
         [HttpPost]
-        public async Task<FACSearchResult> Search(
+        public async Task<ActionResult> Search(
             [FromBody]SearchCriteriaStructure criteria,
             [FromHeader(Name = "UserName")]string UserName,
             [FromHeader(Name = "Password")]string Password)
@@ -106,15 +100,18 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                 //} else {
 
 
-                if (!_authSettings.Users.Any(u => u.UserName == UserName && u.Password == Password)) {
+                if (_authSettings.UserName != UserName || _authSettings.Password != Password) {
                     _log.LogWarning($"Login failed for {UserName}");
-                    return null;
+                    return new UnauthorizedResult();
 
                 } else {
-                    _log.LogInformation($"FAC search started: {criteria}");
                     _log.LogInformation($"FAC search with keyword {criteria.SubjectKeyword}");
                     Task<FACSearchResult> task = _service.CourseSearch(_log, criteria);
-                    return await task;
+                    task.Wait();
+                    if (task.Result?.Value?.Count() > 0)
+                        return new OkObjectResult(task.Result);
+                    else
+                        return new NoContentResult();
                 }
 
             } catch (Exception ex) {

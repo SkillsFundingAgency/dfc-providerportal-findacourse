@@ -8,6 +8,7 @@ namespace Dfc.ProviderPortal.FindACourse.Interfaces
 {
     public interface IFACAuthenticationSettings
     {
-        IEnumerable<APIUser> Users { get; }
+        string UserName { get; }
+        string Password { get; }
     }
 }
