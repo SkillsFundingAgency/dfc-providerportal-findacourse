@@ -9,6 +9,7 @@ namespace Dfc.ProviderPortal.FindACourse.Settings
 {
     public class FACAuthenticationSettings : IFACAuthenticationSettings
     {
-        public IEnumerable<APIUser> Users { get; set; }
+        public string UserName { get; set; }
+        public string Password { get; set; }
     }
 }
