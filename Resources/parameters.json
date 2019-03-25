@@ -55,6 +55,9 @@
     },
     "searchQueryKey": { 
       "value": "not-a-real-key"
+    },
+    "apiPassword": { 
+      "value": "not-a-real-key"
     }
   }
 }

@@ -135,11 +135,10 @@
         "description": "Query key for accessing search"
       }
     },
-    "userObject": {
-      "type": "string",
-      "defaultValue": "[]",
+    "apiPassword": {
+      "type": "securestring",
       "metadata": {
-        "description": "JSON array of objects containing UserName and Password for authentication"
+        "description": "Password to be used for the APIUser account (temp until auth in place)"
       }
     }
   },
@@ -291,8 +290,12 @@
                 "value": "100"
               },
               {
-                "name": "FACAuthenticationSettings__Users",
-                "value": "[concat('\"FACAuthenticationSettings\": { \"Users\": ', parameters('userObject'), ' }')]"
+                "name": "FACAuthenticationSettings__UserName",
+                "value": "APIUser"
+              },
+              {
+                "name": "FACAuthenticationSettings__Password",
+                "value": "[parameters('apiPassword')]"
               }
             ]
           },
