@@ -67,8 +67,6 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
             [FromHeader(Name = "UserName")]string UserName,
             [FromHeader(Name = "Password")]string Password)
         {
-            //string UserName = "ian";
-            //string Password = "abc";
             try {
                 //var result = await _signInManager.PasswordSignInAsync(UserName, Password, false, false);
 
@@ -121,5 +119,41 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
             }
         }
 
+
+        /// <summary>
+        /// Search providers, for example:
+        /// POST providersearch
+        /// </summary>
+        /// <returns>Provider search results</returns>
+        [Route("~/providersearch")]
+        [HttpPost]
+        public async Task<ActionResult> ProviderSearch(
+            [FromBody]ProviderSearchCriteriaStructure criteria,
+            [FromHeader(Name = "UserName")]string UserName,
+            [FromHeader(Name = "Password")]string Password)
+        {
+            try {
+
+                if (_authSettings.UserName != UserName || _authSettings.Password != Password) {
+                    _log.LogWarning($"Login failed for {UserName}");
+                    return new UnauthorizedResult();
+
+                } else {
+                    _log.LogInformation($"Provider search with keyword {criteria.Keyword}");
+                    Task<ProviderSearchResult> task = _service.ProviderSearch(_log, criteria);
+                    task.Wait();
+                    if (task.Result?.Value?.Count() > 0)
+                        return new OkObjectResult(task.Result);
+                    else
+                        return new NoContentResult();
+                }
+
+            } catch (Exception ex) {
+                //return new InternalServerErrorObjectResult(ex);
+                _log.LogError(ex, "Error in Search");
+                return null;
+            }
+
+        }
     }
 }

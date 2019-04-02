@@ -305,6 +305,86 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
             } finally {
                 //_log.LogMethodExit();
             }
+        }
+
+        public ProviderSearchResult SearchProviders(ProviderSearchCriteriaStructure criteria)
+        {
+            Throw.IfNull(criteria, nameof(criteria));
+            //_log.LogMethodEnter();
+
+            try
+            {
+                _log.LogInformation("Provider search criteria.", criteria);
+                _log.LogInformation("Provider search uri.", _uri.ToString());
+
+                // Create filter string
+                // Use a pipe char to delimit; default commas and spaces can't be used as may be in facet values
+                List<KeyValuePair<string, string>> list = new List<KeyValuePair<string, string>>();
+                list.Add(new KeyValuePair<string, string>("Town", string.Join("|", criteria.Towns ?? new string[] { })));
+                list.Add(new KeyValuePair<string, string>("Region", string.Join("|", criteria.Regions ?? new string[] { })));
+                string filter = string.Join(" and ", list.Where(x => !string.IsNullOrWhiteSpace(x.Value))
+                                                         .Select(x => "search.in(" + x.Key + ", '" + x.Value + "', '|')"));
+
+                // Create a search criteria object for azure search service
+                IProviderSearchCriteria providerCriteria = new ProviderSearchCriteria()
+                {
+                    search = $"{criteria.Keyword}*",
+                    searchMode = "all",
+                    top = criteria.TopResults ?? _settings.DefaultTop,
+                    filter = filter,
+                    facets = new string[] { "Town", "Region" },
+                    count = true
+                };
+
+                // Create json ready for posting
+                JsonSerializerSettings settings = new JsonSerializerSettings {
+                    //ContractResolver = new ProviderSearchCriteriaContractResolver()
+                };
+                settings.Converters.Add(new StringEnumConverter() { CamelCaseText = false });
+                StringContent content = new StringContent(JsonConvert.SerializeObject(providerCriteria, settings), Encoding.UTF8, "application/json");
+
+                // Do the search
+                _log.LogInformation("Provider search POST body", JsonConvert.SerializeObject(providerCriteria, settings));
+                Task<HttpResponseMessage> task = _httpClient.PostAsync(_uri, content);
+                task.Wait();
+                HttpResponseMessage response = task.Result;
+                _log.LogInformation("Provider search service http response.", response);
+
+                // Handle response and deserialize results
+                if (response.IsSuccessStatusCode) {
+                    //var json = await response.Content.ReadAsStringAsync();
+                    var json = response.Content.ReadAsStringAsync().Result;
+
+                    _log.LogInformation("Provider search service json response.", json);
+                    settings = new JsonSerializerSettings {
+                        ContractResolver = new ProviderSearchResultContractResolver()
+                    };
+                    settings.Converters.Add(new StringEnumConverter() { CamelCaseText = false });
+
+                    ProviderSearchResult searchResult = JsonConvert.DeserializeObject<ProviderSearchResult>(json, settings);
+                    //return Result.Ok<IProviderSearchResult>(searchResult);
+
+                    return searchResult;
+
+                } else {
+                    _log.LogWarning($"Provider search unexpected response: {response.StatusCode}", response);
+                    //return Result.Fail<IProviderSearchResult>("Provider search service unsuccessfull http response.");
+                    return null;
+                }
+
+            } catch (HttpRequestException hre) {
+                _log.LogError("Provider search service http request error.", hre);
+                //return Result.Fail<IProviderSearchResult>("Provider search service http request error.");
+                return null;
+
+            } catch (Exception e) {
+                _log.LogError("Provider search service unknown error.", e);
+                //return Result.Fail<IProviderSearchResult>("Provider search service unknown error.");
+                return null;
+
+            } finally {
+                //_log.LogMethodExit();
+            }
 
 
         }
