@@ -41,9 +41,11 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
         private static SearchServiceClient _adminService;
         private static ISearchIndexClient _queryIndex;
         private static ISearchIndexClient _adminIndex;
+        //private static ISearchIndexClient _providerIndex;
         private static ISearchIndexClient _onspdIndex;
         private HttpClient _httpClient;
         private readonly Uri _uri;
+        private readonly Uri _providerUri;
 
         public SearchServiceWrapper(
             ILogger log,
@@ -78,6 +80,7 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
             _httpClient.DefaultRequestHeaders.Add("api-version", settings.ApiVersion);
             _httpClient.DefaultRequestHeaders.Add("indexes", settings.Index);
             _uri = new Uri($"{settings.ApiUrl}?api-version={settings.ApiVersion}");
+            _providerUri = new Uri($"{settings.ProviderApiUrl}?api-version={settings.ApiVersion}");
         }
 
         public IEnumerable<IndexingResult> UploadBatch(
@@ -174,23 +177,6 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
 
         public FACSearchResult SearchCourses(SearchCriteriaStructure criteria)
         {
-            //try {
-            //    _log.LogInformation($"Searching by {criteria.SubjectKeywordField}");
-            //    SearchParameters parms = new SearchParameters() {
-            //        //OrderBy = new[] { "id" },
-            //        Top = criteria.TopResults ?? _settings.DefaultTop
-            //    };
-            //    DocumentSearchResult<AzureSearchCourse> results =
-            //        _queryIndex.Documents.Search<AzureSearchCourse>(criteria.SubjectKeywordField, parms); // SearchText, parms);
-            //    _log.LogInformation($"{results.Count ?? 0} matches found");
-            //    return results;
-
-            //} catch (Exception ex) {
-            //    _log.LogError(ex, "Error in SearchCourses", criteria);
-            //    throw ex;
-            //}
-
-
             Throw.IfNull(criteria, nameof(criteria));
 
             //_log.LogMethodEnter();
@@ -259,7 +245,6 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
 
                 // Handle response and deserialize results
                 if (response.IsSuccessStatusCode) {
-                    //var json = await response.Content.ReadAsStringAsync();
                     var json = response.Content.ReadAsStringAsync().Result;
 
                     _log.LogInformation("FAC search service json response.", json);
@@ -269,7 +254,6 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
                     settings.Converters.Add(new StringEnumConverter() { CamelCaseText = false });
 
                     FACSearchResult searchResult = JsonConvert.DeserializeObject<FACSearchResult>(json, settings);
-                    //return Result.Ok<IFACSearchResult>(searchResult);
 
                     if (geoSearchRequired) {
                         foreach (FACSearchResultItem ri in searchResult.Value) {
@@ -317,13 +301,19 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
                 _log.LogInformation("Provider search criteria.", criteria);
                 _log.LogInformation("Provider search uri.", _uri.ToString());
 
-                // Create filter string
+                // Create filter string for indexed fields
                 // Use a pipe char to delimit; default commas and spaces can't be used as may be in facet values
                 List<KeyValuePair<string, string>> list = new List<KeyValuePair<string, string>>();
-                list.Add(new KeyValuePair<string, string>("Town", string.Join("|", criteria.Towns ?? new string[] { })));
-                list.Add(new KeyValuePair<string, string>("Region", string.Join("|", criteria.Regions ?? new string[] { })));
+                list.Add(new KeyValuePair<string, string>("Town", string.Join("|", criteria.Town ?? new string[] { })));
+                //list.Add(new KeyValuePair<string, string>("Region", string.Join("|", criteria.Region ?? new string[] { })));
                 string filter = string.Join(" and ", list.Where(x => !string.IsNullOrWhiteSpace(x.Value))
                                                          .Select(x => "search.in(" + x.Key + ", '" + x.Value + "', '|')"));
+
+                //// Index array fields are a little different
+                //filter = (string.IsNullOrWhiteSpace(filter) ? "" : filter + " and ")
+                //                + "Town/any(t: search.in(t, '" 
+                //                + string.Join("|", criteria.Towns ?? new string[] { })
+                //                + "', '|'))";
 
                 // Create a search criteria object for azure search service
                 IProviderSearchCriteria providerCriteria = new ProviderSearchCriteria()
@@ -332,7 +322,7 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
                     searchMode = "all",
                     top = criteria.TopResults ?? _settings.DefaultTop,
                     filter = filter,
-                    facets = new string[] { "Town", "Region" },
+                    facets = new string[] { "Town" }, //, "Region" },
                     count = true
                 };
 
@@ -345,14 +335,13 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
 
                 // Do the search
                 _log.LogInformation("Provider search POST body", JsonConvert.SerializeObject(providerCriteria, settings));
-                Task<HttpResponseMessage> task = _httpClient.PostAsync(_uri, content);
+                Task<HttpResponseMessage> task = _httpClient.PostAsync(_providerUri, content);
                 task.Wait();
                 HttpResponseMessage response = task.Result;
                 _log.LogInformation("Provider search service http response.", response);
 
                 // Handle response and deserialize results
                 if (response.IsSuccessStatusCode) {
-                    //var json = await response.Content.ReadAsStringAsync();
                     var json = response.Content.ReadAsStringAsync().Result;
 
                     _log.LogInformation("Provider search service json response.", json);
@@ -362,7 +351,6 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
                     settings.Converters.Add(new StringEnumConverter() { CamelCaseText = false });
 
                     ProviderSearchResult searchResult = JsonConvert.DeserializeObject<ProviderSearchResult>(json, settings);
-                    //return Result.Ok<IProviderSearchResult>(searchResult);
 
                     return searchResult;
 
