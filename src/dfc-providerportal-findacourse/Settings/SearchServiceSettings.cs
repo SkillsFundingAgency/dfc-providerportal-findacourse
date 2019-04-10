@@ -9,6 +9,7 @@ namespace Dfc.ProviderPortal.FindACourse.Settings
     {
         public string SearchService { get; set; }
         public string ApiUrl { get; set; }
+        public string ProviderApiUrl { get; set; }
         public string ApiVersion { get; set; }
         public string QueryKey { get; set; }
         public string AdminKey { get; set; }
