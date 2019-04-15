@@ -45,7 +45,7 @@ namespace Dfc.ProviderPortal.FindACourse.API
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddApplicationInsightsTelemetry(Configuration);
 
-            services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new Info { Title = "Courses API", Version = "v1" }); });
+            services.AddSwaggerGen(c => { c.SwaggerDoc("v2", new Info { Title = "Courses API", Version = "v2" }); });
 
             services.Configure<CosmosDbCollectionSettings>(Configuration.GetSection(nameof(CosmosDbCollectionSettings)))
                     .Configure<CosmosDbSettings>(Configuration.GetSection(nameof(CosmosDbSettings)))
@@ -84,7 +84,7 @@ namespace Dfc.ProviderPortal.FindACourse.API
             app.UseSwagger(c => {
                 c.PreSerializeFilters.Add((swaggerDoc, httpReq) => swaggerDoc.Host = httpReq.Host.Value);
             });
-            app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "Courses API v1"); });
+            app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/swagger/v2/swagger.json", "Courses API v2"); });
         }
     }
 }
