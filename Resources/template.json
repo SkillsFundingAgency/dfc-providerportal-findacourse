@@ -117,6 +117,12 @@
         "description": "Name of search index"
       }
     },
+    "providerIndex": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of provider (search) index"
+      }
+    },
     "onspdIndex": {
       "type": "string",
       "metadata": {
@@ -256,6 +262,10 @@
               {
                 "name": "SearchServiceSettings__ApiUrl",
                 "value": "[concat('https://', parameters('searchName'), '.search.windows.net/indexes/', parameters('searchIndex'), '/docs/search')]"
+              },
+              {
+                "name": "SearchServiceSettings__ProviderApiUrl",
+                "value": "[concat('https://', parameters('searchName'), '.search.windows.net/indexes/', parameters('providerIndex'), '/docs/search')]"
               },
               {
                 "name": "SearchServiceSettings__ApiVersion",
