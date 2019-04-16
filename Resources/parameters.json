@@ -47,6 +47,9 @@
     "searchIndex": {
       "value": "course"
     },
+    "providerIndex": {
+      "value": "provider"
+    },
     "onspdIndex": {
       "value": "onspd"
     },
