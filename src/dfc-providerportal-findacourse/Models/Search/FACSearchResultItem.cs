@@ -9,5 +9,6 @@ namespace Dfc.ProviderPortal.FindACourse.Models
         public dynamic SearchScore { get; set; }
         public new dynamic VenueLocation { get; set; }
         public double? GeoSearchDistance { get; set; }
+        public decimal? ScoreBoost { get; set; }
     }
 }
