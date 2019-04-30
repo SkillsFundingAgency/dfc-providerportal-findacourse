@@ -85,26 +85,26 @@ namespace Dfc.ProviderPortal.FindACourse.Services
         //    return (dynamic) new VenueServiceWrapper(_venueServiceSettings).GetById(id);
         //}
 
-        public async Task<IEnumerable<IndexingResult>> UploadCoursesToSearch(ILogger log, IReadOnlyList<Document> documents)
-        {
-            if (documents.Any()) {
+        //public async Task<IEnumerable<IndexingResult>> UploadCoursesToSearch(ILogger log, IReadOnlyList<Document> documents)
+        //{
+        //    if (documents.Any()) {
 
-                log.LogInformation("Getting provider data");
-                IEnumerable<AzureSearchProviderModel> providers = new ProviderServiceWrapper(_providerServiceSettings).GetLiveProvidersForAzureSearch();
+        //        log.LogInformation("Getting provider data");
+        //        IEnumerable<AzureSearchProviderModel> providers = new ProviderServiceWrapper(_providerServiceSettings).GetLiveProvidersForAzureSearch();
 
-                IEnumerable<AzureSearchVenueModel> venues = GetVenues(
-                    log,
-                    documents.Select(d => new Course() { CourseRuns = d.GetPropertyValue<IEnumerable<CourseRun>>("CourseRuns") })
-                             .SelectMany(c => c.CourseRuns)
-                );
+        //        IEnumerable<AzureSearchVenueModel> venues = GetVenues(
+        //            log,
+        //            documents.Select(d => new Course() { CourseRuns = d.GetPropertyValue<IEnumerable<CourseRun>>("CourseRuns") })
+        //                     .SelectMany(c => c.CourseRuns)
+        //        );
                 
-                return new SearchServiceWrapper(log, _searchServiceSettings)
-                        .UploadBatch(providers, venues, documents, out int succeeded);
-            } else {
-                // Return empty list of failed IndexingResults
-                return new List<IndexingResult>();
-            }
-        }
+        //        return new SearchServiceWrapper(log, _searchServiceSettings)
+        //                .UploadBatch(providers, venues, documents, out int succeeded);
+        //    } else {
+        //        // Return empty list of failed IndexingResults
+        //        return new List<IndexingResult>();
+        //    }
+        //}
 
         public async Task<FACSearchResult> CourseSearch(ILogger log, SearchCriteriaStructure criteria) // string SearchText)
         {

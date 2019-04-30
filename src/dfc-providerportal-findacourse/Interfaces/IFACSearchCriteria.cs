@@ -7,6 +7,7 @@ namespace Dfc.ProviderPortal.FindACourse.Interfaces
 {
     public interface IFACSearchCriteria
     {
+        string scoringProfile { get; }
         string search { get; }
         string searchMode { get; }
         int? top { get; }
