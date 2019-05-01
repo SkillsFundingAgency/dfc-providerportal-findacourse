@@ -146,6 +146,13 @@
       "metadata": {
         "description": "Password to be used for the APIUser account (temp until auth in place)"
       }
+    },
+    "boostScoringProfile": {
+      "type": "string",
+      "defaultValue": "region-boost",
+      "metadata": {
+        "description": "Boost Scoring Profile to be used in on Azure search"
+      }
     }
   },
   "variables": {
@@ -306,6 +313,10 @@
               {
                 "name": "FACAuthenticationSettings__Password",
                 "value": "[parameters('apiPassword')]"
+              },
+              {
+                "name": "SearchServiceSettings__RegionBoostScoringProfile",
+                "value": "[parameters('boostScoringProfile')]"
               }
             ]
           },
