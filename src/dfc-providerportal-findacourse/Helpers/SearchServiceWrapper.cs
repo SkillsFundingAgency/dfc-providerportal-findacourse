@@ -375,7 +375,6 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
                 //_log.LogMethodExit();
             }
 
-
         }
     }
 }

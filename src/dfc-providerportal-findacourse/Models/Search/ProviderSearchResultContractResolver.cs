@@ -17,6 +17,7 @@ namespace Dfc.ProviderPortal.FindACourse.Services
                 { "TownODataType", "Town@odata.type" },
                 { "RegionODataType", "Region@odata.type" },
                 { "SearchScore", "@search.score" }
+                //{ "ProviderId", "UKPRN" }
             };
 
             if (names.ContainsKey(propertyName))
