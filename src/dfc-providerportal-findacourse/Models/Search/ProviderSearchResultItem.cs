@@ -11,6 +11,6 @@ namespace Dfc.ProviderPortal.FindACourse.Models
         public string Postcode { get; set; }
         public string Town { get; set; }
         public string Region { get; set; }
-        public string ProviderId { get; set; }
+        public string UKPRN { get; set; }
     }
 }
