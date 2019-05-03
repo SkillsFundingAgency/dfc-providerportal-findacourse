@@ -214,15 +214,18 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
                     latitude = (float?)results?.Results?.FirstOrDefault()?.Document?.lat;
                     longitude = (float?)results?.Results?.FirstOrDefault()?.Document?.@long;
 
-                    if (latitude.HasValue && longitude.HasValue)
-                        filter += $" and geo.distance(VenueLocation, geography'POINT({longitude.Value} {latitude.Value})') le {criteria.Distance}"; //-122.121513 47.673988)') le {criteria.Distance}";
+                    if (latitude.HasValue && longitude.HasValue) {
+                        if (!string.IsNullOrWhiteSpace(filter))
+                            filter += " and ";
+                        filter += $"geo.distance(VenueLocation, geography'POINT({longitude.Value} {latitude.Value})') le {criteria.Distance}";
+                    }
                 }
 
                 // Create a search criteria object for azure search service
                 IFACSearchCriteria facCriteria = new FACSearchCriteria()
                 {
                     scoringProfile = string.IsNullOrWhiteSpace(_settings.RegionBoostScoringProfile) ? "region-boost" : _settings.RegionBoostScoringProfile,
-                    search = $"{criteria.SubjectKeyword}*", //}* {(string.IsNullOrWhiteSpace(criteria.TownOrPostcode) ? "" : criteria.TownOrPostcode)}".Trim(),
+                    search = $"{criteria.SubjectKeyword}*",
                     searchMode = "all",
                     top = criteria.TopResults ?? _settings.DefaultTop,
                     filter = filter,
@@ -256,7 +259,7 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
 
                     FACSearchResult searchResult = JsonConvert.DeserializeObject<FACSearchResult>(json, settings);
 
-                    if (geoSearchRequired) {
+                    if (geoSearchRequired && latitude.HasValue && longitude.HasValue) {
                         foreach (FACSearchResultItem ri in searchResult.Value) {
                             if (ri.VenueLocation != null && ri?.VenueLocation["coordinates"][0] != 0 && ri?.VenueLocation["coordinates"][1] != 0)
                                 ri.GeoSearchDistance = Math.Round(
