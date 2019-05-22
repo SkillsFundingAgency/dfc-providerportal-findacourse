@@ -2,7 +2,6 @@
 using System;
 using System.Linq;
 using System.Security.Claims;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -13,8 +12,7 @@ using Dfc.ProviderPortal.FindACourse.Interfaces;
 using Dfc.ProviderPortal.FindACourse.Models;
 using Dfc.ProviderPortal.FindACourse.Settings;
 using Dfc.ProviderPortal.Packages;
-using System.Collections.Generic;
-using System.Collections;
+using Microsoft.AspNetCore.Http;
 
 namespace Dfc.ProviderPortal.FindACourse.Controllers
 {
@@ -62,6 +60,10 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
         /// <returns>Search results</returns>
         [Route("~/search")]
         [HttpPost]
+        [ProducesResponseType(typeof(FACSearchResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> Search(
             [FromBody]SearchCriteriaStructure criteria,
             [FromHeader(Name = "UserName")]string UserName,
@@ -115,7 +117,7 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
             } catch (Exception ex) {
                 //return new InternalServerErrorObjectResult(ex);
                 _log.LogError(ex, "Error in Search");
-                return null;
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             }
         }
 
@@ -127,6 +129,10 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
         /// <returns>Provider search results</returns>
         [Route("~/providersearch")]
         [HttpPost]
+        [ProducesResponseType(typeof(ProviderSearchResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> ProviderSearch(
             [FromBody]ProviderSearchCriteriaStructure criteria,
             [FromHeader(Name = "UserName")]string UserName,
@@ -151,7 +157,7 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
             } catch (Exception ex) {
                 //return new InternalServerErrorObjectResult(ex);
                 _log.LogError(ex, "Error in Search");
-                return null;
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             }
 
         }
