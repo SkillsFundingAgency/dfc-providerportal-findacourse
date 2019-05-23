@@ -66,7 +66,6 @@ namespace Dfc.ProviderPortal.FindACourse.API
                     //     options.SignIn.RequireConfirmedEmail = false; })
                     //.AddEntityFrameworkStores<ApplicationDbContext>()
                     //.AddDefaultTokenProviders();
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
