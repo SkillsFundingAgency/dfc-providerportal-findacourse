@@ -34,6 +34,7 @@ namespace Dfc.ProviderPortal.FindACourse.API
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{_env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables()
+                .AddApplicationInsightsSettings()
                 .Build();
         }
 
@@ -59,13 +60,11 @@ namespace Dfc.ProviderPortal.FindACourse.API
                     .AddScoped<IVenueServiceWrapper, VenueServiceWrapper>();
                     //.AddScoped<UserManager<APIUser>, UserManager<APIUser>>()
                     //.AddScoped<SignInManager<APIUser>, SignInManager<APIUser>>()
-
                     //.AddIdentity<APIUser, IdentityRole>(options => {
                     //     //options.Tokens.PasswordResetTokenProvider = TokenOptions.DefaultEmailProvider;
                     //     options.SignIn.RequireConfirmedEmail = false; })
                     //.AddEntityFrameworkStores<ApplicationDbContext>()
                     //.AddDefaultTokenProviders();
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
