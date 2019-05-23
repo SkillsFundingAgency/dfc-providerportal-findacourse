@@ -34,6 +34,7 @@ namespace Dfc.ProviderPortal.FindACourse.API
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{_env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables()
+                .AddApplicationInsightsSettings()
                 .Build();
         }
 
