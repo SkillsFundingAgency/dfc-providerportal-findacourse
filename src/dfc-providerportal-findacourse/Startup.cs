@@ -60,7 +60,6 @@ namespace Dfc.ProviderPortal.FindACourse.API
                     .AddScoped<IVenueServiceWrapper, VenueServiceWrapper>();
                     //.AddScoped<UserManager<APIUser>, UserManager<APIUser>>()
                     //.AddScoped<SignInManager<APIUser>, SignInManager<APIUser>>()
-
                     //.AddIdentity<APIUser, IdentityRole>(options => {
                     //     //options.Tokens.PasswordResetTokenProvider = TokenOptions.DefaultEmailProvider;
                     //     options.SignIn.RequireConfirmedEmail = false; })
