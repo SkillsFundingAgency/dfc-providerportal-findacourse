@@ -22,6 +22,7 @@ namespace Dfc.ProviderPortal.AzureSearch.Lars
         /// POST api/wherever
         /// </summary>
         /// <param name="criteria">Criteria</param>
+        [Route("~/larssearch")]
         [HttpPost]
         [ProducesResponseType(typeof(LarsSearchResult), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
