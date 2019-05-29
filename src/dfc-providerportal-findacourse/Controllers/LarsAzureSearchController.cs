@@ -24,17 +24,16 @@ namespace Dfc.ProviderPortal.AzureSearch.Lars
         /// <param name="criteria">Criteria</param>
         [HttpPost]
         [ProducesResponseType(typeof(LarsSearchResult), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public LarsSearchResult Post([FromBody] LarsSearchCriteria criteria)
         {
             return new LarsSearchResult()
             {
-                ODataContext = "https://dfc-dev-prov-sch.search.windows.net/indexes('course')/$metadata#docs(*)",
-                ODataCount = 567,
-                SearchFacets = new LarsSearchFacets() { AwardOrgCodeODataType = "AOCODT", AwardOrgCode = new SearchFacet[] { new SearchFacet() { Value = "abc", Count = 3 } } },
-                Value = new LarsSearchResultItem[] { new LarsSearchResultItem() { SearchScore = 123.4567800009M, AwardOrgAimRef = "AOAR", NotionalNVQLevelv2 = "nvq" } }
+                //ODataContext = "https://dfc-dev-prov-sch.search.windows.net/indexes('course')/$metadata#docs(*)",
+                //ODataCount = 567,
+                //SearchFacets = new LarsSearchFacets() { AwardOrgCodeODataType = "AOCODT", AwardOrgCode = new SearchFacet[] { new SearchFacet() { Value = "abc", Count = 3 } } },
+                //Value = new LarsSearchResultItem[] { new LarsSearchResultItem() { SearchScore = 123.4567800009M, AwardOrgAimRef = "AOAR", NotionalNVQLevelv2 = "nvq" } }
             };
         }
 
