@@ -27,7 +27,7 @@ namespace Dfc.ProviderPortal.AzureSearch.Onspd
         [ProducesResponseType(typeof(PostCodeSearchCriteria), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public PostCodeSearchResult Post([FromBody] PostCodeSearchCriteria criteria)
+        public PostCodeSearchResult PostcodeSearch([FromBody] PostCodeSearchCriteria criteria)
         {
             return new PostCodeSearchResult()
             {

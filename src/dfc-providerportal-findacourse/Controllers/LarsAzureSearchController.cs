@@ -27,7 +27,7 @@ namespace Dfc.ProviderPortal.AzureSearch.Lars
         [ProducesResponseType(typeof(LarsSearchResult), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public LarsSearchResult Post([FromBody] LarsSearchCriteria criteria)
+        public LarsSearchResult LarsSearch([FromBody] LarsSearchCriteria criteria)
         {
             return new LarsSearchResult()
             {
