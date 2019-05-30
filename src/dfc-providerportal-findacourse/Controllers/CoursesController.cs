@@ -116,11 +116,10 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
 
             } catch (Exception ex) {
                 //return new InternalServerErrorObjectResult(ex);
-                _log.LogError(ex, "Error in Search");
+                _log.LogError(ex, $"Error in Search: {ex.Message}");
                 return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             }
         }
-
 
         /// <summary>
         /// Search providers, for example:
@@ -156,10 +155,9 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
 
             } catch (Exception ex) {
                 //return new InternalServerErrorObjectResult(ex);
-                _log.LogError(ex, "Error in Search");
+                _log.LogError(ex, $"Error in Search: {ex.Message}");
                 return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             }
-
         }
     }
 }
