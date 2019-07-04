@@ -9,6 +9,8 @@ namespace Dfc.ProviderPortal.FindACourse.Interfaces
         string SearchService { get; }
         string ApiUrl { get; }
         string ProviderApiUrl { get; }
+        string LARSApiUrl { get; }
+        string ONSPDApiUrl { get; }
         string ApiVersion { get; }
         string QueryKey { get; }
         string AdminKey { get; }

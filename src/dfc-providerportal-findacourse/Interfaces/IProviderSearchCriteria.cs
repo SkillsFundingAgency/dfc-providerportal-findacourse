@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Dfc.ProviderPortal.FindACourse.Interfaces
 {
-    public interface IProviderSearchCriteria
+    public interface ISearchCriteria // IProviderSearchCriteria
     {
         string search { get; }
         string searchMode { get; }

@@ -5,15 +5,18 @@ using Dfc.ProviderPortal.Packages;
 
 namespace Dfc.ProviderPortal.FindACourse.Models
 {
-    public class ProviderSearchCriteriaStructure
+    public class LARSSearchCriteriaStructure
     {
         //public string APIKeyField { get; set; }
         public string Keyword { get; set; }
-        public string[] Town { get; set; }
-        public string[] Region { get; set; }
+        public string[] AwardOrgCode { get; set; }
+        public string[] NotionalNVQLevelv2 { get; set; }
+        public string[] SectorSubjectAreaTier1 { get; set; }
+        public string[] SectorSubjectAreaTier2 { get; set; }
+        public string[] AwardOrgAimRef { get; set; }
         public int? TopResults { get; set; }
 
-        public ProviderSearchCriteriaStructure()
+        public LARSSearchCriteriaStructure()
         {
             //if (TopResults.HasValue)
             //    Throw.IfLessThan(1, TopResults.Value, "");

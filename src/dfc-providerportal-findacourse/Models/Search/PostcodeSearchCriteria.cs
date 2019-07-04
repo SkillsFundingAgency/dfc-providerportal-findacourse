@@ -6,7 +6,7 @@ using Dfc.ProviderPortal.FindACourse.Interfaces;
 
 namespace Dfc.ProviderPortal.FindACourse.Models
 {
-    public class ProviderSearchCriteria : ISearchCriteria // IProviderSearchCriteria
+    public class PostcodeSearchCriteria : ISearchCriteria // IPostcodeSearchCriteria
     {
         public string search { get; set; }
         public string searchMode { get; set; }

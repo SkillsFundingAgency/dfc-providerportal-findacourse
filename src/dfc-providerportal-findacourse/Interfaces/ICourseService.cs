@@ -23,5 +23,7 @@ namespace Dfc.ProviderPortal.FindACourse.Interfaces
         //Task<IEnumerable<IndexingResult>> UploadCoursesToSearch(ILogger log, IReadOnlyList<Document> documents);
         Task<FACSearchResult> CourseSearch(ILogger log, SearchCriteriaStructure criteria); // string SearchText);
         Task<ProviderSearchResult> ProviderSearch(ILogger log, ProviderSearchCriteriaStructure criteria);
+        Task<LARSSearchResult> LARSSearch(ILogger log, LARSSearchCriteriaStructure criteria);
+        Task<PostcodeSearchResult> PostcodeSearch(ILogger log, PostcodeSearchCriteriaStructure criteria);
     }
 }

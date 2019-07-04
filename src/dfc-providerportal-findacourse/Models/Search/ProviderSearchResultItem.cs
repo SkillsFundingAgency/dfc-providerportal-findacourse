@@ -4,7 +4,7 @@ using System;
 
 namespace Dfc.ProviderPortal.FindACourse.Models
 {
-    public class ProviderSearchResultItem //: AzureSearchCourse
+    public class ProviderSearchResultItem
     {
         public Guid id { get; set; }
         public string Name { get; set; }

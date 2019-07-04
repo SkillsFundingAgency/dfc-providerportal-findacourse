@@ -155,7 +155,85 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
 
             } catch (Exception ex) {
                 //return new InternalServerErrorObjectResult(ex);
-                _log.LogError(ex, $"Error in Search: {ex.Message}");
+                _log.LogError(ex, $"Error in ProviderSearch: {ex.Message}");
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        /// <summary>
+        /// Search LARS index, for example:
+        /// POST larssearch
+        /// </summary>
+        /// <returns>LARS search results</returns>
+        [Route("~/larssearch")]
+        [HttpPost]
+        [ProducesResponseType(typeof(LARSSearchResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult> LARSSearch(
+            [FromBody]LARSSearchCriteriaStructure criteria,
+            [FromHeader(Name = "UserName")]string UserName,
+            [FromHeader(Name = "Password")]string Password)
+        {
+            try {
+
+                if (_authSettings.UserName != UserName || _authSettings.Password != Password) {
+                    _log.LogWarning($"Login failed for {UserName}");
+                    return new UnauthorizedResult();
+
+                } else {
+                    _log.LogInformation($"LARS search with keyword {criteria.Keyword}");
+                    Task<LARSSearchResult> task = _service.LARSSearch(_log, criteria);
+                    task.Wait();
+                    if (task.Result?.Value?.Count() > 0)
+                        return new OkObjectResult(task.Result);
+                    else
+                        return new NoContentResult();
+                }
+
+            } catch (Exception ex) {
+                //return new InternalServerErrorObjectResult(ex);
+                _log.LogError(ex, $"Error in LARSSearch: {ex.Message}");
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        /// <summary>
+        /// Search ONSPD index, for example:
+        /// POST onspdsearch
+        /// </summary>
+        /// <returns>ONSPD postcode search results</returns>
+        [Route("~/onspdsearch")]
+        [HttpPost]
+        [ProducesResponseType(typeof(PostcodeSearchResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult> ONSPDSearch(
+            [FromBody]PostcodeSearchCriteriaStructure criteria,
+            [FromHeader(Name = "UserName")]string UserName,
+            [FromHeader(Name = "Password")]string Password)
+        {
+            try {
+
+                if (_authSettings.UserName != UserName || _authSettings.Password != Password) {
+                    _log.LogWarning($"Login failed for {UserName}");
+                    return new UnauthorizedResult();
+
+                } else {
+                    _log.LogInformation($"ONSPD search with keyword {criteria.Keyword}");
+                    Task<PostcodeSearchResult> task = _service.PostcodeSearch(_log, criteria);
+                    task.Wait();
+                    if (task.Result?.Value?.Count() > 0)
+                        return new OkObjectResult(task.Result);
+                    else
+                        return new NoContentResult();
+                }
+
+            } catch (Exception ex) {
+                //return new InternalServerErrorObjectResult(ex);
+                _log.LogError(ex, $"Error in ONSPDSearch: {ex.Message}");
                 return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             }
         }
