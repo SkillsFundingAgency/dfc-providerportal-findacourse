@@ -116,6 +116,16 @@ namespace Dfc.ProviderPortal.FindACourse.Services
             return new SearchServiceWrapper(log, _searchServiceSettings).SearchProviders(criteria);
         }
 
+        public async Task<LARSSearchResult> LARSSearch(ILogger log, LARSSearchCriteriaStructure criteria)
+        {
+            return new SearchServiceWrapper(log, _searchServiceSettings).SearchLARS(criteria);
+        }
+
+        public async Task<PostcodeSearchResult> PostcodeSearch(ILogger log, PostcodeSearchCriteriaStructure criteria)
+        {
+            return new SearchServiceWrapper(log, _searchServiceSettings).SearchPostcode(criteria);
+        }
+
         //public async Task<IEnumerable<IAzureSearchCourse>> FindACourseAzureSearchData(ILogger log)
         //{
         //    try {
