@@ -38,7 +38,7 @@ namespace Dfc.ProviderPortal.FindACourse.API
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddApplicationInsightsTelemetry(Configuration);
 
-            services.AddSwaggerGen(c => 
+            services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Info { Title = "Find a Course API", Version = "v1" });
             });
@@ -58,7 +58,10 @@ namespace Dfc.ProviderPortal.FindACourse.API
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            app.UseSwagger();
+            app.UseSwagger(c =>
+            {
+                c.PreSerializeFilters.Add((swaggerDoc, httpReq) => swaggerDoc.Host = httpReq.Host.Value);
+            });
 
             app.UseSwaggerUI(c =>
             {
