@@ -53,6 +53,9 @@
     "onspdIndex": {
       "value": "onspd"
     },
+    "larsIndex": {
+      "value": "lars"
+    },
     "searchAdminKey": {
       "value": "not-a-real-key"
     },
