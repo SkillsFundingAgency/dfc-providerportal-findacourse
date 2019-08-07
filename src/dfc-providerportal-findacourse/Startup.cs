@@ -49,6 +49,7 @@ namespace Dfc.ProviderPortal.FindACourse.API
                     .Configure<VenueServiceSettings>(Configuration.GetSection(nameof(VenueServiceSettings)))
                     .Configure<SearchServiceSettings>(Configuration.GetSection(nameof(SearchServiceSettings)))
                     .Configure<FACAuthenticationSettings>(Configuration.GetSection(nameof(FACAuthenticationSettings)))
+                    .Configure<QualificationServiceSettings>(Configuration.GetSection(nameof(QualificationServiceSettings)))
                     .AddScoped<ICourseService, CoursesService>()
                     .AddScoped<ICosmosDbHelper, CosmosDbHelper>()
                     .AddScoped<IProviderServiceWrapper, ProviderServiceWrapper>()
