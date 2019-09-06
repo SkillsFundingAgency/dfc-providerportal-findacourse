@@ -310,7 +310,7 @@
               },
               {
                 "name": "SearchServiceSettings__DefaultTop",
-                "value": "10"
+                "value": "1000"
               },
               {
                 "name": "SearchServiceSettings__CoursesConnectionString",
