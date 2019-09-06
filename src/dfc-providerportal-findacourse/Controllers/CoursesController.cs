@@ -107,7 +107,6 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                 return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             }
         }
-
         [Route("~/larssearch")]
         [HttpPost]
         [ProducesResponseType(typeof(LARSSearchResult), StatusCodes.Status200OK)]
