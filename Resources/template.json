@@ -266,7 +266,7 @@
               },
               {
                 "name": "QualificationServiceSettings__DefaultTop",
-                "value": "10"
+                "value": "1000"
               },
               {
                 "name": "SearchServiceSettings__SearchService",
