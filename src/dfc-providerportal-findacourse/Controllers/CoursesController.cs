@@ -36,13 +36,13 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
             _authSettings = authSettings.Value;
         }
 
-        [Route("~/search")]
+        [Route("~/coursesearch")]
         [HttpPost]
         [ProducesResponseType(typeof(FACSearchResult), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> Search(
+        public async Task<ActionResult> CourseSearch(
             [FromBody]SearchCriteriaStructure criteria,
             [FromHeader(Name = "UserName")]string UserName,
             [FromHeader(Name = "Password")]string Password)
