@@ -12,6 +12,7 @@ namespace Dfc.ProviderPortal.FindACourse.Models
         public string search { get; set; }
         public string searchMode { get; set; }
         public int? top { get; set; }
+        public int? skip { get; set; }
         public string filter { get; set; }
         public IEnumerable<string> facets { get; set; }
         public bool count { get; set; }
