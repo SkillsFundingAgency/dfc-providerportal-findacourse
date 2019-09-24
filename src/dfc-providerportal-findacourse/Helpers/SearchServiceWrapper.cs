@@ -237,11 +237,6 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
                     skip = (criteria.PageNo.HasValue && criteria.TopResults.HasValue && criteria.PageNo.Value > 0) ? ((criteria.PageNo.Value - 1) * criteria.TopResults.Value) : 0,
                     count = true
                 };
-                //if (criteria.TopResults.HasValue)
-                //    facCriteria.top = criteria.TopResults ?? _settings.DefaultTop;
-                //if (criteria.PageNo.HasValue && criteria.TopResults.HasValue)
-                //    facCriteria.skip = criteria.PageNo.Value * criteria.PageSize.Value;
-
 
                 // Create json ready for posting
                 JsonSerializerSettings settings = new JsonSerializerSettings {
