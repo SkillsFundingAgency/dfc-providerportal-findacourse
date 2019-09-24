@@ -37,7 +37,7 @@ namespace Dfc.ProviderPortal.FindACourse.Models
         public string TownOrPostcode { get; set; }
 
         public int? TopResults { get; set; }
-
+        public int? PageNo { get; set; }
 
         public SearchCriteriaStructure()
         {
