@@ -81,22 +81,10 @@
         "description": "API URL for the venue search"
       }
     },
-    "venueApiKey": {
-      "type": "securestring",
-      "metadata": {
-        "description": "API host key (code) needed to access the venues function app (REST API)"
-      }
-    },
     "providerApiUrl": {
       "type": "string",
       "metadata": {
         "description": "API URL for the provider (ukrlp) search"
-      }
-    },
-    "providerApiKey": {
-      "type": "securestring",
-      "metadata": {
-        "description": "API host key (code) needed to access the provider (ukrlp) function app (REST API)"
       }
     },
     "searchName": {
@@ -158,6 +146,18 @@
       "defaultValue": "region-boost",
       "metadata": {
         "description": "Boost Scoring Profile to be used in on Azure search"
+      }
+    },
+    "apimKey": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Subscription key for accessing the API via APIM"
+      }
+    },
+    "courseApiUrl": {
+      "type":  "string",
+      "metadata": {
+        "description": "URL to the Courses API"
       }
     }
   },
@@ -242,7 +242,7 @@
               },
               {
                 "name": "VenueServiceSettings__ApiKey",
-                "value": "[parameters('venueApiKey')]"
+                "value": "[parameters('apimKey')]"
               },
               {
                 "name": "ProviderServiceSettings__ApiUrl",
@@ -250,7 +250,7 @@
               },
               {
                 "name": "ProviderServiceSettings__ApiKey",
-                "value": "[parameters('providerApiKey')]"
+                "value": "[parameters('apimKey')]"
               },
               {
                 "name": "QualificationServiceSettings__SearchService",
@@ -331,6 +331,14 @@
               {
                 "name": "SearchServiceSettings__RegionBoostScoringProfile",
                 "value": "[parameters('boostScoringProfile')]"
+              },
+              {
+                  "name": "CourseServiceSettings_ApiUrl",
+                  "value": "[parameters('courseApiUrl')]"
+              },
+              {
+                "name": "CourseServiceSettings_ApiKey",
+                "value": "[parameters('apimKey')]"
               }
             ]
           },
