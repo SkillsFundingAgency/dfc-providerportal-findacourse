@@ -47,6 +47,7 @@ namespace Dfc.ProviderPortal.FindACourse.API
                     .Configure<CosmosDbSettings>(Configuration.GetSection(nameof(CosmosDbSettings)))
                     .Configure<ProviderServiceSettings>(Configuration.GetSection(nameof(ProviderServiceSettings)))
                     .Configure<VenueServiceSettings>(Configuration.GetSection(nameof(VenueServiceSettings)))
+                    .Configure<CourseServiceSettings>(Configuration.GetSection(nameof(CourseServiceSettings)))
                     .Configure<SearchServiceSettings>(Configuration.GetSection(nameof(SearchServiceSettings)))
                     .Configure<FACAuthenticationSettings>(Configuration.GetSection(nameof(FACAuthenticationSettings)))
                     .Configure<QualificationServiceSettings>(Configuration.GetSection(nameof(QualificationServiceSettings)))
@@ -66,7 +67,7 @@ namespace Dfc.ProviderPortal.FindACourse.API
 
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Find a Course API");
+                c.SwaggerEndpoint("/swagger/swagger/v1//swagger.json", "Find a Course API");
             });
 
             app.UseMvc();

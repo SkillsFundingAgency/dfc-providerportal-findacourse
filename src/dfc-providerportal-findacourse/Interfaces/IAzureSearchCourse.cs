@@ -12,6 +12,7 @@ namespace Dfc.ProviderPortal.FindACourse.Interfaces
     {
         Guid? id { get; set; }
         Guid? CourseId { get; set; }
+        Guid? CourseRunId { get; set; }
         string QualificationCourseTitle { get; set; }
         string LearnAimRef { get; set; }
         string NotionalNVQLevelv2 { get; set; }
