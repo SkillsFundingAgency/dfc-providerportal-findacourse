@@ -39,8 +39,20 @@ namespace Dfc.ProviderPortal.FindACourse.Models
         public string VenueAddress { get; set; }
         public GeographyPoint VenueLocation { get; set; }
         public string VenueAttendancePattern { get; set; }
+        public string VenueAttendancePatternDescription { get; set; }
         public string ProviderName { get; set; }
         public string Region { get; set; }
+        public decimal ScoreBoost { get; set; }
         public int? Status { get; set; }
+        public string VenueStudyMode { get; set; }
+        public string VenueStudyModeDescription { get; set; }
+        public string DeliveryMode { get; set; }
+        public string DeliveryModeDescription { get; set; }
+        public DateTime? StartDate { get; set; }
+        public string VenueTown { get; set; }
+        public int? Cost { get; set; }
+        public string CostDescription { get; set; }
+        public string CourseText { get; set; }
+        public string UKPRN { get; set; }
     }
 }
