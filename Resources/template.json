@@ -333,11 +333,11 @@
                 "value": "[parameters('boostScoringProfile')]"
               },
               {
-                  "name": "CourseServiceSettings_ApiUrl",
+                  "name": "CourseServiceSettings__ApiUrl",
                   "value": "[parameters('courseApiUrl')]"
               },
               {
-                "name": "CourseServiceSettings_ApiKey",
+                "name": "CourseServiceSettings__ApiKey",
                 "value": "[parameters('apimKey')]"
               }
             ]
