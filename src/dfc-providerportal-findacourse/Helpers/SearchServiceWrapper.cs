@@ -231,9 +231,10 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
                     scoringProfile = string.IsNullOrWhiteSpace(_settings.RegionBoostScoringProfile) ? "region-boost" : _settings.RegionBoostScoringProfile,
                     search = $"{criteria.SubjectKeyword}*",
                     searchMode = "all",
-                    top = criteria.TopResults ?? _settings.DefaultTop,
                     filter = filter,
                     facets = new string[] { "NotionalNVQLevelv2", "VenueAttendancePattern", "ProviderName", "Region" },
+                    top = criteria.TopResults ?? _settings.DefaultTop,
+                    skip = (criteria.PageNo.HasValue && criteria.TopResults.HasValue && criteria.PageNo.Value > 0) ? ((criteria.PageNo.Value - 1) * criteria.TopResults.Value) : 0,
                     count = true
                 };
 

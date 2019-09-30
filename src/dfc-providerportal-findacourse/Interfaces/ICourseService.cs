@@ -25,5 +25,7 @@ namespace Dfc.ProviderPortal.FindACourse.Interfaces
         Task<ProviderSearchResult> ProviderSearch(ILogger log, ProviderSearchCriteriaStructure criteria);
         Task<LARSSearchResult> LARSSearch(ILogger log, LARSSearchCriteriaStructure criteria);
         Task<PostcodeSearchResult> PostcodeSearch(ILogger log, PostcodeSearchCriteriaStructure criteria);
+        Task<object> CourseDetail(Guid CourseId, Guid RunId);
+        Task<Provider> ProviderDetail(string PRN);
     }
 }
