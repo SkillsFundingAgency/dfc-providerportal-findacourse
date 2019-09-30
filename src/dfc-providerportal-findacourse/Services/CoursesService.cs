@@ -108,6 +108,20 @@ namespace Dfc.ProviderPortal.FindACourse.Services
             };
         }
 
+        public async Task<Provider> ProviderDetail(string PRN)
+        {
+            // Call service to get data
+            StringContent content = new StringContent(JsonConvert.SerializeObject(new { PRN }),
+                                                      Encoding.UTF8,
+                                                      "application/json");
+            Task<HttpResponseMessage> taskResponse = new HttpClient().GetAsync($"{_providerServiceSettings.ApiUrl}GetProviderByPRN?code={_courseServiceSettings.ApiKey}&PRN={PRN}");
+                                                                                //content);
+            taskResponse.Wait();
+            Task<string> taskJSON = taskResponse.Result.Content.ReadAsStringAsync();
+            taskJSON.Wait();
+            return JsonConvert.DeserializeObject<Provider>(taskJSON.Result);
+        }
+
         private IEnumerable<AzureSearchVenueModel> GetVenues(ILogger log, IEnumerable<CourseRun> runs = null)
         {
             IVenueServiceWrapper service = new VenueServiceWrapper(_venueServiceSettings);

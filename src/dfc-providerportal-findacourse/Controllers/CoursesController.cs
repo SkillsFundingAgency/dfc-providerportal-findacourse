@@ -95,7 +95,7 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                 }
 
             } catch (Exception ex) {
-                _log.LogError(ex, $"Error in CourseDetail: {ex.Message}");
+                _log.LogError(ex, $"Error in CourseGet: {ex.Message}");
                 return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             }
         }
@@ -111,15 +111,11 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
             [FromHeader(Name = "UserName")]string UserName,
             [FromHeader(Name = "Password")]string Password)
         {
-            try
-            {
-                if (_authSettings.UserName != UserName || _authSettings.Password != Password)
-                {
+            try {
+                if (_authSettings.UserName != UserName || _authSettings.Password != Password) {
                     _log.LogWarning($"Login failed for {UserName}");
                     return new UnauthorizedResult();
-                }
-                else
-                {
+                } else {
                     _log.LogInformation($"Provider search with keyword {criteria.Keyword}");
                     Task<ProviderSearchResult> task = _service.ProviderSearch(_log, criteria);
                     task.Wait();
@@ -128,13 +124,45 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                     else
                         return new NoContentResult();
                 }
-            }
-            catch (Exception ex)
-            {
+
+            } catch (Exception ex) {
                 _log.LogError(ex, $"Error in ProviderSearch: {ex.Message}");
                 return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             }
         }
+
+        [Route("~/providerget")]
+        [HttpPost]
+        [ProducesResponseType(typeof(Provider), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult> ProviderGet(
+            [FromBody]string PRN,
+            [FromHeader(Name = "UserName")]string UserName,
+            [FromHeader(Name = "Password")]string Password)
+        {
+            try {
+                if (_authSettings.UserName != UserName || _authSettings.Password != Password) {
+                    _log.LogWarning($"Login failed for {UserName}");
+                    return new UnauthorizedResult();
+                } else {
+                    _log.LogInformation($"FAC ProviderGet called for PRN {PRN}");
+                    Task<Provider> task = _service.ProviderDetail(PRN);
+                    task.Wait();
+                    if (task.Result != null)
+                        return new OkObjectResult((Provider)task.Result);
+                    else
+                        return new NoContentResult();
+                }
+
+            } catch (Exception ex) {
+                _log.LogError(ex, $"Error in ProviderGet: {ex.Message}");
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+
         [Route("~/larssearch")]
         [HttpPost]
         [ProducesResponseType(typeof(LARSSearchResult), StatusCodes.Status200OK)]

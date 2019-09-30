@@ -8,8 +8,8 @@ namespace Dfc.ProviderPortal.FindACourse.Interfaces
     public interface ICourseDetailResult
     {
         Course Course { get; set; }
-        Provider Provider { get; set; }
-        Venue Venue { get; set; }
-        Qualification Qualification { get; set; }
+        dynamic /*Provider*/ Provider { get; set; }
+        dynamic /*Venue*/ Venue { get; set; }
+        dynamic /*Qualification*/ Qualification { get; set; }
     }
 }
