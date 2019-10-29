@@ -1,41 +1,30 @@
-﻿
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Dfc.ProviderPortal.FindACourse.Interfaces;
 using Dfc.ProviderPortal.FindACourse.Models;
-using Dfc.ProviderPortal.FindACourse.Settings;
 using Dfc.ProviderPortal.Packages;
-
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace Dfc.ProviderPortal.FindACourse.Controllers
 {
     [ApiController]
     public class CoursesController : ControllerBase
     {
-        private ILogger _log = null;
-        private ICourseService _service = null;
-        //private readonly SignInManager<APIUser> _signInManager;
-        //private readonly UserManager<APIUser> _userManager;
-        private readonly IFACAuthenticationSettings _authSettings;
+        private readonly ILogger _log;
+        private readonly ICourseService _service;
 
         public CoursesController(
             ILogger<CoursesController> logger,
-            ICourseService service,
-            IOptions<FACAuthenticationSettings> authSettings)
+            ICourseService service)
         {
-            Throw.IfNull<ILogger<CoursesController>>(logger, nameof(logger));
-            Throw.IfNull<ICourseService>(service, nameof(service));
-            Throw.IfNull<IOptions<FACAuthenticationSettings>>(authSettings, nameof(authSettings));
+            Throw.IfNull(logger, nameof(logger));
+            Throw.IfNull(service, nameof(service));
 
             _log = logger;
             _service = service;
-            _authSettings = authSettings.Value;
         }
 
         [Route("~/coursesearch")]
@@ -44,26 +33,23 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> CourseSearch(
-            [FromBody]SearchCriteriaStructure criteria,
-            [FromHeader(Name = "UserName")]string UserName,
-            [FromHeader(Name = "Password")]string Password)
+        public async Task<ActionResult> CourseSearch([FromBody]SearchCriteriaStructure criteria)
         {
-            try {
-                if (_authSettings.UserName != UserName || _authSettings.Password != Password) {
-                    _log.LogWarning($"Login failed for {UserName}");
-                    return new UnauthorizedResult();
-                } else {
-                    _log.LogInformation($"FAC search with keyword {criteria.SubjectKeyword}");
-                    Task<FACSearchResult> task = _service.CourseSearch(_log, criteria);
-                    task.Wait();
-                    if (task.Result?.Value?.Count() > 0)
-                        return new OkObjectResult(task.Result);
-                    else
-                        return new NoContentResult();
+            try
+            {
+                _log.LogInformation($"FAC search with keyword {criteria.SubjectKeyword}");
+                var result = await _service.CourseSearch(_log, criteria);
+                if (result?.Value?.Count() > 0)
+                {
+                    return new OkObjectResult(result);
                 }
-
-            } catch (Exception ex) {
+                else
+                {
+                    return new NoContentResult();
+                }
+            }
+            catch (Exception ex)
+            {
                 _log.LogError(ex, $"Error in Search: {ex.Message}");
                 return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             }
@@ -75,26 +61,22 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> CourseGet(
-            [FromBody]CourseDetailStructure criteria,
-            [FromHeader(Name = "UserName")]string UserName,
-            [FromHeader(Name = "Password")]string Password)
+        public async Task<ActionResult> CourseGet([FromBody]CourseDetailStructure criteria)
         {
-            try {
-                if (_authSettings.UserName != UserName || _authSettings.Password != Password) {
-                    _log.LogWarning($"Login failed for {UserName}");
-                    return new UnauthorizedResult();
-                } else {
-                    _log.LogInformation($"FAC CourseDetail called for CourseId {criteria.CourseId}");
-                    Task<object> task = _service.CourseDetail(criteria.CourseId, criteria.RunId);
-                    task.Wait();
-                    if (task.Result != null)
-                        return new OkObjectResult((object)task.Result);
-                    else
-                        return new NoContentResult();
+            try
+            {
+                _log.LogInformation($"FAC CourseDetail called for CourseId {criteria.CourseId}");
+                var result = await _service.CourseDetail(criteria.CourseId, criteria.RunId);
+                if (result != null)
+                {
+                    return new OkObjectResult(result);
                 }
-
-            } catch (Exception ex) {
+                else
+                {
+                    return new NoContentResult();
+                }
+            }
+            catch (Exception ex) {
                 _log.LogError(ex, $"Error in CourseGet: {ex.Message}");
                 return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             }
@@ -106,26 +88,23 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> ProviderSearch(
-            [FromBody]ProviderSearchCriteriaStructure criteria,
-            [FromHeader(Name = "UserName")]string UserName,
-            [FromHeader(Name = "Password")]string Password)
+        public async Task<ActionResult> ProviderSearch([FromBody]ProviderSearchCriteriaStructure criteria)
         {
-            try {
-                if (_authSettings.UserName != UserName || _authSettings.Password != Password) {
-                    _log.LogWarning($"Login failed for {UserName}");
-                    return new UnauthorizedResult();
-                } else {
-                    _log.LogInformation($"Provider search with keyword {criteria.Keyword}");
-                    Task<ProviderSearchResult> task = _service.ProviderSearch(_log, criteria);
-                    task.Wait();
-                    if (task.Result?.Value?.Count() > 0)
-                        return new OkObjectResult(task.Result);
-                    else
-                        return new NoContentResult();
+            try
+            {
+                _log.LogInformation($"Provider search with keyword {criteria.Keyword}");
+                var result = await _service.ProviderSearch(_log, criteria);
+                if (result?.Value?.Count() > 0)
+                {
+                    return new OkObjectResult(result);
                 }
-
-            } catch (Exception ex) {
+                else
+                {
+                    return new NoContentResult();
+                }
+            }
+            catch (Exception ex)
+            {
                 _log.LogError(ex, $"Error in ProviderSearch: {ex.Message}");
                 return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             }
@@ -137,31 +116,27 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> ProviderGet(
-            [FromBody]string PRN,
-            [FromHeader(Name = "UserName")]string UserName,
-            [FromHeader(Name = "Password")]string Password)
+        public async Task<ActionResult> ProviderGet([FromBody]string PRN)
         {
-            try {
-                if (_authSettings.UserName != UserName || _authSettings.Password != Password) {
-                    _log.LogWarning($"Login failed for {UserName}");
-                    return new UnauthorizedResult();
-                } else {
-                    _log.LogInformation($"FAC ProviderGet called for PRN {PRN}");
-                    Task<Provider> task = _service.ProviderDetail(PRN);
-                    task.Wait();
-                    if (task.Result != null)
-                        return new OkObjectResult((Provider)task.Result);
-                    else
-                        return new NoContentResult();
+            try
+            {
+                _log.LogInformation($"FAC ProviderGet called for PRN {PRN}");
+                var result = await _service.ProviderDetail(PRN);
+                if (result != null)
+                {
+                    return new OkObjectResult(result);
                 }
-
-            } catch (Exception ex) {
+                else
+                {
+                    return new NoContentResult();
+                }
+            }
+            catch (Exception ex)
+            {
                 _log.LogError(ex, $"Error in ProviderGet: {ex.Message}");
                 return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             }
         }
-
 
         [Route("~/larssearch")]
         [HttpPost]
@@ -169,27 +144,19 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> LARSSearch(
-            [FromBody]LARSSearchCriteriaStructure criteria,
-            [FromHeader(Name = "UserName")]string UserName,
-            [FromHeader(Name = "Password")]string Password)
+        public async Task<ActionResult> LARSSearch([FromBody]LARSSearchCriteriaStructure criteria)
         {
             try
             {
-                if (_authSettings.UserName != UserName || _authSettings.Password != Password)
+                _log.LogInformation($"LARS search with keyword {criteria.Keyword}");
+                var result = await _service.LARSSearch(_log, criteria);
+                if (result?.Value?.Count() > 0)
                 {
-                    _log.LogWarning($"Login failed for {UserName}");
-                    return new UnauthorizedResult();
+                    return new OkObjectResult(result);
                 }
                 else
                 {
-                    _log.LogInformation($"LARS search with keyword {criteria.Keyword}");
-                    Task<LARSSearchResult> task = _service.LARSSearch(_log, criteria);
-                    task.Wait();
-                    if (task.Result?.Value?.Count() > 0)
-                        return new OkObjectResult(task.Result);
-                    else
-                        return new NoContentResult();
+                    return new NoContentResult();
                 }
             }
             catch (Exception ex)
@@ -205,27 +172,19 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> ONSPDSearch(
-            [FromBody]PostcodeSearchCriteriaStructure criteria,
-            [FromHeader(Name = "UserName")]string UserName,
-            [FromHeader(Name = "Password")]string Password)
+        public async Task<ActionResult> ONSPDSearch([FromBody]PostcodeSearchCriteriaStructure criteria)
         {
             try
             {
-                if (_authSettings.UserName != UserName || _authSettings.Password != Password)
+                _log.LogInformation($"ONSPD search with keyword {criteria.Keyword}");
+                var result = await _service.PostcodeSearch(_log, criteria);
+                if (result?.Value?.Count() > 0)
                 {
-                    _log.LogWarning($"Login failed for {UserName}");
-                    return new UnauthorizedResult();
+                    return new OkObjectResult(result);
                 }
                 else
                 {
-                    _log.LogInformation($"ONSPD search with keyword {criteria.Keyword}");
-                    Task<PostcodeSearchResult> task = _service.PostcodeSearch(_log, criteria);
-                    task.Wait();
-                    if (task.Result?.Value?.Count() > 0)
-                        return new OkObjectResult(task.Result);
-                    else
-                        return new NoContentResult();
+                    return new NoContentResult();
                 }
             }
             catch (Exception ex)

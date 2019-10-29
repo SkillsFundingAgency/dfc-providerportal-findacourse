@@ -2,9 +2,12 @@
 using Dfc.ProviderPortal.FindACourse.Interfaces;
 using Dfc.ProviderPortal.FindACourse.Services;
 using Dfc.ProviderPortal.FindACourse.Settings;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
@@ -35,13 +38,35 @@ namespace Dfc.ProviderPortal.FindACourse.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services
+                .AddMvc(o =>
+                {
+                    var policy = new AuthorizationPolicyBuilder(UsernamePasswordAuthenticationDefaults.AuthenticationScheme)
+                        .RequireAuthenticatedUser()
+                        .Build();
+                    o.Filters.Add(new AuthorizeFilter(policy));
+                })
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
             services.AddApplicationInsightsTelemetry(Configuration);
 
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Info { Title = "Find a Course API", Version = "v1" });
             });
+
+            services
+                .AddAuthentication(UsernamePasswordAuthenticationDefaults.AuthenticationScheme)
+                .AddScheme<UsernamePasswordAuthenticationOptions, UsernamePasswordAuthenticationHandler>(
+                    UsernamePasswordAuthenticationDefaults.AuthenticationScheme,
+                    o =>
+                    {
+                        var authSettings = new FACAuthenticationSettings();
+                        Configuration.GetSection(nameof(FACAuthenticationSettings)).Bind(authSettings);
+
+                        o.Username = authSettings.UserName;
+                        o.Password = authSettings.Password;
+                    });
 
             services.Configure<CosmosDbCollectionSettings>(Configuration.GetSection(nameof(CosmosDbCollectionSettings)))
                     .Configure<CosmosDbSettings>(Configuration.GetSection(nameof(CosmosDbSettings)))
