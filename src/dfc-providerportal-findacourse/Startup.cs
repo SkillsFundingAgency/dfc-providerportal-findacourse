@@ -1,17 +1,14 @@
-﻿using Dfc.ProviderPortal.FindACourse.Helpers;
+﻿using System;
+using Dfc.ProviderPortal.FindACourse.Helpers;
 using Dfc.ProviderPortal.FindACourse.Interfaces;
 using Dfc.ProviderPortal.FindACourse.Services;
 using Dfc.ProviderPortal.FindACourse.Settings;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
-using System;
 
 namespace Dfc.ProviderPortal.FindACourse.API
 {
@@ -39,13 +36,7 @@ namespace Dfc.ProviderPortal.FindACourse.API
         public void ConfigureServices(IServiceCollection services)
         {
             services
-                .AddMvc(o =>
-                {
-                    var policy = new AuthorizationPolicyBuilder(UsernamePasswordAuthenticationDefaults.AuthenticationScheme)
-                        .RequireAuthenticatedUser()
-                        .Build();
-                    o.Filters.Add(new AuthorizeFilter(policy));
-                })
+                .AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddApplicationInsightsTelemetry(Configuration);
@@ -55,26 +46,12 @@ namespace Dfc.ProviderPortal.FindACourse.API
                 c.SwaggerDoc("v1", new Info { Title = "Find a Course API", Version = "v1" });
             });
 
-            services
-                .AddAuthentication(UsernamePasswordAuthenticationDefaults.AuthenticationScheme)
-                .AddScheme<UsernamePasswordAuthenticationOptions, UsernamePasswordAuthenticationHandler>(
-                    UsernamePasswordAuthenticationDefaults.AuthenticationScheme,
-                    o =>
-                    {
-                        var authSettings = new FACAuthenticationSettings();
-                        Configuration.GetSection(nameof(FACAuthenticationSettings)).Bind(authSettings);
-
-                        o.Username = authSettings.UserName;
-                        o.Password = authSettings.Password;
-                    });
-
             services.Configure<CosmosDbCollectionSettings>(Configuration.GetSection(nameof(CosmosDbCollectionSettings)))
                     .Configure<CosmosDbSettings>(Configuration.GetSection(nameof(CosmosDbSettings)))
                     .Configure<ProviderServiceSettings>(Configuration.GetSection(nameof(ProviderServiceSettings)))
                     .Configure<VenueServiceSettings>(Configuration.GetSection(nameof(VenueServiceSettings)))
                     .Configure<CourseServiceSettings>(Configuration.GetSection(nameof(CourseServiceSettings)))
                     .Configure<SearchServiceSettings>(Configuration.GetSection(nameof(SearchServiceSettings)))
-                    .Configure<FACAuthenticationSettings>(Configuration.GetSection(nameof(FACAuthenticationSettings)))
                     .Configure<QualificationServiceSettings>(Configuration.GetSection(nameof(QualificationServiceSettings)))
                     .AddScoped<ICourseService, CoursesService>()
                     .AddScoped<ICosmosDbHelper, CosmosDbHelper>()
