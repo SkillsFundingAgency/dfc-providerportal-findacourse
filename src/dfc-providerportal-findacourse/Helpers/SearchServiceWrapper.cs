@@ -201,14 +201,20 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
                 string filter = string.Join(" and ", list.Where(x => !string.IsNullOrWhiteSpace(x.Value))
                                                          .Select(x => "search.in(" + x.Key + ", '" + x.Value + "', '|')"));
 
-                // Add geo distance clause if required
+                var sortBy = criteria.SortBy ?? CourseSearchSortBy.Relevance;
+
+                var geoFilterRequired = criteria.Distance.GetValueOrDefault(0) > 0 && !string.IsNullOrWhiteSpace(criteria.TownOrPostcode);
+
+                // lat/lng required if Distance filter is specified *or* sorting by Distance
+                var getBaseCoords = geoFilterRequired || sortBy == CourseSearchSortBy.Distance;
                 float? latitude = null;
                 float? longitude = null;
-                bool geoSearchRequired = (criteria.Distance.GetValueOrDefault(0) > 0 && !string.IsNullOrWhiteSpace(criteria.TownOrPostcode));
-                if (geoSearchRequired) {
+                if (getBaseCoords)
+                {
                     _log.LogInformation($"FAC getting lat/long for location {criteria.TownOrPostcode}");
 
-                    SearchParameters parameters = new SearchParameters {
+                    SearchParameters parameters = new SearchParameters
+                    {
                         Select = new[] { "pcds", "lat", "long" },
                         SearchMode = SearchMode.All,
                         Top = 1,
@@ -217,13 +223,21 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
                     DocumentSearchResult<dynamic> results = _onspdIndex.Documents.Search<dynamic>(criteria.TownOrPostcode, parameters);
                     latitude = (float?)results?.Results?.FirstOrDefault()?.Document?.lat;
                     longitude = (float?)results?.Results?.FirstOrDefault()?.Document?.@long;
-
-                    if (latitude.HasValue && longitude.HasValue) {
-                        if (!string.IsNullOrWhiteSpace(filter))
-                            filter += " and ";
-                        filter += $"geo.distance(VenueLocation, geography'POINT({longitude.Value} {latitude.Value})') le {criteria.Distance}";
-                    }
                 }
+
+                // Add geo distance clause if required
+                if (geoFilterRequired && latitude.HasValue && longitude.HasValue)
+                {
+                    if (!string.IsNullOrWhiteSpace(filter))
+                        filter += " and ";
+                    filter += $"geo.distance(VenueLocation, geography'POINT({longitude.Value} {latitude.Value})') le {criteria.Distance}";
+                }
+
+                var orderBy = sortBy == CourseSearchSortBy.StartDateDescending ?
+                    "StartDate desc" : sortBy == CourseSearchSortBy.StartDateAscending ?
+                    "StartDate asc" : sortBy == CourseSearchSortBy.Distance && latitude.HasValue && longitude.HasValue ?
+                    $"geo.distance(VenueLocation, geography'POINT({longitude.Value} {latitude.Value})')" :
+                    "search.score() desc";
 
                 // Create a search criteria object for azure search service
                 IFACSearchCriteria facCriteria = new FACSearchCriteria()
@@ -235,7 +249,8 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
                     facets = new string[] { "NotionalNVQLevelv2", "VenueAttendancePattern", "ProviderName", "Region" },
                     top = criteria.TopResults ?? _settings.DefaultTop,
                     skip = (criteria.PageNo.HasValue && criteria.TopResults.HasValue && criteria.PageNo.Value > 0) ? ((criteria.PageNo.Value - 1) * criteria.TopResults.Value) : 0,
-                    count = true
+                    count = true,
+                    orderby = orderBy
                 };
 
                 // Create json ready for posting
@@ -263,7 +278,7 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
                     settings.Converters.Add(new StringEnumConverter() { CamelCaseText = false });
 
                     FACSearchResult searchResult = JsonConvert.DeserializeObject<FACSearchResult>(json, settings);
-                    if (geoSearchRequired && latitude.HasValue && longitude.HasValue) {
+                    if (getBaseCoords && latitude.HasValue && longitude.HasValue) {
                         foreach (FACSearchResultItem ri in searchResult.Value) {
                             if (ri.VenueLocation != null && ri?.VenueLocation["coordinates"][0] != 0 && ri?.VenueLocation["coordinates"][1] != 0)
                                 ri.GeoSearchDistance = Math.Round(
