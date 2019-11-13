@@ -238,6 +238,23 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
                     filter += $"geo.distance(VenueLocation, geography'POINT({longitude.Value} {latitude.Value})') le {criteria.Distance}";
                 }
 
+                if (criteria.StartDateFrom.HasValue)
+                {
+                    if (!string.IsNullOrWhiteSpace(filter))
+                    {
+                        filter += " and ";
+                    }
+                    filter += $"StartDate ge {criteria.StartDateFrom.Value:o}";
+                }
+                if (criteria.StartDateTo.HasValue)
+                {
+                    if (!string.IsNullOrWhiteSpace(filter))
+                    {
+                        filter += " and ";
+                    }
+                    filter += $"StartDate le {criteria.StartDateTo.Value:o}";
+                }
+
                 var orderBy = sortBy == CourseSearchSortBy.StartDateDescending ?
                     "StartDate desc" : sortBy == CourseSearchSortBy.StartDateAscending ?
                     "StartDate asc" : sortBy == CourseSearchSortBy.Distance ?
