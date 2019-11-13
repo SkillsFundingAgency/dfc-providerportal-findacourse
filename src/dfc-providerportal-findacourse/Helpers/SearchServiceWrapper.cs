@@ -223,10 +223,15 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
                     DocumentSearchResult<dynamic> results = _onspdIndex.Documents.Search<dynamic>(criteria.TownOrPostcode, parameters);
                     latitude = (float?)results?.Results?.FirstOrDefault()?.Document?.lat;
                     longitude = (float?)results?.Results?.FirstOrDefault()?.Document?.@long;
+
+                    if (!latitude.HasValue || !longitude.HasValue)
+                    {
+                        return null;
+                    }
                 }
 
                 // Add geo distance clause if required
-                if (geoFilterRequired && latitude.HasValue && longitude.HasValue)
+                if (geoFilterRequired)
                 {
                     if (!string.IsNullOrWhiteSpace(filter))
                         filter += " and ";
@@ -235,7 +240,7 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
 
                 var orderBy = sortBy == CourseSearchSortBy.StartDateDescending ?
                     "StartDate desc" : sortBy == CourseSearchSortBy.StartDateAscending ?
-                    "StartDate asc" : sortBy == CourseSearchSortBy.Distance && latitude.HasValue && longitude.HasValue ?
+                    "StartDate asc" : sortBy == CourseSearchSortBy.Distance ?
                     $"geo.distance(VenueLocation, geography'POINT({longitude.Value} {latitude.Value})')" :
                     "search.score() desc";
 
