@@ -36,6 +36,8 @@ namespace Dfc.ProviderPortal.FindACourse.Models
         //public string ILSFlagField { get; set; }
         public string TownOrPostcode { get; set; }
         public CourseSearchSortBy? SortBy { get; set; }
+        public DateTime? StartDateFrom { get; set; }
+        public DateTime? StartDateTo { get; set; }
 
         public int? TopResults { get; set; }
         public int? PageNo { get; set; }
