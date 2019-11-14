@@ -36,5 +36,6 @@ namespace Dfc.ProviderPortal.FindACourse.Interfaces
         string CostDescription { get; set; }
         string CourseText { get; set; }
         string UKPRN { get; set; }
+        string CourseDescription { get; set; }
     }
 }
