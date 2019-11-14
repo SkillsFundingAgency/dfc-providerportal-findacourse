@@ -54,5 +54,6 @@ namespace Dfc.ProviderPortal.FindACourse.Models
         public string CostDescription { get; set; }
         public string CourseText { get; set; }
         public string UKPRN { get; set; }
+        public string CourseDescription { get; set; }
     }
 }
