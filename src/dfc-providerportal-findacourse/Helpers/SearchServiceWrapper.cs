@@ -190,17 +190,6 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
                 _log.LogInformation("FAC search criteria.", criteria);
                 _log.LogInformation("FAC search uri.", _uri.ToString());
 
-                // Create filter string
-                // Use a pipe char to delimit; default commas and spaces can't be used as may be in facet values
-                List<KeyValuePair<string, string>> list = new List<KeyValuePair<string, string>>();
-                //list.Add(new KeyValuePair<string, string>("AttendanceMode", string.Join("|", criteria.AttendanceModes ?? new string[] { } )));
-                list.Add(new KeyValuePair<string, string>("VenueAttendancePattern", string.Join("|", criteria.AttendancePatterns ?? new string[] { } )));
-                //list.Add(new KeyValuePair<string, string>("DFE1619FundedField", string.Join("|", criteria.DFE1619Funded ?? new string[] { } )));
-                list.Add(new KeyValuePair<string, string>("NotionalNVQLevelv2", string.Join("|", criteria.QualificationLevels ?? new string[] { })));
-                //list.Add(new KeyValuePair<string, string>("StudyModesField", string.Join("|", criteria.StudyModes ?? new string[] { } )));
-                string filter = string.Join(" and ", list.Where(x => !string.IsNullOrWhiteSpace(x.Value))
-                                                         .Select(x => "search.in(" + x.Key + ", '" + x.Value + "', '|')"));
-
                 var sortBy = criteria.SortBy ?? CourseSearchSortBy.Relevance;
 
                 var geoFilterRequired = criteria.Distance.GetValueOrDefault(0) > 0 && !string.IsNullOrWhiteSpace(criteria.TownOrPostcode);
@@ -230,30 +219,37 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
                     }
                 }
 
-                // Add geo distance clause if required
-                if (geoFilterRequired)
+                var filterClauses = new List<string>()
                 {
-                    if (!string.IsNullOrWhiteSpace(filter))
-                        filter += " and ";
-                    filter += $"geo.distance(VenueLocation, geography'POINT({longitude.Value} {latitude.Value})') le {criteria.Distance}";
-                }
+                    "Status eq 2"  // only search live courses
+                };
 
                 if (criteria.StartDateFrom.HasValue)
                 {
-                    if (!string.IsNullOrWhiteSpace(filter))
-                    {
-                        filter += " and ";
-                    }
-                    filter += $"StartDate ge {criteria.StartDateFrom.Value:o}";
+                    filterClauses.Add($"StartDate ge {criteria.StartDateFrom.Value:o}");
                 }
+
                 if (criteria.StartDateTo.HasValue)
                 {
-                    if (!string.IsNullOrWhiteSpace(filter))
-                    {
-                        filter += " and ";
-                    }
-                    filter += $"StartDate le {criteria.StartDateTo.Value:o}";
+                    filterClauses.Add($"StartDate le {criteria.StartDateTo.Value:o}");
                 }
+
+                if (criteria.AttendancePatterns?.Any() ?? false)
+                {
+                    filterClauses.Add($"search.in(VenueAttendancePattern, '{string.Join("|", criteria.AttendancePatterns)}', '|')");
+                }
+
+                if (criteria.QualificationLevels?.Any() ?? false)
+                {
+                    filterClauses.Add($"search.in(NotionalNVQLevelv2, '{string.Join("|", criteria.QualificationLevels)}', '|')");
+                }
+
+                if (geoFilterRequired)
+                {
+                    filterClauses.Add($"geo.distance(VenueLocation, geography'POINT({longitude.Value} {latitude.Value})') le {criteria.Distance}");
+                }
+
+                var filter = string.Join(" and ", filterClauses);
 
                 var orderBy = sortBy == CourseSearchSortBy.StartDateDescending ?
                     "StartDate desc" : sortBy == CourseSearchSortBy.StartDateAscending ?
