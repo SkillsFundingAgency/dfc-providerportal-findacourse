@@ -50,8 +50,8 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
         [Route("~/courseget")]
         [HttpPost]
         [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> CourseGet([FromBody]CourseDetailStructure criteria)
         {
@@ -65,7 +65,7 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                 }
                 else
                 {
-                    return new NoContentResult();
+                    return new NotFoundResult();
                 }
             }
             catch (Exception ex) {
@@ -97,8 +97,8 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
         [Route("~/providerget")]
         [HttpPost]
         [ProducesResponseType(typeof(Provider), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> ProviderGet([FromBody]string PRN)
         {
@@ -112,7 +112,7 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                 }
                 else
                 {
-                    return new NoContentResult();
+                    return new NotFoundResult();
                 }
             }
             catch (Exception ex)
