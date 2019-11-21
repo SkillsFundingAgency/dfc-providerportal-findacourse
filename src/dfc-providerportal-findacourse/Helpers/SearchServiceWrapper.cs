@@ -221,7 +221,7 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
 
                 var filterClauses = new List<string>()
                 {
-                    "Status eq 2"  // only search live courses
+                    "Status eq 1"  // only search live courses
                 };
 
                 if (criteria.StartDateFrom.HasValue)
