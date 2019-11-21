@@ -30,7 +30,6 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
         [Route("~/coursesearch")]
         [HttpPost]
         [ProducesResponseType(typeof(FACSearchResult), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> CourseSearch([FromBody]SearchCriteriaStructure criteria)
@@ -39,14 +38,7 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
             {
                 _log.LogInformation($"FAC search with keyword {criteria.SubjectKeyword}");
                 var result = await _service.CourseSearch(_log, criteria);
-                if (result?.Value?.Count() > 0)
-                {
-                    return new OkObjectResult(result);
-                }
-                else
-                {
-                    return new NoContentResult();
-                }
+                return new OkObjectResult(result);
             }
             catch (Exception ex)
             {
@@ -85,7 +77,6 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
         [Route("~/providersearch")]
         [HttpPost]
         [ProducesResponseType(typeof(ProviderSearchResult), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> ProviderSearch([FromBody]ProviderSearchCriteriaStructure criteria)
@@ -94,14 +85,7 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
             {
                 _log.LogInformation($"Provider search with keyword {criteria.Keyword}");
                 var result = await _service.ProviderSearch(_log, criteria);
-                if (result?.Value?.Count() > 0)
-                {
-                    return new OkObjectResult(result);
-                }
-                else
-                {
-                    return new NoContentResult();
-                }
+                return new OkObjectResult(result);
             }
             catch (Exception ex)
             {
@@ -141,7 +125,6 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
         [Route("~/larssearch")]
         [HttpPost]
         [ProducesResponseType(typeof(LARSSearchResult), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> LARSSearch([FromBody]LARSSearchCriteriaStructure criteria)
@@ -150,14 +133,7 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
             {
                 _log.LogInformation($"LARS search with keyword {criteria.Keyword}");
                 var result = await _service.LARSSearch(_log, criteria);
-                if (result?.Value?.Count() > 0)
-                {
-                    return new OkObjectResult(result);
-                }
-                else
-                {
-                    return new NoContentResult();
-                }
+                return new OkObjectResult(result);
             }
             catch (Exception ex)
             {
@@ -169,7 +145,6 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
         [Route("~/onspdsearch")]
         [HttpPost]
         [ProducesResponseType(typeof(PostcodeSearchResult), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> ONSPDSearch([FromBody]PostcodeSearchCriteriaStructure criteria)
@@ -178,14 +153,7 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
             {
                 _log.LogInformation($"ONSPD search with keyword {criteria.Keyword}");
                 var result = await _service.PostcodeSearch(_log, criteria);
-                if (result?.Value?.Count() > 0)
-                {
-                    return new OkObjectResult(result);
-                }
-                else
-                {
-                    return new NoContentResult();
-                }
+                return new OkObjectResult(result);
             }
             catch (Exception ex)
             {
