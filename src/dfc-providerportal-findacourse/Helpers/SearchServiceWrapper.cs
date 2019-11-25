@@ -20,6 +20,7 @@ using Dfc.ProviderPortal.FindACourse.Interfaces;
 using Dfc.ProviderPortal.FindACourse.Services;
 using Document = Microsoft.Azure.Documents.Document;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.RegularExpressions;
 
 namespace Dfc.ProviderPortal.FindACourse.Helpers
 {
@@ -32,6 +33,8 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
             public string Region { get; set; }
             public AzureSearchVenueModel Venue { get; set; }
         }
+
+        private static readonly Regex _postcode = new Regex("^([A-PR-UWYZ0-9][A-HK-Y0-9][AEHMNPRTVXY0-9]?[ABEHMNPRVWXY0-9]? {1,2}[0-9][ABD-HJLN-UW-Z]{2}|GIR 0AA)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private readonly ILogger _log;
         private readonly ISearchServiceSettings _settings;
@@ -199,6 +202,20 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
                 });
             }
 
+            // Validate postcode
+            if (!string.IsNullOrWhiteSpace(criteria.Postcode))
+            {
+                if (!_postcode.IsMatch(criteria.Postcode))
+                {
+                    throw new ProblemDetailsException(new ProblemDetails()
+                    {
+                        Detail = "Postcode is not valid.",
+                        Status = 400,
+                        Title = "InvalidPostcode"
+                    });
+                }
+            }
+
             var geoFilterRequired = criteria.Distance.GetValueOrDefault(0) > 0 && !string.IsNullOrWhiteSpace(criteria.Postcode);
 
             // lat/lng required if Distance filter is specified *or* sorting by Distance
@@ -211,6 +228,7 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
 
                 SearchParameters parameters = new SearchParameters
                 {
+                    SearchFields = new[] { "pcds" },
                     Select = new[] { "pcds", "lat", "long" },
                     SearchMode = SearchMode.All,
                     Top = 1,
@@ -226,7 +244,7 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
                     {
                         Detail = "Specified postcode cannot be found.",
                         Status = 400,
-                        Title = "InvalidPostcode"
+                        Title = "PostcodeNotFound"
                     });
                 }
             }
