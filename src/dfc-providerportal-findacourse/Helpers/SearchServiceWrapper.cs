@@ -222,14 +222,19 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
 
                 if (!latitude.HasValue || !longitude.HasValue)
                 {
-                    return null;
+                    throw new ProblemDetailsException(new ProblemDetails()
+                    {
+                        Detail = "Specified postcode cannot be found.",
+                        Status = 400,
+                        Title = "InvalidPostcode"
+                    });
                 }
             }
 
             var filterClauses = new List<string>()
-                {
-                    "Status eq 1"  // only search live courses
-                };
+            {
+                "Status eq 1"  // only search live courses
+            };
 
             if (criteria.StartDateFrom.HasValue)
             {
