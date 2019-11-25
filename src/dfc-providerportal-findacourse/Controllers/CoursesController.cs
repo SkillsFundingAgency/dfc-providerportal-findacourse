@@ -30,6 +30,7 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
         [Route("~/coursesearch")]
         [HttpPost]
         [ProducesResponseType(typeof(FACSearchResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> CourseSearch([FromBody]SearchCriteriaStructure criteria)
@@ -39,6 +40,17 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                 _log.LogInformation($"FAC search with keyword {criteria.SubjectKeyword}");
                 var result = await _service.CourseSearch(_log, criteria);
                 return new OkObjectResult(result);
+            }
+            catch (ProblemDetailsException ex)
+            {
+                return new ObjectResult(ex.ProblemDetails)
+                {
+                    ContentTypes = new Microsoft.AspNetCore.Mvc.Formatters.MediaTypeCollection()
+                    {
+                        new Microsoft.Net.Http.Headers.MediaTypeHeaderValue("application/problem+json")
+                    },
+                    StatusCode = ex.ProblemDetails.Status ?? 400
+                };
             }
             catch (Exception ex)
             {

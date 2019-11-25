@@ -19,7 +19,7 @@ using Dfc.ProviderPortal.FindACourse.Settings;
 using Dfc.ProviderPortal.FindACourse.Interfaces;
 using Dfc.ProviderPortal.FindACourse.Services;
 using Document = Microsoft.Azure.Documents.Document;
-
+using Microsoft.AspNetCore.Mvc;
 
 namespace Dfc.ProviderPortal.FindACourse.Helpers
 {
@@ -183,151 +183,156 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
         {
             Throw.IfNull(criteria, nameof(criteria));
 
-            //_log.LogMethodEnter();
+            _log.LogInformation("FAC search criteria.", criteria);
+            _log.LogInformation("FAC search uri.", _uri.ToString());
 
-            try
+            var sortBy = criteria.SortBy ?? CourseSearchSortBy.Relevance;
+
+            // Can only sort by distance if a postcode is specified
+            if (sortBy == CourseSearchSortBy.Distance && string.IsNullOrWhiteSpace(criteria.Postcode))
             {
-                _log.LogInformation("FAC search criteria.", criteria);
-                _log.LogInformation("FAC search uri.", _uri.ToString());
-
-                var sortBy = criteria.SortBy ?? CourseSearchSortBy.Relevance;
-
-                var geoFilterRequired = criteria.Distance.GetValueOrDefault(0) > 0 && !string.IsNullOrWhiteSpace(criteria.TownOrPostcode);
-
-                // lat/lng required if Distance filter is specified *or* sorting by Distance
-                var getBaseCoords = geoFilterRequired || sortBy == CourseSearchSortBy.Distance;
-                float? latitude = null;
-                float? longitude = null;
-                if (getBaseCoords)
+                throw new ProblemDetailsException(new ProblemDetails()
                 {
-                    _log.LogInformation($"FAC getting lat/long for location {criteria.TownOrPostcode}");
+                    Detail = "Postcode is required to sort by Distance.",
+                    Status = 400,
+                    Title = "PostcodeRequired"
+                });
+            }
 
-                    SearchParameters parameters = new SearchParameters
-                    {
-                        Select = new[] { "pcds", "lat", "long" },
-                        SearchMode = SearchMode.All,
-                        Top = 1,
-                        QueryType = QueryType.Full
-                    };
-                    DocumentSearchResult<dynamic> results = _onspdIndex.Documents.Search<dynamic>(criteria.TownOrPostcode, parameters);
-                    latitude = (float?)results?.Results?.FirstOrDefault()?.Document?.lat;
-                    longitude = (float?)results?.Results?.FirstOrDefault()?.Document?.@long;
+            var geoFilterRequired = criteria.Distance.GetValueOrDefault(0) > 0 && !string.IsNullOrWhiteSpace(criteria.Postcode);
 
-                    if (!latitude.HasValue || !longitude.HasValue)
-                    {
-                        return null;
-                    }
+            // lat/lng required if Distance filter is specified *or* sorting by Distance
+            var getBaseCoords = geoFilterRequired || sortBy == CourseSearchSortBy.Distance;
+            float? latitude = null;
+            float? longitude = null;
+            if (getBaseCoords)
+            {
+                _log.LogInformation($"FAC getting lat/long for location {criteria.Postcode}");
+
+                SearchParameters parameters = new SearchParameters
+                {
+                    Select = new[] { "pcds", "lat", "long" },
+                    SearchMode = SearchMode.All,
+                    Top = 1,
+                    QueryType = QueryType.Full
+                };
+                DocumentSearchResult<dynamic> results = _onspdIndex.Documents.Search<dynamic>(criteria.Postcode, parameters);
+                latitude = (float?)results?.Results?.FirstOrDefault()?.Document?.lat;
+                longitude = (float?)results?.Results?.FirstOrDefault()?.Document?.@long;
+
+                if (!latitude.HasValue || !longitude.HasValue)
+                {
+                    return null;
                 }
+            }
 
-                var filterClauses = new List<string>()
+            var filterClauses = new List<string>()
                 {
                     "Status eq 1"  // only search live courses
                 };
 
-                if (criteria.StartDateFrom.HasValue)
+            if (criteria.StartDateFrom.HasValue)
+            {
+                filterClauses.Add($"StartDate ge {criteria.StartDateFrom.Value:o}");
+            }
+
+            if (criteria.StartDateTo.HasValue)
+            {
+                filterClauses.Add($"StartDate le {criteria.StartDateTo.Value:o}");
+            }
+
+            if (criteria.AttendancePatterns?.Any() ?? false)
+            {
+                filterClauses.Add($"search.in(VenueAttendancePattern, '{string.Join("|", criteria.AttendancePatterns)}', '|')");
+            }
+
+            if (criteria.QualificationLevels?.Any() ?? false)
+            {
+                filterClauses.Add($"search.in(NotionalNVQLevelv2, '{string.Join("|", criteria.QualificationLevels)}', '|')");
+            }
+
+            if (geoFilterRequired)
+            {
+                filterClauses.Add($"geo.distance(VenueLocation, geography'POINT({longitude.Value} {latitude.Value})') le {criteria.Distance}");
+            }
+
+            var filter = string.Join(" and ", filterClauses);
+
+            var orderBy = sortBy == CourseSearchSortBy.StartDateDescending ?
+                "StartDate desc" : sortBy == CourseSearchSortBy.StartDateAscending ?
+                "StartDate asc" : sortBy == CourseSearchSortBy.Distance ?
+                $"geo.distance(VenueLocation, geography'POINT({longitude.Value} {latitude.Value})')" :
+                "search.score() desc";
+
+            // Create a search criteria object for azure search service
+            IFACSearchCriteria facCriteria = new FACSearchCriteria()
+            {
+                scoringProfile = string.IsNullOrWhiteSpace(_settings.RegionBoostScoringProfile) ? "region-boost" : _settings.RegionBoostScoringProfile,
+                search = $"{criteria.SubjectKeyword}*",
+                searchMode = "all",
+                filter = filter,
+                facets = new string[] { "NotionalNVQLevelv2", "VenueAttendancePattern", "ProviderName", "Region" },
+                top = criteria.TopResults ?? _settings.DefaultTop,
+                skip = (criteria.PageNo.HasValue && criteria.TopResults.HasValue && criteria.PageNo.Value > 0) ? ((criteria.PageNo.Value - 1) * criteria.TopResults.Value) : 0,
+                count = true,
+                orderby = orderBy
+            };
+
+            // Create json ready for posting
+            JsonSerializerSettings settings = new JsonSerializerSettings
+            {
+                //ContractResolver = new FACSearchCriteriaContractResolver()
+            };
+            settings.Converters.Add(new StringEnumConverter() { CamelCaseText = false });
+            StringContent content = new StringContent(JsonConvert.SerializeObject(facCriteria, settings), Encoding.UTF8, "application/json");
+
+            // Do the search
+            _log.LogInformation("FAC search POST body", JsonConvert.SerializeObject(facCriteria, settings));
+            Task<HttpResponseMessage> task = _httpClient.PostAsync(_uri, content);
+            task.Wait();
+            HttpResponseMessage response = task.Result;
+            _log.LogInformation("FAC search service http response.", response);
+
+            // Handle response and deserialize results
+            if (response.IsSuccessStatusCode)
+            {
+                var json = response.Content.ReadAsStringAsync().Result;
+
+                _log.LogInformation("FAC search service json response.", json);
+                settings = new JsonSerializerSettings
                 {
-                    filterClauses.Add($"StartDate ge {criteria.StartDateFrom.Value:o}");
-                }
-
-                if (criteria.StartDateTo.HasValue)
-                {
-                    filterClauses.Add($"StartDate le {criteria.StartDateTo.Value:o}");
-                }
-
-                if (criteria.AttendancePatterns?.Any() ?? false)
-                {
-                    filterClauses.Add($"search.in(VenueAttendancePattern, '{string.Join("|", criteria.AttendancePatterns)}', '|')");
-                }
-
-                if (criteria.QualificationLevels?.Any() ?? false)
-                {
-                    filterClauses.Add($"search.in(NotionalNVQLevelv2, '{string.Join("|", criteria.QualificationLevels)}', '|')");
-                }
-
-                if (geoFilterRequired)
-                {
-                    filterClauses.Add($"geo.distance(VenueLocation, geography'POINT({longitude.Value} {latitude.Value})') le {criteria.Distance}");
-                }
-
-                var filter = string.Join(" and ", filterClauses);
-
-                var orderBy = sortBy == CourseSearchSortBy.StartDateDescending ?
-                    "StartDate desc" : sortBy == CourseSearchSortBy.StartDateAscending ?
-                    "StartDate asc" : sortBy == CourseSearchSortBy.Distance ?
-                    $"geo.distance(VenueLocation, geography'POINT({longitude.Value} {latitude.Value})')" :
-                    "search.score() desc";
-
-                // Create a search criteria object for azure search service
-                IFACSearchCriteria facCriteria = new FACSearchCriteria()
-                {
-                    scoringProfile = string.IsNullOrWhiteSpace(_settings.RegionBoostScoringProfile) ? "region-boost" : _settings.RegionBoostScoringProfile,
-                    search = $"{criteria.SubjectKeyword}*",
-                    searchMode = "all",
-                    filter = filter,
-                    facets = new string[] { "NotionalNVQLevelv2", "VenueAttendancePattern", "ProviderName", "Region" },
-                    top = criteria.TopResults ?? _settings.DefaultTop,
-                    skip = (criteria.PageNo.HasValue && criteria.TopResults.HasValue && criteria.PageNo.Value > 0) ? ((criteria.PageNo.Value - 1) * criteria.TopResults.Value) : 0,
-                    count = true,
-                    orderby = orderBy
-                };
-
-                // Create json ready for posting
-                JsonSerializerSettings settings = new JsonSerializerSettings {
-                    //ContractResolver = new FACSearchCriteriaContractResolver()
+                    ContractResolver = new FACSearchResultContractResolver()
                 };
                 settings.Converters.Add(new StringEnumConverter() { CamelCaseText = false });
-                StringContent content = new StringContent(JsonConvert.SerializeObject(facCriteria, settings), Encoding.UTF8, "application/json");
 
-                // Do the search
-                _log.LogInformation("FAC search POST body", JsonConvert.SerializeObject(facCriteria, settings));
-                Task<HttpResponseMessage> task = _httpClient.PostAsync(_uri, content);
-                task.Wait();
-                HttpResponseMessage response = task.Result;
-                _log.LogInformation("FAC search service http response.", response);
-
-                // Handle response and deserialize results
-                if (response.IsSuccessStatusCode) {
-                    var json = response.Content.ReadAsStringAsync().Result;
-
-                    _log.LogInformation("FAC search service json response.", json);
-                    settings = new JsonSerializerSettings {
-                        ContractResolver = new FACSearchResultContractResolver()
-                    };
-                    settings.Converters.Add(new StringEnumConverter() { CamelCaseText = false });
-
-                    FACSearchResult searchResult = JsonConvert.DeserializeObject<FACSearchResult>(json, settings);
-                    if (getBaseCoords && latitude.HasValue && longitude.HasValue) {
-                        foreach (FACSearchResultItem ri in searchResult.Value) {
-                            if (ri.VenueLocation != null && ri?.VenueLocation["coordinates"][0] != 0 && ri?.VenueLocation["coordinates"][1] != 0)
-                                ri.GeoSearchDistance = Math.Round(
-                                    GeoHelper.DistanceTo(
-                                        new GeoHelper.Coordinates() { Latitude = latitude.Value,
-                                                                      Longitude = longitude.Value },
-                                        new GeoHelper.Coordinates() { Latitude = ri?.VenueLocation["coordinates"][1],
-                                                                      Longitude = ri?.VenueLocation["coordinates"][0] }),
-                                2);
-                        }
+                FACSearchResult searchResult = JsonConvert.DeserializeObject<FACSearchResult>(json, settings);
+                if (getBaseCoords && latitude.HasValue && longitude.HasValue)
+                {
+                    foreach (FACSearchResultItem ri in searchResult.Value)
+                    {
+                        if (ri.VenueLocation != null && ri?.VenueLocation["coordinates"][0] != 0 && ri?.VenueLocation["coordinates"][1] != 0)
+                            ri.GeoSearchDistance = Math.Round(
+                                GeoHelper.DistanceTo(
+                                    new GeoHelper.Coordinates()
+                                    {
+                                        Latitude = latitude.Value,
+                                        Longitude = longitude.Value
+                                    },
+                                    new GeoHelper.Coordinates()
+                                    {
+                                        Latitude = ri?.VenueLocation["coordinates"][1],
+                                        Longitude = ri?.VenueLocation["coordinates"][0]
+                                    }),
+                            2);
                     }
-                    return searchResult;
-
-                } else {
-                    _log.LogWarning($"FAC unexpected response: {response.StatusCode}", response);
-                    //return Result.Fail<IFACSearchResult>("FAC search service unsuccessfull http response.");
-                    return null;
                 }
+                return searchResult;
 
-            } catch (HttpRequestException hre) {
-                _log.LogError("FAC search service http request error.", hre);
-                //return Result.Fail<IFACSearchResult>("FAC search service http request error.");
+            }
+            else
+            {
+                response.EnsureSuccessStatusCode();  // throws
                 return null;
-
-            } catch (Exception e) {
-                _log.LogError("FAC search service unknown error.", e);
-                //return Result.Fail<IFACSearchResult>("FAC search service unknown error.");
-                return null;
-
-            } finally {
-                //_log.LogMethodExit();
             }
         }
 
