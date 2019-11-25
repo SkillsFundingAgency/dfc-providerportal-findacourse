@@ -7,10 +7,10 @@ namespace Dfc.ProviderPortal.FindACourse.Models
         public string SubjectKeyword { get; set; }
         public string DFE1619Funded { get; set; }
         public float? Distance { get; set; }
-        public string[] QualificationLevels { get; set; }
-        public string[] StudyModes { get; set; }
-        public string[] AttendanceModes { get; set; }
-        public string[] AttendancePatterns { get; set; }
+        public int[] QualificationLevels { get; set; }
+        public int[] StudyModes { get; set; }
+        public int[] AttendanceModes { get; set; }
+        public int[] AttendancePatterns { get; set; }
         public string Town { get; set; }
         public string Postcode { get; set; }
         public CourseSearchSortBy? SortBy { get; set; }

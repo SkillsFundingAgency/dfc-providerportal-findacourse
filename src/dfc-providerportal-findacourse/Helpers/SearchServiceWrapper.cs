@@ -285,6 +285,16 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
                 filterClauses.Add($"search.ismatch('{townEscaped}', 'VenueTown')");
             }
 
+            if (criteria.StudyModes?.Any() ?? false)
+            {
+                filterClauses.Add($"search.in(VenueStudyMode, '{string.Join("|", criteria.StudyModes)}', '|')");
+            }
+
+            if (criteria.AttendanceModes?.Any() ?? false)
+            {
+                filterClauses.Add($"search.in(VenueAttendancePattern, '{string.Join("|", criteria.AttendanceModes)}', '|')");
+            }
+
             var filter = string.Join(" and ", filterClauses);
 
             var orderBy = sortBy == CourseSearchSortBy.StartDateDescending ?
