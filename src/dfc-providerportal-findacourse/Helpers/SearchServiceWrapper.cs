@@ -341,83 +341,65 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
             Throw.IfNull(criteria, nameof(criteria));
             //_log.LogMethodEnter();
 
-            try
+            _log.LogInformation("Provider search criteria.", criteria);
+            _log.LogInformation("Provider search uri.", _uri.ToString());
+
+            // Create filter string for indexed fields
+            // Use a pipe char to delimit; default commas and spaces can't be used as may be in facet values
+            List<KeyValuePair<string, string>> list = new List<KeyValuePair<string, string>>();
+            list.Add(new KeyValuePair<string, string>("Town", string.Join("|", criteria.Town ?? new string[] { })));
+            //list.Add(new KeyValuePair<string, string>("Region", string.Join("|", criteria.Region ?? new string[] { })));
+            string filter = string.Join(" and ", list.Where(x => !string.IsNullOrWhiteSpace(x.Value))
+                                                        .Select(x => "search.in(" + x.Key + ", '" + x.Value + "', '|')"));
+
+            //// Index array fields are a little different
+            //filter = (string.IsNullOrWhiteSpace(filter) ? "" : filter + " and ")
+            //                + "Town/any(t: search.in(t, '" 
+            //                + string.Join("|", criteria.Towns ?? new string[] { })
+            //                + "', '|'))";
+
+            // Create a search criteria object for azure search service
+            ISearchCriteria providerCriteria = new ProviderSearchCriteria()
             {
-                _log.LogInformation("Provider search criteria.", criteria);
-                _log.LogInformation("Provider search uri.", _uri.ToString());
+                search = $"{criteria.Keyword}*",
+                searchMode = "all",
+                top = criteria.TopResults ?? _settings.DefaultTop,
+                filter = filter,
+                facets = new string[] { "Town" }, //, "Region" },
+                count = true
+            };
 
-                // Create filter string for indexed fields
-                // Use a pipe char to delimit; default commas and spaces can't be used as may be in facet values
-                List<KeyValuePair<string, string>> list = new List<KeyValuePair<string, string>>();
-                list.Add(new KeyValuePair<string, string>("Town", string.Join("|", criteria.Town ?? new string[] { })));
-                //list.Add(new KeyValuePair<string, string>("Region", string.Join("|", criteria.Region ?? new string[] { })));
-                string filter = string.Join(" and ", list.Where(x => !string.IsNullOrWhiteSpace(x.Value))
-                                                         .Select(x => "search.in(" + x.Key + ", '" + x.Value + "', '|')"));
+            // Create json ready for posting
+            JsonSerializerSettings settings = new JsonSerializerSettings {
+                //ContractResolver = new ProviderSearchCriteriaContractResolver()
+            };
+            settings.Converters.Add(new StringEnumConverter() { CamelCaseText = false });
+            StringContent content = new StringContent(JsonConvert.SerializeObject(providerCriteria, settings), Encoding.UTF8, "application/json");
 
-                //// Index array fields are a little different
-                //filter = (string.IsNullOrWhiteSpace(filter) ? "" : filter + " and ")
-                //                + "Town/any(t: search.in(t, '" 
-                //                + string.Join("|", criteria.Towns ?? new string[] { })
-                //                + "', '|'))";
+            // Do the search
+            _log.LogInformation("Provider search POST body", JsonConvert.SerializeObject(providerCriteria, settings));
+            Task<HttpResponseMessage> task = _httpClient.PostAsync(_providerUri, content);
+            task.Wait();
+            HttpResponseMessage response = task.Result;
+            _log.LogInformation("Provider search service http response.", response);
 
-                // Create a search criteria object for azure search service
-                ISearchCriteria providerCriteria = new ProviderSearchCriteria()
-                {
-                    search = $"{criteria.Keyword}*",
-                    searchMode = "all",
-                    top = criteria.TopResults ?? _settings.DefaultTop,
-                    filter = filter,
-                    facets = new string[] { "Town" }, //, "Region" },
-                    count = true
-                };
+            // Handle response and deserialize results
+            if (response.IsSuccessStatusCode) {
+                var json = response.Content.ReadAsStringAsync().Result;
 
-                // Create json ready for posting
-                JsonSerializerSettings settings = new JsonSerializerSettings {
-                    //ContractResolver = new ProviderSearchCriteriaContractResolver()
+                _log.LogInformation("Provider search service json response.", json);
+                settings = new JsonSerializerSettings {
+                    ContractResolver = new ProviderSearchResultContractResolver()
                 };
                 settings.Converters.Add(new StringEnumConverter() { CamelCaseText = false });
-                StringContent content = new StringContent(JsonConvert.SerializeObject(providerCriteria, settings), Encoding.UTF8, "application/json");
 
-                // Do the search
-                _log.LogInformation("Provider search POST body", JsonConvert.SerializeObject(providerCriteria, settings));
-                Task<HttpResponseMessage> task = _httpClient.PostAsync(_providerUri, content);
-                task.Wait();
-                HttpResponseMessage response = task.Result;
-                _log.LogInformation("Provider search service http response.", response);
+                ProviderSearchResult searchResult = JsonConvert.DeserializeObject<ProviderSearchResult>(json, settings);
+                return searchResult;
 
-                // Handle response and deserialize results
-                if (response.IsSuccessStatusCode) {
-                    var json = response.Content.ReadAsStringAsync().Result;
-
-                    _log.LogInformation("Provider search service json response.", json);
-                    settings = new JsonSerializerSettings {
-                        ContractResolver = new ProviderSearchResultContractResolver()
-                    };
-                    settings.Converters.Add(new StringEnumConverter() { CamelCaseText = false });
-
-                    ProviderSearchResult searchResult = JsonConvert.DeserializeObject<ProviderSearchResult>(json, settings);
-                    return searchResult;
-
-                } else {
-                    _log.LogWarning($"Provider search unexpected response: {response.StatusCode}", response);
-                    //return Result.Fail<IProviderSearchResult>("Provider search service unsuccessfull http response.");
-                    return null;
-                }
-
-            } catch (HttpRequestException hre) {
-                _log.LogError("Provider search service http request error.", hre);
-                //return Result.Fail<IProviderSearchResult>("Provider search service http request error.");
+            } else {
+                response.EnsureSuccessStatusCode();  // throws
                 return null;
-
-            } catch (Exception e) {
-                _log.LogError("Provider search service unknown error.", e);
-                //return Result.Fail<IProviderSearchResult>("Provider search service unknown error.");
-                return null;
-
-            } finally {
-                //_log.LogMethodExit();
             }
-
         }
 
         public LARSSearchResult SearchLARS(LARSSearchCriteriaStructure criteria)
@@ -425,84 +407,67 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
             Throw.IfNull(criteria, nameof(criteria));
             //_log.LogMethodEnter();
 
-            try
+            _log.LogInformation("LARS search criteria.", criteria);
+            _log.LogInformation("LARS search uri.", _uri.ToString());
+
+            // Create filter string for indexed fields
+            // Use a pipe char to delimit; default commas and spaces can't be used as may be in facet values
+            List<KeyValuePair<string, string>> list = new List<KeyValuePair<string, string>>();
+            list.Add(new KeyValuePair<string, string>("AwardOrgCode", string.Join("|", criteria.AwardOrgCode ?? new string[] { })));
+            list.Add(new KeyValuePair<string, string>("NotionalNVQLevelv2", string.Join("|", criteria.NotionalNVQLevelv2 ?? new string[] { })));
+            list.Add(new KeyValuePair<string, string>("SectorSubjectAreaTier1", string.Join("|", criteria.SectorSubjectAreaTier1 ?? new string[] { })));
+            list.Add(new KeyValuePair<string, string>("SectorSubjectAreaTier2", string.Join("|", criteria.SectorSubjectAreaTier2 ?? new string[] { })));
+            list.Add(new KeyValuePair<string, string>("AwardOrgAimRef", string.Join("|", criteria.AwardOrgAimRef ?? new string[] { })));
+            string filter = string.Join(" and ", list.Where(x => !string.IsNullOrWhiteSpace(x.Value))
+                                                        .Select(x => "search.in(" + x.Key + ", '" + x.Value + "', '|')"));
+
+            //// Index array fields are a little different
+            //filter = (string.IsNullOrWhiteSpace(filter) ? "" : filter + " and ")
+            //                + "Town/any(t: search.in(t, '" 
+            //                + string.Join("|", criteria.Towns ?? new string[] { })
+            //                + "', '|'))";
+
+            // Create a search criteria object for azure search service
+            ISearchCriteria larsCriteria = new LARSSearchCriteria()
             {
-                _log.LogInformation("LARS search criteria.", criteria);
-                _log.LogInformation("LARS search uri.", _uri.ToString());
+                search = $"{criteria.Keyword}*",
+                searchMode = "all",
+                top = criteria.TopResults ?? _settings.DefaultTop,
+                filter = filter,
+                facets = new string[] { "AwardOrgCode", "NotionalNVQLevelv2", "SectorSubjectAreaTier1", "SectorSubjectAreaTier2", "AwardOrgAimRef" },
+                count = true
+            };
 
-                // Create filter string for indexed fields
-                // Use a pipe char to delimit; default commas and spaces can't be used as may be in facet values
-                List<KeyValuePair<string, string>> list = new List<KeyValuePair<string, string>>();
-                list.Add(new KeyValuePair<string, string>("AwardOrgCode", string.Join("|", criteria.AwardOrgCode ?? new string[] { })));
-                list.Add(new KeyValuePair<string, string>("NotionalNVQLevelv2", string.Join("|", criteria.NotionalNVQLevelv2 ?? new string[] { })));
-                list.Add(new KeyValuePair<string, string>("SectorSubjectAreaTier1", string.Join("|", criteria.SectorSubjectAreaTier1 ?? new string[] { })));
-                list.Add(new KeyValuePair<string, string>("SectorSubjectAreaTier2", string.Join("|", criteria.SectorSubjectAreaTier2 ?? new string[] { })));
-                list.Add(new KeyValuePair<string, string>("AwardOrgAimRef", string.Join("|", criteria.AwardOrgAimRef ?? new string[] { })));
-                string filter = string.Join(" and ", list.Where(x => !string.IsNullOrWhiteSpace(x.Value))
-                                                         .Select(x => "search.in(" + x.Key + ", '" + x.Value + "', '|')"));
+            // Create json ready for posting
+            JsonSerializerSettings settings = new JsonSerializerSettings {
+                ContractResolver = new LARSSearchResultContractResolver()
+            };
+            settings.Converters.Add(new StringEnumConverter() { CamelCaseText = false });
+            StringContent content = new StringContent(JsonConvert.SerializeObject(larsCriteria, settings), Encoding.UTF8, "application/json");
 
-                //// Index array fields are a little different
-                //filter = (string.IsNullOrWhiteSpace(filter) ? "" : filter + " and ")
-                //                + "Town/any(t: search.in(t, '" 
-                //                + string.Join("|", criteria.Towns ?? new string[] { })
-                //                + "', '|'))";
+            // Do the search
+            _log.LogInformation("LARS search POST body", JsonConvert.SerializeObject(larsCriteria, settings));
+            Task<HttpResponseMessage> task = _httpClient.PostAsync(_larsUri, content);
+            task.Wait();
+            HttpResponseMessage response = task.Result;
+            _log.LogInformation("LARS search service http response.", response);
 
-                // Create a search criteria object for azure search service
-                ISearchCriteria larsCriteria = new LARSSearchCriteria()
-                {
-                    search = $"{criteria.Keyword}*",
-                    searchMode = "all",
-                    top = criteria.TopResults ?? _settings.DefaultTop,
-                    filter = filter,
-                    facets = new string[] { "AwardOrgCode", "NotionalNVQLevelv2", "SectorSubjectAreaTier1", "SectorSubjectAreaTier2", "AwardOrgAimRef" },
-                    count = true
-                };
+            // Handle response and deserialize results
+            if (response.IsSuccessStatusCode) {
+                var json = response.Content.ReadAsStringAsync().Result;
 
-                // Create json ready for posting
-                JsonSerializerSettings settings = new JsonSerializerSettings {
+                _log.LogInformation("LARS search service json response.", json);
+                settings = new JsonSerializerSettings {
                     ContractResolver = new LARSSearchResultContractResolver()
                 };
                 settings.Converters.Add(new StringEnumConverter() { CamelCaseText = false });
-                StringContent content = new StringContent(JsonConvert.SerializeObject(larsCriteria, settings), Encoding.UTF8, "application/json");
 
-                // Do the search
-                _log.LogInformation("LARS search POST body", JsonConvert.SerializeObject(larsCriteria, settings));
-                Task<HttpResponseMessage> task = _httpClient.PostAsync(_larsUri, content);
-                task.Wait();
-                HttpResponseMessage response = task.Result;
-                _log.LogInformation("LARS search service http response.", response);
+                LARSSearchResult searchResult = JsonConvert.DeserializeObject<LARSSearchResult>(json, settings);
+                return searchResult;
 
-                // Handle response and deserialize results
-                if (response.IsSuccessStatusCode) {
-                    var json = response.Content.ReadAsStringAsync().Result;
-
-                    _log.LogInformation("LARS search service json response.", json);
-                    settings = new JsonSerializerSettings {
-                        ContractResolver = new LARSSearchResultContractResolver()
-                    };
-                    settings.Converters.Add(new StringEnumConverter() { CamelCaseText = false });
-
-                    LARSSearchResult searchResult = JsonConvert.DeserializeObject<LARSSearchResult>(json, settings);
-                    return searchResult;
-
-                } else {
-                    _log.LogWarning($"LARS search unexpected response: {response.StatusCode}", response);
-                    //return Result.Fail<ILARSSearchResult>("LARS search service unsuccessfull http response.");
-                    return null;
-                }
-
-            } catch (HttpRequestException hre) {
-                _log.LogError("LARS search service http request error.", hre);
-                //return Result.Fail<ILARSSearchResult>("LARS search service http request error.");
+            } else {
+                response.EnsureSuccessStatusCode();  // throws
                 return null;
-
-            } catch (Exception e) {
-                _log.LogError("LARS search service unknown error.", e);
-                //return Result.Fail<ILARSSearchResult>("LARS search service unknown error.");
-                return null;
-
-            } finally {
-                //_log.LogMethodExit();
             }
         }
 
@@ -510,83 +475,65 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
         {
             Throw.IfNull(criteria, nameof(criteria));
             //_log.LogMethodEnter();
+            
+            _log.LogInformation("Postcode search criteria.", criteria);
+            _log.LogInformation("Postcode search uri.", _uri.ToString());
 
-            try
+            // Create filter string for indexed fields
+            // Use a pipe char to delimit; default commas and spaces can't be used as may be in facet values
+            List<KeyValuePair<string, string>> list = new List<KeyValuePair<string, string>>();
+            //list.Add(new KeyValuePair<string, string>("Town", string.Join("|", criteria.Town ?? new string[] { })));
+            //string filter = string.Join(" and ", list.Where(x => !string.IsNullOrWhiteSpace(x.Value))
+            //                                         .Select(x => "search.in(" + x.Key + ", '" + x.Value + "', '|')"));
+
+            //// Index array fields are a little different
+            //filter = (string.IsNullOrWhiteSpace(filter) ? "" : filter + " and ")
+            //                + "Town/any(t: search.in(t, '" 
+            //                + string.Join("|", criteria.Towns ?? new string[] { })
+            //                + "', '|'))";
+
+            // Create a search criteria object for azure search service
+            ISearchCriteria postcodeCriteria = new PostcodeSearchCriteria()
             {
-                _log.LogInformation("Postcode search criteria.", criteria);
-                _log.LogInformation("Postcode search uri.", _uri.ToString());
+                search = $"{criteria.Keyword}*",
+                searchMode = "all",
+                top = criteria.TopResults ?? _settings.DefaultTop,
+                filter = "", //filter,
+                facets = new string[] { },
+                count = true
+            };
 
-                // Create filter string for indexed fields
-                // Use a pipe char to delimit; default commas and spaces can't be used as may be in facet values
-                List<KeyValuePair<string, string>> list = new List<KeyValuePair<string, string>>();
-                //list.Add(new KeyValuePair<string, string>("Town", string.Join("|", criteria.Town ?? new string[] { })));
-                //string filter = string.Join(" and ", list.Where(x => !string.IsNullOrWhiteSpace(x.Value))
-                //                                         .Select(x => "search.in(" + x.Key + ", '" + x.Value + "', '|')"));
+            // Create json ready for posting
+            JsonSerializerSettings settings = new JsonSerializerSettings {
+                ContractResolver = new PostcodeSearchResultContractResolver()
+            };
+            settings.Converters.Add(new StringEnumConverter() { CamelCaseText = false });
+            StringContent content = new StringContent(JsonConvert.SerializeObject(postcodeCriteria, settings), Encoding.UTF8, "application/json");
 
-                //// Index array fields are a little different
-                //filter = (string.IsNullOrWhiteSpace(filter) ? "" : filter + " and ")
-                //                + "Town/any(t: search.in(t, '" 
-                //                + string.Join("|", criteria.Towns ?? new string[] { })
-                //                + "', '|'))";
+            // Do the search
+            _log.LogInformation("Postcode search POST body", JsonConvert.SerializeObject(postcodeCriteria, settings));
+            Task<HttpResponseMessage> task = _httpClient.PostAsync(_onspdUri, content);
+            task.Wait();
+            HttpResponseMessage response = task.Result;
+            _log.LogInformation("Postcode search service http response.", response);
 
-                // Create a search criteria object for azure search service
-                ISearchCriteria postcodeCriteria = new PostcodeSearchCriteria()
-                {
-                    search = $"{criteria.Keyword}*",
-                    searchMode = "all",
-                    top = criteria.TopResults ?? _settings.DefaultTop,
-                    filter = "", //filter,
-                    facets = new string[] { },
-                    count = true
-                };
+            // Handle response and deserialize results
+            if (response.IsSuccessStatusCode) {
+                var json = response.Content.ReadAsStringAsync().Result;
 
-                // Create json ready for posting
-                JsonSerializerSettings settings = new JsonSerializerSettings {
+                _log.LogInformation("Postcode search service json response.", json);
+                settings = new JsonSerializerSettings {
                     ContractResolver = new PostcodeSearchResultContractResolver()
                 };
                 settings.Converters.Add(new StringEnumConverter() { CamelCaseText = false });
-                StringContent content = new StringContent(JsonConvert.SerializeObject(postcodeCriteria, settings), Encoding.UTF8, "application/json");
 
-                // Do the search
-                _log.LogInformation("Postcode search POST body", JsonConvert.SerializeObject(postcodeCriteria, settings));
-                Task<HttpResponseMessage> task = _httpClient.PostAsync(_onspdUri, content);
-                task.Wait();
-                HttpResponseMessage response = task.Result;
-                _log.LogInformation("Postcode search service http response.", response);
+                PostcodeSearchResult searchResult = JsonConvert.DeserializeObject<PostcodeSearchResult>(json, settings);
+                return searchResult;
 
-                // Handle response and deserialize results
-                if (response.IsSuccessStatusCode) {
-                    var json = response.Content.ReadAsStringAsync().Result;
-
-                    _log.LogInformation("Postcode search service json response.", json);
-                    settings = new JsonSerializerSettings {
-                        ContractResolver = new PostcodeSearchResultContractResolver()
-                    };
-                    settings.Converters.Add(new StringEnumConverter() { CamelCaseText = false });
-
-                    PostcodeSearchResult searchResult = JsonConvert.DeserializeObject<PostcodeSearchResult>(json, settings);
-                    return searchResult;
-
-                } else {
-                    _log.LogWarning($"Postcode search unexpected response: {response.StatusCode}", response);
-                    //return Result.Fail<IPostcodeSearchResult>("Postcode search service unsuccessfull http response.");
-                    return null;
-                }
-
-            } catch (HttpRequestException hre) {
-                _log.LogError("Postcode search service http request error.", hre);
-                //return Result.Fail<IPostcodeSearchResult>("Postcode search service http request error.");
+            } else {
+                response.EnsureSuccessStatusCode();  // throws
                 return null;
-
-            } catch (Exception e) {
-                _log.LogError("Postcode search service unknown error.", e);
-                //return Result.Fail<IPostcodeSearchResult>("Postcode search service unknown error.");
-                return null;
-
-            } finally {
-                //_log.LogMethodExit();
             }
-
         }
     }
 }
