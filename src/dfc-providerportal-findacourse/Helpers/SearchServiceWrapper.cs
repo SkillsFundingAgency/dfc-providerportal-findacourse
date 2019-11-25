@@ -332,7 +332,7 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
             else
             {
                 response.EnsureSuccessStatusCode();  // throws
-                return default;
+                return null;
             }
         }
 
