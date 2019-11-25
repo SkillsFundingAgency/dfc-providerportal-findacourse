@@ -279,6 +279,12 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
                 filterClauses.Add($"geo.distance(VenueLocation, geography'POINT({longitude.Value} {latitude.Value})') le {criteria.Distance}");
             }
 
+            if (!string.IsNullOrWhiteSpace(criteria.Town))
+            {
+                var townEscaped = Uri.EscapeDataString(criteria.Town);
+                filterClauses.Add($"search.ismatch('{townEscaped}', 'VenueTown')");
+            }
+
             var filter = string.Join(" and ", filterClauses);
 
             var orderBy = sortBy == CourseSearchSortBy.StartDateDescending ?
