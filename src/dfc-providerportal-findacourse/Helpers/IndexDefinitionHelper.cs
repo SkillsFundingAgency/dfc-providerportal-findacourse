@@ -5,7 +5,7 @@ using Microsoft.Azure.Search;
 using Microsoft.Azure.Search.Models;
 using Microsoft.Extensions.Options;
 
-namespace Dfc.ProviderPortal.FindACourse
+namespace Dfc.ProviderPortal.FindACourse.Helpers
 {
     public class IndexDefinitionHelper
     {
@@ -39,7 +39,7 @@ namespace Dfc.ProviderPortal.FindACourse
                         new MagnitudeScoringFunction(
                             "ScoreBoost",
                             boost: 100,
-                            new MagnitudeScoringParameters()
+                            parameters: new MagnitudeScoringParameters()
                             {
                                 BoostingRangeStart = 1,
                                 BoostingRangeEnd = 100,
