@@ -144,90 +144,25 @@ namespace Dfc.ProviderPortal.FindACourse.Services
             }
         }
 
-        //private IEnumerable<dynamic> GetVenue(Guid id)
-        //{
-        //    return (dynamic) new VenueServiceWrapper(_venueServiceSettings).GetById(id);
-        //}
-
-        //public async Task<IEnumerable<IndexingResult>> UploadCoursesToSearch(ILogger log, IReadOnlyList<Document> documents)
-        //{
-        //    if (documents.Any()) {
-
-        //        log.LogInformation("Getting provider data");
-        //        IEnumerable<AzureSearchProviderModel> providers = new ProviderServiceWrapper(_providerServiceSettings).GetLiveProvidersForAzureSearch();
-
-        //        IEnumerable<AzureSearchVenueModel> venues = GetVenues(
-        //            log,
-        //            documents.Select(d => new Course() { CourseRuns = d.GetPropertyValue<IEnumerable<CourseRun>>("CourseRuns") })
-        //                     .SelectMany(c => c.CourseRuns)
-        //        );
-                
-        //        return new SearchServiceWrapper(log, _searchServiceSettings)
-        //                .UploadBatch(providers, venues, documents, out int succeeded);
-        //    } else {
-        //        // Return empty list of failed IndexingResults
-        //        return new List<IndexingResult>();
-        //    }
-        //}
-
-        public async Task<FACSearchResult> CourseSearch(ILogger log, SearchCriteriaStructure criteria) // string SearchText)
+        public Task<FACSearchResult> CourseSearch(ILogger log, SearchCriteriaStructure criteria) // string SearchText)
         {
             return new SearchServiceWrapper(log, _searchServiceSettings).SearchCourses(criteria);
         }
 
-        public async Task<ProviderSearchResult> ProviderSearch(ILogger log, ProviderSearchCriteriaStructure criteria)
+        public Task<ProviderSearchResult> ProviderSearch(ILogger log, ProviderSearchCriteriaStructure criteria)
         {
             return new SearchServiceWrapper(log, _searchServiceSettings).SearchProviders(criteria);
         }
 
-        public async Task<LARSSearchResult> LARSSearch(ILogger log, LARSSearchCriteriaStructure criteria)
+        public Task<LARSSearchResult> LARSSearch(ILogger log, LARSSearchCriteriaStructure criteria)
         {
             return new SearchServiceWrapper(log, _searchServiceSettings).SearchLARS(criteria);
         }
 
-        public async Task<PostcodeSearchResult> PostcodeSearch(ILogger log, PostcodeSearchCriteriaStructure criteria)
+        public Task<PostcodeSearchResult> PostcodeSearch(ILogger log, PostcodeSearchCriteriaStructure criteria)
         {
             return new SearchServiceWrapper(log, _searchServiceSettings).SearchPostcode(criteria);
         }
-
-        //public async Task<IEnumerable<IAzureSearchCourse>> FindACourseAzureSearchData(ILogger log)
-        //{
-        //    try {
-        //        IEnumerable<ICourse> persisted = await GetAllCourses(log);
-        //        IEnumerable<AzureSearchProviderModel> providers = new ProviderServiceWrapper(_providerServiceSettings).GetLiveProvidersForAzureSearch();
-        //        IEnumerable<AzureSearchVenueModel> venues = GetVenues(persisted.SelectMany(p => p.CourseRuns ?? new List<CourseRun>())); //new VenueServiceWrapper(_venueServiceSettings).GetVenues();
-
-        //        IEnumerable<IAzureSearchCourse> results = from ICourse c in persisted
-        //                                                  from CourseRun cr in c.CourseRuns ?? new List<CourseRun>()
-        //                                                  join AzureSearchProviderModel p in providers
-        //                                                  on c.ProviderUKPRN equals p.UnitedKingdomProviderReferenceNumber
-        //                                                  from vm in venues.Where(v => cr.VenueId == v.id)
-        //                                                                   .DefaultIfEmpty()
-        //                                                  select new AzureSearchCourse()
-        //                                                  {
-        //                                                      id = cr.id,
-        //                                                      CourseId = c.id,
-        //                                                      QualificationCourseTitle = c.QualificationCourseTitle,
-        //                                                      LearnAimRef = c.LearnAimRef,
-        //                                                      NotionalNVQLevelv2 = c.NotionalNVQLevelv2,
-        //                                                      VenueName = vm?.VENUE_NAME,
-        //                                                      VenueAddress = string.Format("{0}{1}{2}{3}{4}",
-        //                                                                     string.IsNullOrWhiteSpace(vm?.ADDRESS_1) ? "" : vm?.ADDRESS_1 + ", ",
-        //                                                                     string.IsNullOrWhiteSpace(vm?.ADDRESS_2) ? "" : vm?.ADDRESS_2 + ", ",
-        //                                                                     string.IsNullOrWhiteSpace(vm?.TOWN) ? "" : vm?.TOWN + ", ",
-        //                                                                     string.IsNullOrWhiteSpace(vm?.COUNTY) ? "" : vm?.COUNTY + ", ",
-        //                                                                     vm?.POSTCODE),
-        //                                                      VenueAttendancePattern = cr.AttendancePattern,
-        //                                                      VenueLocation = GeographyPoint.Create(vm?.Latitude ?? 0, vm?.Longitude ?? 0),
-        //                                                      ProviderName = p.ProviderName,
-        //                                                      UpdatedOn = c.UpdatedDate
-        //                                                  };
-        //        return results;
-
-        //    } catch (Exception ex) {
-        //        throw ex;
-        //    }
-        //}
 
         public async Task<IEnumerable<ICourse>> GetAllCourses(ILogger log)
         {
