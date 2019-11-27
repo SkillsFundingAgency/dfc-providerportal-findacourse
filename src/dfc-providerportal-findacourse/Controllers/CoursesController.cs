@@ -61,7 +61,13 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                 var response = new CourseSearchResponse()
                 {
                     ResultCount = result.ResultCount,
-                    SearchFacets = result.Facets,
+                    Facets = result.Facets.ToDictionary(
+                        f => f.Key,
+                        f => f.Value.Select(v => new FacetCountResult()
+                        {
+                            Value = v.Value,
+                            Count = v.Count.Value
+                        })),
                     Value = result.Items.Select(i => new CourseSearchResponseItem()
                     {
                         Cost = i.Course.Cost,
