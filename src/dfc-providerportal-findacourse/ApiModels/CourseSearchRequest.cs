@@ -6,7 +6,6 @@ namespace Dfc.ProviderPortal.FindACourse.ApiModels
     public class CourseSearchRequest
     {
         public string SubjectKeyword { get; set; }
-        public string DFE1619Funded { get; set; }
         public float? Distance { get; set; }
         public int[] QualificationLevels { get; set; }
         public int[] StudyModes { get; set; }

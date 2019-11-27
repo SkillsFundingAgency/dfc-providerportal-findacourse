@@ -42,7 +42,6 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                 {
                     AttendanceModes = request.AttendanceModes,
                     AttendancePatterns = request.AttendancePatterns,
-                    DFE1619Funded = request.DFE1619Funded,
                     Distance = request.Distance,
                     PageNo = request.PageNo,
                     Postcode = request.Postcode,
