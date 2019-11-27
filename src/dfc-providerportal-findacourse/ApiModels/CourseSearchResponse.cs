@@ -7,16 +7,14 @@ namespace Dfc.ProviderPortal.FindACourse.ApiModels
     {
         public long ResultCount { get; set; }
         public IDictionary<string, IEnumerable<FacetCountResult>> Facets { get; set; }
-        public IEnumerable<CourseSearchResponseItem> Value { get; set; }
+        public IEnumerable<CourseSearchResponseItem> Results { get; set; }
     }
 
     public class CourseSearchResponseItem
     {
-        public dynamic SearchScore { get; set; }
-        public dynamic VenueLocation { get; set; }
-        public double? GeoSearchDistance { get; set; }
-        public decimal? ScoreBoost { get; set; }
-        public Guid? id { get; set; }
+        public double SearchScore { get; set; }
+        public double? Distance { get; set; }
+        public Coordinates VenueLocation { get; set; }
         public Guid? CourseId { get; set; }
         public Guid? CourseRunId { get; set; }
         public string QualificationCourseTitle { get; set; }
@@ -29,7 +27,6 @@ namespace Dfc.ProviderPortal.FindACourse.ApiModels
         public string VenueAttendancePatternDescription { get; set; }
         public string ProviderName { get; set; }
         public string Region { get; set; }
-        public int? Status { get; set; }
         public string VenueStudyMode { get; set; }
         public string VenueStudyModeDescription { get; set; }
         public string DeliveryMode { get; set; }
