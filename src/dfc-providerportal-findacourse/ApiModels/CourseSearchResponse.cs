@@ -5,8 +5,7 @@ namespace Dfc.ProviderPortal.FindACourse.ApiModels
 {
     public class CourseSearchResponse
     {
-        public string ODataContext { get; set; }
-        public int? ODataCount { get; set; }
+        public long ResultCount { get; set; }
         public dynamic SearchFacets { get; set; } //FACSearchFacets SearchFacets { get; set; }
         public IEnumerable<CourseSearchResponseItem> Value { get; set; }
     }

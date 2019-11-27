@@ -1,16 +1,13 @@
-﻿
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Dfc.ProviderPortal.FindACourse.Interfaces;
-
+using Microsoft.Azure.Search.Models;
 
 namespace Dfc.ProviderPortal.FindACourse.Models
 {
     public class FACSearchResult : IFACSearchResult
     {
-        public string ODataContext { get; set; }
-        public int? ODataCount { get; set; }
-        public dynamic SearchFacets { get; set; } //FACSearchFacets SearchFacets { get; set; }
-        public IEnumerable<FACSearchResultItem> Value { get; set; }
+        public long ResultCount { get; set; }
+        public IDictionary<string, IList<FacetResult>> Facets { get; set; }
+        public IEnumerable<FACSearchResultItem> Items { get; set; }
     }
 }
