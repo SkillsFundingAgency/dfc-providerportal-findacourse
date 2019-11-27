@@ -5,7 +5,6 @@ namespace Dfc.ProviderPortal.FindACourse.Models
     public class SearchCriteriaStructure
     {
         public string SubjectKeyword { get; set; }
-        public string DFE1619Funded { get; set; }
         public float? Distance { get; set; }
         public int[] QualificationLevels { get; set; }
         public int[] StudyModes { get; set; }
