@@ -31,7 +31,7 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
         [Route("~/coursesearch")]
         [HttpPost]
         [ProducesResponseType(typeof(FACSearchResult), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> CourseSearch([FromBody]CourseSearchRequest request)
