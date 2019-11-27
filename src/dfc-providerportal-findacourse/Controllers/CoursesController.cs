@@ -30,7 +30,7 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
 
         [Route("~/coursesearch")]
         [HttpPost]
-        [ProducesResponseType(typeof(FACSearchResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(CourseSearchResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -58,7 +58,47 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
 
                 _log.LogInformation($"FAC search with keyword {criteria.SubjectKeyword}");
                 var result = await _service.CourseSearch(_log, criteria);
-                return new OkObjectResult(result);
+
+                var response = new CourseSearchResponse()
+                {
+                    ODataContext = result.ODataContext,
+                    ODataCount = result.ODataCount,
+                    SearchFacets = result.SearchFacets,
+                    Value = result.Value.Select(i => new CourseSearchResponseItem()
+                    {
+                        Cost = i.Cost,
+                        CostDescription = i.CostDescription,
+                        CourseDescription = i.CourseDescription,
+                        CourseId = i.CourseId,
+                        CourseRunId = i.CourseRunId,
+                        CourseText = i.CourseText,
+                        DeliveryMode = i.DeliveryMode,
+                        DeliveryModeDescription = i.DeliveryModeDescription,
+                        GeoSearchDistance = i.GeoSearchDistance,
+                        id = i.id,
+                        LearnAimRef = i.LearnAimRef,
+                        NotionalNVQLevelv2 = i.NotionalNVQLevelv2,
+                        ProviderName = i.ProviderName,
+                        QualificationCourseTitle = i.QualificationCourseTitle,
+                        Region = i.Region,
+                        ScoreBoost = i.ScoreBoost,
+                        SearchScore = i.SearchScore,
+                        StartDate = i.StartDate,
+                        Status = i.Status,
+                        UKPRN = i.UKPRN,
+                        UpdatedOn = i.UpdatedOn,
+                        VenueAddress = i.VenueAddress,
+                        VenueAttendancePattern = i.VenueAttendancePattern,
+                        VenueAttendancePatternDescription = i.VenueAttendancePatternDescription,
+                        VenueLocation = i.VenueLocation,
+                        VenueName = i.VenueName,
+                        VenueStudyMode = i.VenueStudyMode,
+                        VenueStudyModeDescription = i.VenueStudyModeDescription,
+                        VenueTown = i.VenueTown
+                    })
+                };
+
+                return new OkObjectResult(response);
             }
             catch (ProblemDetailsException ex)
             {
@@ -107,7 +147,7 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
 
         [Route("~/providersearch")]
         [HttpPost]
-        [ProducesResponseType(typeof(ProviderSearchResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProviderSearchResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> ProviderSearch([FromBody]ProviderSearchRequest request)
@@ -124,7 +164,29 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
 
                 _log.LogInformation($"Provider search with keyword {request.Keyword}");
                 var result = await _service.ProviderSearch(_log, criteria);
-                return new OkObjectResult(result);
+
+                var response = new ProviderSearchResponse()
+                {
+                    ODataContext = result.ODataContext,
+                    ODataCount = result.ODataCount,
+                    SearchFacets = result.SearchFacets,
+                    Value = result.Value.Select(i => new ProviderSearchResponseItem()
+                    {
+                        CourseDirectoryName = i.CourseDirectoryName,
+                        id = i.id,
+                        Name = i.Name,
+                        Postcode = i.Postcode,
+                        ProviderAlias = i.ProviderAlias,
+                        ProviderStatus = i.ProviderStatus,
+                        Region = i.Region,
+                        Status = i.Status,
+                        Town = i.Town,
+                        TradingName = i.TradingName,
+                        UKPRN = i.UKPRN
+                    })
+                };
+
+                return new OkObjectResult(response);
             }
             catch (Exception ex)
             {
@@ -135,7 +197,7 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
 
         [Route("~/providerget")]
         [HttpPost]
-        [ProducesResponseType(typeof(Provider), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProviderGetResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -145,9 +207,35 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
             {
                 _log.LogInformation($"FAC ProviderGet called for PRN {request.UKPRN}");
                 var result = await _service.ProviderDetail(request.UKPRN);
+
                 if (result != null)
                 {
-                    return new OkObjectResult(result);
+                    var response = new ProviderGetResponse()
+                    {
+                        Alias = result.Alias,
+                        BulkUploadStatus = result.BulkUploadStatus,
+                        CourseDirectoryName = result.CourseDirectoryName,
+                        ExpiryDateSpecified = result.ExpiryDateSpecified,
+                        id = result.id,
+                        MarketingInformation = result.MarketingInformation,
+                        NationalApprenticeshipProvider = result.NationalApprenticeshipProvider,
+                        ProviderAliases = result.ProviderAliases,
+                        ProviderAssociations = result.ProviderAssociations,
+                        ProviderContact = result.ProviderContact,
+                        ProviderId = result.ProviderId,
+                        ProviderName = result.ProviderName,
+                        ProviderStatus = result.ProviderStatus,
+                        ProviderType = result.ProviderType,
+                        ProviderVerificationDate = result.ProviderVerificationDate,
+                        ProviderVerificationDateSpecified = result.ProviderVerificationDateSpecified,
+                        Status = result.Status,
+                        TradingName = result.TradingName,
+                        UnitedKingdomProviderReferenceNumber = result.UnitedKingdomProviderReferenceNumber,
+                        UPIN = result.UPIN,
+                        VerificationDetails = result.VerificationDetails
+                    };
+
+                    return new OkObjectResult(response);
                 }
                 else
                 {
@@ -163,7 +251,7 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
 
         [Route("~/larssearch")]
         [HttpPost]
-        [ProducesResponseType(typeof(LARSSearchResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(LARSSearchResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> LARSSearch([FromBody]LARSSearchRequest request)
@@ -183,7 +271,16 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
 
                 _log.LogInformation($"LARS search with keyword {criteria.Keyword}");
                 var result = await _service.LARSSearch(_log, criteria);
-                return new OkObjectResult(result);
+
+                var response = new LARSSearchResponse()
+                {
+                    ODataContext = result.ODataContext,
+                    ODataCount = result.ODataCount,
+                    SearchFacets = result.SearchFacets,
+                    Value = result.Value
+                };
+
+                return new OkObjectResult(response);
             }
             catch (Exception ex)
             {
@@ -194,7 +291,7 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
 
         [Route("~/onspdsearch")]
         [HttpPost]
-        [ProducesResponseType(typeof(PostcodeSearchResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(PostcodeSearchResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> ONSPDSearch([FromBody]PostcodeSearchRequest request)
@@ -209,7 +306,16 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
 
                 _log.LogInformation($"ONSPD search with keyword {criteria.Keyword}");
                 var result = await _service.PostcodeSearch(_log, criteria);
-                return new OkObjectResult(result);
+
+                var response = new PostcodeSearchResponse()
+                {
+                    ODataContext = result.ODataContext,
+                    ODataCount = result.ODataCount,
+                    SearchFacets = result.SearchFacets,
+                    Value = result.Value
+                };
+
+                return new OkObjectResult(response);
             }
             catch (Exception ex)
             {
