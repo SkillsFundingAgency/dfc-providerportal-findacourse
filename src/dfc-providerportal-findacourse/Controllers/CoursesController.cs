@@ -68,7 +68,7 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                             Value = v.Value,
                             Count = v.Count.Value
                         })),
-                    Value = result.Items.Select(i => new CourseSearchResponseItem()
+                    Results = result.Items.Select(i => new CourseSearchResponseItem()
                     {
                         Cost = i.Course.Cost,
                         CostDescription = i.Course.CostDescription,
@@ -78,23 +78,24 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                         CourseText = i.Course.CourseText,
                         DeliveryMode = i.Course.DeliveryMode,
                         DeliveryModeDescription = i.Course.DeliveryModeDescription,
-                        GeoSearchDistance = i.Distance,
-                        id = i.Course.id,
+                        Distance = i.Distance,
                         LearnAimRef = i.Course.LearnAimRef,
                         NotionalNVQLevelv2 = i.Course.NotionalNVQLevelv2,
                         ProviderName = i.Course.ProviderName,
                         QualificationCourseTitle = i.Course.QualificationCourseTitle,
                         Region = i.Course.Region,
-                        ScoreBoost = i.Course.ScoreBoost,
                         SearchScore = i.Score,
                         StartDate = i.Course.StartDate,
-                        Status = i.Course.Status,
                         UKPRN = i.Course.UKPRN,
                         UpdatedOn = i.Course.UpdatedOn,
                         VenueAddress = i.Course.VenueAddress,
                         VenueAttendancePattern = i.Course.VenueAttendancePattern,
                         VenueAttendancePatternDescription = i.Course.VenueAttendancePatternDescription,
-                        VenueLocation = i.Course.VenueLocation,
+                        VenueLocation = new Coordinates()
+                        {
+                            Latitude = i.Course.VenueLocation.Latitude,
+                            Longitude = i.Course.VenueLocation.Longitude
+                        },
                         VenueName = i.Course.VenueName,
                         VenueStudyMode = i.Course.VenueStudyMode,
                         VenueStudyModeDescription = i.Course.VenueStudyModeDescription,
