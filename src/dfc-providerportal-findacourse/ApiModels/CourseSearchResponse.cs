@@ -6,7 +6,7 @@ namespace Dfc.ProviderPortal.FindACourse.ApiModels
     public class CourseSearchResponse
     {
         public long ResultCount { get; set; }
-        public dynamic SearchFacets { get; set; } //FACSearchFacets SearchFacets { get; set; }
+        public IDictionary<string, IEnumerable<FacetCountResult>> Facets { get; set; }
         public IEnumerable<CourseSearchResponseItem> Value { get; set; }
     }
 
