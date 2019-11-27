@@ -73,6 +73,7 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                         Cost = i.Course.Cost,
                         CostDescription = i.Course.CostDescription,
                         CourseDescription = i.Course.CourseDescription,
+                        CourseName = i.Course.CourseName,
                         CourseId = i.Course.CourseId,
                         CourseRunId = i.Course.CourseRunId,
                         CourseText = i.Course.CourseText,

@@ -38,5 +38,6 @@ namespace Dfc.ProviderPortal.FindACourse.ApiModels
         public string CourseText { get; set; }
         public string UKPRN { get; set; }
         public string CourseDescription { get; set; }
+        public string CourseName { get; set; }
     }
 }
