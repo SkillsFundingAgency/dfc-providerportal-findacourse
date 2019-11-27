@@ -1,14 +1,9 @@
-﻿
-using System;
-
-
-namespace Dfc.ProviderPortal.FindACourse.Models
+﻿namespace Dfc.ProviderPortal.FindACourse.Models
 {
-    public class FACSearchResultItem : AzureSearchCourse
+    public class FACSearchResultItem
     {
-        public dynamic SearchScore { get; set; }
-        public new dynamic VenueLocation { get; set; }
-        public double? GeoSearchDistance { get; set; }
-        public decimal? ScoreBoost { get; set; }
+        public AzureSearchCourse Course { get; set; }
+        public double? Distance { get; set; }
+        public double Score { get; set; }
     }
 }
