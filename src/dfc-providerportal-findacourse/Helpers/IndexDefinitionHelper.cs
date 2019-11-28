@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 using Dfc.ProviderPortal.FindACourse.Settings;
 using Microsoft.Azure.Search;
@@ -22,35 +23,69 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
         {
             // TODO Move all index definitions here
 
-            return EnsureScoringProfilesOnCoursesIndex();
+            return EnsureCoursesIndex();
         }
 
-        private async Task EnsureScoringProfilesOnCoursesIndex()
+        private async Task EnsureCoursesIndex()
         {
-            var index = await _service.Indexes.GetAsync(_coursesIndexName);
-
-            if (index.ScoringProfiles.Count == 0)
+            var index = new Index()
             {
-                index.ScoringProfiles.Add(new ScoringProfile()
+                Name = _coursesIndexName,
+                Fields = new List<Field>()
                 {
-                    Name = "region-boost",
-                    Functions = new List<ScoringFunction>()
+                    new Field("id", DataType.String) { IsKey = true, IsFacetable = false, IsFilterable = false, IsSearchable = false, IsSortable = false },
+                    new Field("CourseId", DataType.String) { IsFacetable = false, IsFilterable = true, IsSearchable = true, IsSortable = false },
+                    new Field("CourseRunId", DataType.String) { IsFacetable = false, IsFilterable = true, IsSearchable = true, IsSortable = false },
+                    new Field("QualificationCourseTitle", DataType.String) { IsFacetable = false, IsFilterable = true, IsSearchable = true, IsSortable = false },
+                    new Field("LearnAimRef", DataType.String) { IsFacetable = false, IsFilterable = true, IsSearchable = true, IsSortable = false },
+                    new Field("NotionalNVQLevelv2", DataType.String) { IsFacetable = true, IsFilterable = true, IsSearchable = false, IsSortable = false },
+                    new Field("Status", DataType.Int32) { IsFacetable = false, IsFilterable = true, IsSearchable = false, IsSortable = false },
+                    new Field("VenueName", DataType.String) { IsFacetable = false, IsFilterable = true, IsSearchable = true, IsSortable = false },
+                    new Field("VenueAddress", DataType.String) { IsFacetable = false, IsFilterable = true, IsSearchable = true, IsSortable = false },
+                    new Field("VenueLocation", DataType.GeographyPoint) { IsFacetable = false, IsFilterable = true, IsSearchable = false, IsSortable = true },
+                    new Field("VenueAttendancePattern", DataType.String) { IsFacetable = true, IsFilterable = true, IsSearchable = true, IsSortable = false },
+                    new Field("ProviderName", DataType.String) { IsFacetable = true, IsFilterable = true, IsSearchable = false, IsSortable = false },
+                    new Field("Region", DataType.String) { IsFacetable = true, IsFilterable = true, IsSearchable = true, IsSortable = false },
+                    new Field("Weighting", DataType.String) { IsFacetable = true, IsFilterable = true, IsSearchable = true, IsSortable = true },
+                    new Field("ScoreBoost", DataType.Double) { IsFacetable = true, IsFilterable = true, IsSearchable = false, IsSortable = true },
+                    new Field("UpdatedOn", DataType.DateTimeOffset) { IsFacetable = false, IsFilterable = true, IsSearchable = false, IsSortable = false },
+                    new Field("VenueStudyMode", DataType.String) { IsFacetable = true, IsFilterable = true, IsSearchable = true, IsSortable = false },
+                    new Field("DeliveryMode", DataType.String) { IsFacetable = true, IsFilterable = true, IsSearchable = true, IsSortable = false },
+                    new Field("StartDate", DataType.DateTimeOffset) { IsFacetable = false, IsFilterable = true, IsSearchable = false, IsSortable = true },
+                    new Field("VenueTown", DataType.String) { IsFacetable = true, IsFilterable = true, IsSearchable = true, IsSortable = false },
+                    new Field("Cost", DataType.Int32) { IsFacetable = false, IsFilterable = true, IsSearchable = false, IsSortable = true },
+                    new Field("CostDescription", DataType.String) { IsFacetable = false, IsFilterable = true, IsSearchable = false, IsSortable = false },
+                    new Field("CourseText", DataType.String) { IsFacetable = false, IsFilterable = true, IsSearchable = false, IsSortable = false },
+                    new Field("VenueAttendancePatternDescription", DataType.String) { IsFacetable = false, IsFilterable = true, IsSearchable = false, IsSortable = false },
+                    new Field("VenueStudyModeDescription", DataType.String) { IsFacetable = false, IsFilterable = true, IsSearchable = false, IsSortable = false },
+                    new Field("DeliveryModeDescription", DataType.String) { IsFacetable = false, IsFilterable = true, IsSearchable = false, IsSortable = false },
+                    new Field("UKPRN", DataType.String) { IsFacetable = true, IsFilterable = true, IsSearchable = true, IsSortable = false },
+                    new Field("CourseDescription", DataType.String) { IsFacetable = false, IsFilterable = true, IsSearchable = false, IsSortable = false },
+                    new Field("CourseName", DataType.String) { IsFacetable = false, IsFilterable = true, IsSearchable = true, IsSortable = false }
+                },
+                ScoringProfiles = new List<ScoringProfile>()
+                {
+                    new ScoringProfile()
                     {
-                        new MagnitudeScoringFunction(
-                            "ScoreBoost",
-                            boost: 100,
-                            parameters: new MagnitudeScoringParameters()
-                            {
-                                BoostingRangeStart = 1,
-                                BoostingRangeEnd = 100,
-                                ShouldBoostBeyondRangeByConstant = true
-                            },
-                            interpolation: ScoringFunctionInterpolation.Linear)
+                        Name = "region-boost",
+                        Functions = new List<ScoringFunction>()
+                        {
+                            new MagnitudeScoringFunction(
+                                "ScoreBoost",
+                                boost: 100,
+                                parameters: new MagnitudeScoringParameters()
+                                {
+                                    BoostingRangeStart = 1,
+                                    BoostingRangeEnd = 100,
+                                    ShouldBoostBeyondRangeByConstant = true
+                                },
+                                interpolation: ScoringFunctionInterpolation.Linear)
+                        }
                     }
-                });
+                }
+            };
 
-                await _service.Indexes.CreateOrUpdateAsync(index);
-            }
+            await _service.Indexes.CreateOrUpdateAsync(index);
         }
     }
 }
