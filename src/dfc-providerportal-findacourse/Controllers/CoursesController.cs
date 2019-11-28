@@ -41,15 +41,15 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                 AttendanceModes = request.AttendanceModes,
                 AttendancePatterns = request.AttendancePatterns,
                 Distance = request.Distance,
-                PageNo = request.PageNo,
+                Limit = request.Limit,
                 Postcode = request.Postcode,
                 QualificationLevels = request.QualificationLevels,
                 SortBy = request.SortBy,
+                Start = request.Start,
                 StartDateFrom = request.StartDateFrom,
                 StartDateTo = request.StartDateTo,
                 StudyModes = request.StudyModes,
                 SubjectKeyword = request.SubjectKeyword,
-                TopResults = request.TopResults,
                 Town = request.Town
             };
 
@@ -57,7 +57,9 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
 
             var response = new CourseSearchResponse()
             {
-                ResultCount = result.ResultCount,
+                    Limit = result.Limit,
+                    Start = result.Start,
+                    Total = result.Total,
                 Facets = result.Facets.ToDictionary(
                     f => f.Key,
                     f => f.Value.Select(v => new FacetCountResult()

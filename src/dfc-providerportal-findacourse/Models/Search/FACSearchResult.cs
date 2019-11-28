@@ -6,7 +6,9 @@ namespace Dfc.ProviderPortal.FindACourse.Models
 {
     public class FACSearchResult : IFACSearchResult
     {
-        public long ResultCount { get; set; }
+        public int Total { get; set; }
+        public int Limit { get; set; }
+        public int Start { get; set; }
         public IDictionary<string, IList<FacetResult>> Facets { get; set; }
         public IEnumerable<FACSearchResultItem> Items { get; set; }
     }
