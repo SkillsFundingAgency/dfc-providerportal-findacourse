@@ -61,7 +61,8 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
                     new Field("DeliveryModeDescription", DataType.String) { IsFacetable = false, IsFilterable = true, IsSearchable = false, IsSortable = false },
                     new Field("UKPRN", DataType.String) { IsFacetable = true, IsFilterable = true, IsSearchable = true, IsSortable = false },
                     new Field("CourseDescription", DataType.String) { IsFacetable = false, IsFilterable = true, IsSearchable = false, IsSortable = false },
-                    new Field("CourseName", DataType.String) { IsFacetable = false, IsFilterable = true, IsSearchable = true, IsSortable = false }
+                    new Field("CourseName", DataType.String) { IsFacetable = false, IsFilterable = true, IsSearchable = true, IsSortable = false },
+                    new Field("FlexibleStartDate", DataType.Boolean) { IsFacetable = false, IsFilterable = true, IsSearchable = false, IsSortable = false }
                 },
                 ScoringProfiles = new List<ScoringProfile>()
                 {

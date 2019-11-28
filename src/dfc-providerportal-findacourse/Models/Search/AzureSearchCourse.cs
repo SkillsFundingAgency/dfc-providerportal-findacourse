@@ -56,5 +56,6 @@ namespace Dfc.ProviderPortal.FindACourse.Models
         public string UKPRN { get; set; }
         public string CourseDescription { get; set; }
         public string CourseName { get; set; }
+        public bool? FlexibleStartDate { get; set; }
     }
 }
