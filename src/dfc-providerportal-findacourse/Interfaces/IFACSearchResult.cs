@@ -6,7 +6,9 @@ namespace Dfc.ProviderPortal.FindACourse.Interfaces
 {
     public interface IFACSearchResult
     {
-        long ResultCount { get; set; }
+        int Total { get; set; }
+        int Limit { get; set; }
+        int Start { get; set; }
         IDictionary<string, IList<FacetResult>> Facets { get; set; }
         IEnumerable<FACSearchResultItem> Items { get; set; }
     }

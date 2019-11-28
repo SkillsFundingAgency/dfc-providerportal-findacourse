@@ -15,8 +15,7 @@ namespace Dfc.ProviderPortal.FindACourse.Models
         public CourseSearchSortBy? SortBy { get; set; }
         public DateTime? StartDateFrom { get; set; }
         public DateTime? StartDateTo { get; set; }
-
-        public int? TopResults { get; set; }
-        public int? PageNo { get; set; }
+        public int? Limit { get; set; }
+        public int? Start { get; set; }
     }
 }

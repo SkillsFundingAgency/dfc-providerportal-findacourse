@@ -3,11 +3,13 @@ using System.Collections.Generic;
 
 namespace Dfc.ProviderPortal.FindACourse.ApiModels
 {
-    public class CourseSearchResponse
+    public class CourseSearchResponse : IPagedResponse
     {
-        public long ResultCount { get; set; }
         public IDictionary<string, IEnumerable<FacetCountResult>> Facets { get; set; }
         public IEnumerable<CourseSearchResponseItem> Results { get; set; }
+        public int Total { get; set; }
+        public int Limit { get; set; }
+        public int Start { get; set; }
     }
 
     public class CourseSearchResponseItem

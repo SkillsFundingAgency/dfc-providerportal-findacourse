@@ -185,9 +185,7 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
                 $"geo.distance(VenueLocation, geography'POINT({longitude.Value} {latitude.Value})')" :
                 "search.score() desc";
 
-            var skip = criteria.PageNo.HasValue && criteria.TopResults.HasValue && criteria.PageNo.Value > 0 ?
-                (criteria.PageNo.Value - 1) * criteria.TopResults.Value :
-                0;
+            var (limit, start) = ResolvePagingParams(criteria.Limit, criteria.Start);
 
             var scoringProfile = string.IsNullOrWhiteSpace(_settings.RegionBoostScoringProfile) ? "region-boost" : _settings.RegionBoostScoringProfile;
 
@@ -201,15 +199,17 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
                     IncludeTotalResultCount = true,
                     ScoringProfile = scoringProfile,
                     SearchMode = SearchMode.All,
-                    Top = criteria.TopResults ?? _settings.DefaultTop,
-                    Skip = skip,
+                    Top = limit,
+                    Skip = start,
                     OrderBy = new[] { orderBy }
                 });
 
             return new FACSearchResult()
             {
+                Limit = limit,
+                Start = start,
+                Total = (int)results.Count.Value,
                 Facets = results.Facets,
-                ResultCount = results.Count.Value,
                 Items = results.Results.Select(r => new FACSearchResultItem()
                 {
                     Course = r.Document,
@@ -411,6 +411,36 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
 
             PostcodeSearchResult searchResult = JsonConvert.DeserializeObject<PostcodeSearchResult>(json, settings);
             return searchResult;
+        }
+
+        private (int limit, int start) ResolvePagingParams(int? limit, int? start)
+        {
+            if (limit.HasValue && limit.Value <= 0)
+            {
+                throw new ProblemDetailsException(
+                    new ProblemDetails()
+                    {
+                        Detail = "limit parameter is invalid.",
+                        Status = 400,
+                        Title = "InvalidPagingParameters"
+                    });
+            }
+
+            if (start.HasValue && start.Value < 0)
+            {
+                throw new ProblemDetailsException(
+                    new ProblemDetails()
+                    {
+                        Detail = "start parameter is invalid.",
+                        Status = 400,
+                        Title = "InvalidPagingParameters"
+                    });
+            }
+
+            var top = limit ?? _settings.DefaultTop;
+            var skip = start ?? 0;
+
+            return (top, skip);
         }
 
         private async Task<(float lat, float lng)?> TryGetCoordinatesForPostcode(string postcode)
