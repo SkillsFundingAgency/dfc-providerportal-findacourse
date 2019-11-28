@@ -80,6 +80,7 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                         DeliveryMode = i.Course.DeliveryMode,
                         DeliveryModeDescription = i.Course.DeliveryModeDescription,
                         Distance = i.Distance,
+                        FlexibleStartDate = i.Course.FlexibleStartDate,
                         LearnAimRef = i.Course.LearnAimRef,
                         NotionalNVQLevelv2 = i.Course.NotionalNVQLevelv2,
                         ProviderName = i.Course.ProviderName,
