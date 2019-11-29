@@ -6,6 +6,7 @@ namespace Dfc.ProviderPortal.FindACourse.Models
     {
         public string SubjectKeyword { get; set; }
         public float? Distance { get; set; }
+        public string ProviderName { get; set; }
         public int[] QualificationLevels { get; set; }
         public int[] StudyModes { get; set; }
         public int[] AttendanceModes { get; set; }

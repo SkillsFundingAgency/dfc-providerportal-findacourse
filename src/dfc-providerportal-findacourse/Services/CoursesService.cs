@@ -144,7 +144,7 @@ namespace Dfc.ProviderPortal.FindACourse.Services
             }
         }
 
-        public Task<FACSearchResult> CourseSearch(ILogger log, SearchCriteriaStructure criteria) // string SearchText)
+        public Task<FACSearchResult> CourseSearch(ILogger log, SearchCriteriaStructure criteria)
         {
             return new SearchServiceWrapper(log, _searchServiceSettings).SearchCourses(criteria);
         }

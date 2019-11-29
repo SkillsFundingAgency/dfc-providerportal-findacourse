@@ -43,6 +43,7 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                 Distance = request.Distance,
                 Limit = request.Limit,
                 Postcode = request.Postcode,
+                ProviderName = request.ProviderName,
                 QualificationLevels = request.QualificationLevels,
                 SortBy = request.SortBy,
                 Start = request.Start,
