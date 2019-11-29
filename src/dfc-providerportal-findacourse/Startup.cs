@@ -56,19 +56,12 @@ namespace Dfc.ProviderPortal.FindACourse.API
                     .AddScoped<ICourseService, CoursesService>()
                     .AddScoped<ICosmosDbHelper, CosmosDbHelper>()
                     .AddScoped<IProviderServiceWrapper, ProviderServiceWrapper>()
-                    .AddScoped<IVenueServiceWrapper, VenueServiceWrapper>()
-                    .AddTransient<IndexDefinitionHelper>();
+                    .AddScoped<IVenueServiceWrapper, VenueServiceWrapper>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            using (var scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
-            {
-                var indexDefinitionHelper = scope.ServiceProvider.GetRequiredService<IndexDefinitionHelper>();
-                indexDefinitionHelper.UpdateIndexDefinitions().Wait();
-            }
-
             app.UseSwagger(c =>
             {
                 c.PreSerializeFilters.Add((swaggerDoc, httpReq) => swaggerDoc.Host = httpReq.Host.Value);
