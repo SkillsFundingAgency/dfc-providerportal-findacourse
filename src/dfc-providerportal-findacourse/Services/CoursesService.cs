@@ -63,49 +63,16 @@ namespace Dfc.ProviderPortal.FindACourse.Services
             //_searchServiceWrapper = searchServiceWrapper;
         }
 
-        public async Task<object> CourseDetail(Guid CourseId, Guid RunId)
+        public async Task<AzureSearchCourseDetail> CourseDetail(Guid courseId, Guid courseRunId)
         {
-            // Call service to get data
-            StringContent content = new StringContent(JsonConvert.SerializeObject(new { CourseId, RunId }),
-                                                      Encoding.UTF8,
-                                                      "application/json");
-            Task<HttpResponseMessage> taskResponse = new HttpClient().GetAsync($"{_courseServiceSettings.ApiUrl}CourseDetail?code={_courseServiceSettings.ApiKey}&CourseId={CourseId}&RunId={RunId}");
-                                                                                //content);
-            taskResponse.Wait();
-            Task<string> taskJSON = taskResponse.Result.Content.ReadAsStringAsync();
-            taskJSON.Wait();
-            CourseDetailResult cdr = JsonConvert.DeserializeObject<CourseDetailResult>(taskJSON.Result);
-            return new {
-                id = cdr.Course.id,
-                QualificationCourseTitle = cdr.Course.QualificationCourseTitle,
-                LearnAimRef = cdr.Course.LearnAimRef,
-                NotionalNVQLevelv2 = cdr.Course.NotionalNVQLevelv2,
-                AwardOrgCode = cdr.Course.AwardOrgCode,
-                QualificationType = cdr.Course.QualificationType,
-                CourseDescription = cdr.Course.CourseDescription,
-                EntryRequirements = cdr.Course.EntryRequirements,
-                WhatYoullLearn = cdr.Course.WhatYoullLearn,
-                HowYoullLearn = cdr.Course.HowYoullLearn,
-                WhatYoullNeed = cdr.Course.WhatYoullNeed,
-                HowYoullBeAssessed = cdr.Course.HowYoullBeAssessed,
-                WhereNext = cdr.Course.WhereNext,
-                Provider = cdr.Provider, //new {
-                //    ProviderUKPRN = cdr.Provider.UnitedKingdomProviderReferenceNumber,
-                //    ProviderName = cdr.Provider.CourseDirectoryName,
-                //    //ProviderAddress = cdr.Provider.Address,
-                //    //ProviderWebsite = cdr.Provider.Website,
-                //    //ProviderEmail = cdr.Provider.Email,
-                //    //ProviderPhone = cdr.Provider.Phone,
-                //    //ProviderLocation = cdr.Provider.Location
-                //},
-                FEChoices = new {
-                    //LearnerSatisfaction = cdr.Course.LearnerSatisfaction,
-                    //EmployerSatisfaction = cdr.Course.EmployerSatisfaction
-                },
-                CourseRun = cdr.Course
-                               .CourseRuns
-                               .FirstOrDefault(r => r.id == RunId)
-            };
+            using (var httpClient = new HttpClient())
+            {
+                var response = await httpClient.GetAsync($"{_courseServiceSettings.ApiUrl}CourseDetail?code={_courseServiceSettings.ApiKey}&CourseId={courseId}&RunId={courseRunId}");
+                response.EnsureSuccessStatusCode();
+
+                var json = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<AzureSearchCourseDetail>(json);
+            }
         }
 
         public async Task<Provider> ProviderDetail(string PRN)

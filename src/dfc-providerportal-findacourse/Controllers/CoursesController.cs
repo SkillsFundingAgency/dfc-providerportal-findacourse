@@ -118,7 +118,7 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
 
         [Route("~/coursedetail")]
         [HttpGet]
-        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(CourseDetailResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -128,6 +128,40 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
 
             if (result != null)
             {
+                var response = new CourseDetailResponse()
+                {
+                    id = result.Course.id,
+                    QualificationCourseTitle = result.Course.QualificationCourseTitle,
+                    LearnAimRef = result.Course.LearnAimRef,
+                    NotionalNVQLevelv2 = result.Course.NotionalNVQLevelv2,
+                    AwardOrgCode = result.Course.AwardOrgCode,
+                    QualificationType = result.Course.QualificationType,
+                    CourseDescription = result.Course.CourseDescription,
+                    EntryRequirements = result.Course.EntryRequirements,
+                    WhatYoullLearn = result.Course.WhatYoullLearn,
+                    HowYoullLearn = result.Course.HowYoullLearn,
+                    WhatYoullNeed = result.Course.WhatYoullNeed,
+                    HowYoullBeAssessed = result.Course.HowYoullBeAssessed,
+                    WhereNext = result.Course.WhereNext,
+                    Provider = result.Provider, //new {
+                                             //    ProviderUKPRN = cdr.Provider.UnitedKingdomProviderReferenceNumber,
+                                             //    ProviderName = cdr.Provider.CourseDirectoryName,
+                                             //    //ProviderAddress = cdr.Provider.Address,
+                                             //    //ProviderWebsite = cdr.Provider.Website,
+                                             //    //ProviderEmail = cdr.Provider.Email,
+                                             //    //ProviderPhone = cdr.Provider.Phone,
+                                             //    //ProviderLocation = cdr.Provider.Location
+                                             //},
+                    FEChoices = new
+                    {
+                        //LearnerSatisfaction = cdr.Course.LearnerSatisfaction,
+                        //EmployerSatisfaction = cdr.Course.EmployerSatisfaction
+                    },
+                    CourseRun = result.Course
+                                   .CourseRuns
+                                   .FirstOrDefault(r => r.id == request.CourseRunId)
+                };
+
                 return new OkObjectResult(result);
             }
             else
