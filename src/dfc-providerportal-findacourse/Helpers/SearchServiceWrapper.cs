@@ -177,6 +177,12 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
                 filterClauses.Add($"search.in(VenueAttendancePattern, '{string.Join("|", criteria.AttendanceModes)}', '|')");
             }
 
+            if (!string.IsNullOrWhiteSpace(criteria.ProviderName))
+            {
+                var providerNameEscaped = Uri.EscapeDataString(criteria.ProviderName);
+                filterClauses.Add($"search.ismatch('{providerNameEscaped}', 'ProviderName')");
+            }
+
             var filter = string.Join(" and ", filterClauses);
 
             var orderBy = sortBy == CourseSearchSortBy.StartDateDescending ?
@@ -189,7 +195,6 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
 
             var scoringProfile = string.IsNullOrWhiteSpace(_settings.RegionBoostScoringProfile) ? "region-boost" : _settings.RegionBoostScoringProfile;
 
-            // TODO Limit fields that the search works on?
             var results = await _queryIndex.Documents.SearchAsync<AzureSearchCourse>(
                 $"{criteria.SubjectKeyword}*",
                 new SearchParameters()
