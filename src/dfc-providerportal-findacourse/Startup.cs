@@ -69,7 +69,7 @@ namespace Dfc.ProviderPortal.FindACourse.API
 
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/swagger/v1//swagger.json", "Find a Course API");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Find a Course API");
             });
 
             app.UseMvc();
