@@ -116,16 +116,16 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
             return new OkObjectResult(response);
         }
 
-        [Route("~/courseget")]
-        [HttpPost]
+        [Route("~/coursedetail")]
+        [HttpGet]
         [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> CourseGet([FromBody]CourseGetRequest request)
+        public async Task<ActionResult> CourseGet([FromQuery] CourseDetailRequest request)
         {
-            _log.LogInformation($"FAC CourseDetail called for CourseId {request.CourseId}");
-            var result = await _service.CourseDetail(request.CourseId, request.RunId);
+            var result = await _service.CourseDetail(request.CourseId, request.CourseRunId);
+
             if (result != null)
             {
                 return new OkObjectResult(result);
