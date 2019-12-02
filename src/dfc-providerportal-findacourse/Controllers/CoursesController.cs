@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Dfc.ProviderPortal.FindACourse.ApiModels;
 using Dfc.ProviderPortal.FindACourse.Interfaces;
@@ -14,6 +15,13 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
     [ApiController]
     public class CoursesController : ControllerBase, IActionFilter
     {
+        private static readonly Dictionary<string, string> _courseSearchFacetMapping = new Dictionary<string, string>()
+        {
+            { "NotionalNVQLevelv2", "QualificationLevel" },
+            { "VenueStudyMode", "StudyMode" },
+            { "VenueAttendancePattern", "AttendancePattern" }
+        };
+
         private readonly ILogger _log;
         private readonly ICourseService _service;
 
@@ -58,11 +66,11 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
 
             var response = new CourseSearchResponse()
             {
-                    Limit = result.Limit,
-                    Start = result.Start,
-                    Total = result.Total,
+                Limit = result.Limit,
+                Start = result.Start,
+                Total = result.Total,
                 Facets = result.Facets.ToDictionary(
-                    f => f.Key,
+                    f => _courseSearchFacetMapping.GetValueOrDefault(f.Key, f.Key),
                     f => f.Value.Select(v => new FacetCountResult()
                     {
                         Value = v.Value,
@@ -82,7 +90,7 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                     Distance = i.Distance,
                     FlexibleStartDate = i.Course.FlexibleStartDate,
                     LearnAimRef = i.Course.LearnAimRef,
-                    NotionalNVQLevelv2 = i.Course.NotionalNVQLevelv2,
+                    QualificationLevel = i.Course.NotionalNVQLevelv2,
                     ProviderName = i.Course.ProviderName,
                     QualificationCourseTitle = i.Course.QualificationCourseTitle,
                     Region = i.Course.Region,

@@ -21,7 +21,7 @@ namespace Dfc.ProviderPortal.FindACourse.ApiModels
         public Guid? CourseRunId { get; set; }
         public string QualificationCourseTitle { get; set; }
         public string LearnAimRef { get; set; }
-        public string NotionalNVQLevelv2 { get; set; }
+        public string QualificationLevel { get; set; }
         public DateTime? UpdatedOn { get; set; }
         public string VenueName { get; set; }
         public string VenueAddress { get; set; }
