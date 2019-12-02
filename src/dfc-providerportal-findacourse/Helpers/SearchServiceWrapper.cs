@@ -172,9 +172,9 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
                 filterClauses.Add($"search.in(VenueStudyMode, '{string.Join("|", criteria.StudyModes)}', '|')");
             }
 
-            if (criteria.AttendanceModes?.Any() ?? false)
+            if (criteria.DeliveryModes?.Any() ?? false)
             {
-                filterClauses.Add($"search.in(VenueAttendancePattern, '{string.Join("|", criteria.AttendanceModes)}', '|')");
+                filterClauses.Add($"search.in(DeliveryMode, '{string.Join("|", criteria.DeliveryModes)}', '|')");
             }
 
             if (!string.IsNullOrWhiteSpace(criteria.ProviderName))
@@ -199,7 +199,15 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
                 $"{criteria.SubjectKeyword}*",
                 new SearchParameters()
                 {
-                    Facets = new[] { "NotionalNVQLevelv2", "VenueAttendancePattern", "ProviderName", "Region" },
+                    Facets = new[]
+                    {
+                        "NotionalNVQLevelv2",
+                        "VenueStudyMode",
+                        "VenueAttendancePattern",
+                        "DeliveryMode",
+                        "ProviderName",
+                        "Region"
+                    },
                     Filter = filter,
                     IncludeTotalResultCount = true,
                     ScoringProfile = scoringProfile,
