@@ -158,7 +158,8 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
 
             if (geoFilterRequired)
             {
-                filterClauses.Add($"geo.distance(VenueLocation, geography'POINT({longitude.Value} {latitude.Value})') le {criteria.Distance}");
+                var distanceInKm = GeoHelper.MilesToKilometers(criteria.Distance.Value);
+                filterClauses.Add($"geo.distance(VenueLocation, geography'POINT({longitude.Value} {latitude.Value})') le {distanceInKm}");
             }
 
             if (!string.IsNullOrWhiteSpace(criteria.Town))
@@ -227,9 +228,12 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
                 {
                     Course = r.Document,
                     Distance = getBaseCoords && r.Document.VenueLocation != null ?
-                        GeoHelper.GetDistanceTo(
-                            (latitude.Value, longitude.Value),
-                            (r.Document.VenueLocation.Latitude, r.Document.VenueLocation.Longitude)) :
+                        Math.Round(
+                            GeoHelper.KilometersToMiles(
+                                GeoHelper.GetDistanceTo(
+                                    (latitude.Value, longitude.Value),
+                                    (r.Document.VenueLocation.Latitude, r.Document.VenueLocation.Longitude))),
+                            2) :
                         (double?)null,
                     Score = r.Score
                 })
