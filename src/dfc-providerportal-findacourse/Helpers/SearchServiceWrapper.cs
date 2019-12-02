@@ -172,11 +172,6 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
                 filterClauses.Add($"search.in(VenueStudyMode, '{string.Join("|", criteria.StudyModes)}', '|')");
             }
 
-            if (criteria.AttendanceModes?.Any() ?? false)
-            {
-                filterClauses.Add($"search.in(VenueAttendancePattern, '{string.Join("|", criteria.AttendanceModes)}', '|')");
-            }
-
             if (criteria.DeliveryModes?.Any() ?? false)
             {
                 filterClauses.Add($"search.in(DeliveryMode, '{string.Join("|", criteria.DeliveryModes)}', '|')");

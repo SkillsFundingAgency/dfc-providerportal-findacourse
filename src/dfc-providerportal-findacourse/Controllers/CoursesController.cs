@@ -38,7 +38,6 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
         {
             var criteria = new SearchCriteriaStructure()
             {
-                AttendanceModes = request.AttendanceModes,
                 AttendancePatterns = request.AttendancePatterns,
                 DeliveryModes = request.DeliveryModes,
                 Distance = request.Distance,

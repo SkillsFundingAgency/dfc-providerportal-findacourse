@@ -10,7 +10,6 @@ namespace Dfc.ProviderPortal.FindACourse.ApiModels
         public string ProviderName { get; set; }
         public int[] QualificationLevels { get; set; }
         public int[] StudyModes { get; set; }
-        public int[] AttendanceModes { get; set; }
         public int[] AttendancePatterns { get; set; }
         public int[] DeliveryModes { get; set; }
         public string Town { get; set; }
