@@ -55,5 +55,9 @@ namespace Dfc.GeoCoordinate
 
             return dDistance / 1000;
         }
+
+        public static double MilesToKilometers(double miles) => miles * 1.609344;
+
+        public static double KilometersToMiles(double km) => km / 1.609344;
     }
 }
