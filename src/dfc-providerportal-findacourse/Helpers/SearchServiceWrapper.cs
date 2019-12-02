@@ -219,17 +219,9 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
                 {
                     Course = r.Document,
                     Distance = getBaseCoords && r.Document.VenueLocation != null ?
-                        GeoHelper.DistanceTo(
-                            new GeoHelper.Coordinates()
-                            {
-                                Latitude = latitude.Value,
-                                Longitude = longitude.Value
-                            },
-                            new GeoHelper.Coordinates()
-                            {
-                                Latitude = r.Document.VenueLocation.Latitude,
-                                Longitude = r.Document.VenueLocation.Longitude
-                            }) :
+                        GeoHelper.GetDistanceTo(
+                            (latitude.Value, longitude.Value),
+                            (r.Document.VenueLocation.Latitude, r.Document.VenueLocation.Longitude)) :
                         (double?)null,
                     Score = r.Score
                 })
