@@ -12,6 +12,7 @@ namespace Dfc.ProviderPortal.FindACourse.ApiModels
         public int[] StudyModes { get; set; }
         public int[] AttendanceModes { get; set; }
         public int[] AttendancePatterns { get; set; }
+        public int[] DeliveryModes { get; set; }
         public string Town { get; set; }
         public string Postcode { get; set; }
         public CourseSearchSortBy? SortBy { get; set; }

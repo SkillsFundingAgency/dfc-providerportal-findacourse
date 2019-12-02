@@ -177,6 +177,11 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
                 filterClauses.Add($"search.in(VenueAttendancePattern, '{string.Join("|", criteria.AttendanceModes)}', '|')");
             }
 
+            if (criteria.DeliveryModes?.Any() ?? false)
+            {
+                filterClauses.Add($"search.in(DeliveryMode, '{string.Join("|", criteria.DeliveryModes)}', '|')");
+            }
+
             if (!string.IsNullOrWhiteSpace(criteria.ProviderName))
             {
                 var providerNameEscaped = Uri.EscapeDataString(criteria.ProviderName);

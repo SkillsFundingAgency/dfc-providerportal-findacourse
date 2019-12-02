@@ -40,6 +40,7 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
             {
                 AttendanceModes = request.AttendanceModes,
                 AttendancePatterns = request.AttendancePatterns,
+                DeliveryModes = request.DeliveryModes,
                 Distance = request.Distance,
                 Limit = request.Limit,
                 Postcode = request.Postcode,
