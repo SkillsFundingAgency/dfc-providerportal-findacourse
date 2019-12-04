@@ -194,44 +194,44 @@ namespace Dfc.ProviderPortal.FindACourse.Services
             return persisted;
         }
 
-        public async Task<AzureSearchCourseDetail> GetCourseSearchDataById(Guid CourseId, Guid RunId)
-        {
-            if (CourseId == Guid.Empty)
-                throw new ArgumentException($"Cannot be an empty {nameof(Guid)}", nameof(CourseId));
-            if (RunId == Guid.Empty)
-                throw new ArgumentException($"Cannot be an empty {nameof(Guid)}", nameof(RunId));
+        //public async Task<AzureSearchCourseDetail> GetCourseSearchDataById(Guid CourseId, Guid RunId)
+        //{
+        //    if (CourseId == Guid.Empty)
+        //        throw new ArgumentException($"Cannot be an empty {nameof(Guid)}", nameof(CourseId));
+        //    if (RunId == Guid.Empty)
+        //        throw new ArgumentException($"Cannot be an empty {nameof(Guid)}", nameof(RunId));
 
-            Course course = null;
-            dynamic venue = null;
+        //    Course course = null;
+        //    dynamic venue = null;
 
-            using (var client = _cosmosDbHelper.GetClient()) {
-                var doc = _cosmosDbHelper.GetDocumentById(client, _settings.CoursesCollectionId, CourseId);
-                course = _cosmosDbHelper.DocumentTo<Course>(doc);
-            }
+        //    using (var client = _cosmosDbHelper.GetClient()) {
+        //        var doc = _cosmosDbHelper.GetDocumentById(client, _settings.CoursesCollectionId, CourseId);
+        //        course = _cosmosDbHelper.DocumentTo<Course>(doc);
+        //    }
 
-            //CourseRun run = course.CourseRuns.FirstOrDefault(r => r.id == RunId);
-            Guid? venueid = course.CourseRuns
-                                  .Where(r => r.id == RunId && r.VenueId != null)
-                                  .FirstOrDefault()
-                                  ?.VenueId;
-            if (venueid.HasValue)
-                venue = (dynamic)new VenueServiceWrapper(_venueServiceSettings).GetById<dynamic>(venueid.Value);
-            var provider = new ProviderServiceWrapper(_providerServiceSettings).GetByPRN(course.ProviderUKPRN);
-            var qualification = new QualificationServiceWrapper(_qualServiceSettings).GetQualificationById(course.LearnAimRef);
+        //    //CourseRun run = course.CourseRuns.FirstOrDefault(r => r.id == RunId);
+        //    Guid? venueid = course.CourseRuns
+        //                          .Where(r => r.id == RunId && r.VenueId != null)
+        //                          .FirstOrDefault()
+        //                          ?.VenueId;
+        //    if (venueid.HasValue)
+        //        venue = (dynamic)new VenueServiceWrapper(_venueServiceSettings).GetById<dynamic>(venueid.Value);
+        //    var provider = new ProviderServiceWrapper(_providerServiceSettings).GetByPRN(course.ProviderUKPRN);
+        //    var qualification = new QualificationServiceWrapper(_qualServiceSettings).GetQualificationById(course.LearnAimRef);
 
-            //return from Course c in new List<Course>() { course }
-            //       from CourseRun r in c.CourseRuns
-            //       from AzureSearchProviderModel p in new List<AzureSearchProviderModel>() { provider }
-            //       from AzureSearchVenueModel v in venues
-            //       select new AzureSearchCourseDetail();
-            return new AzureSearchCourseDetail()
-            {
-                Course = course,
-                Provider = provider,
-                Qualification = qualification,
-                Venue = venue
-            };
-        }
+        //    //return from Course c in new List<Course>() { course }
+        //    //       from CourseRun r in c.CourseRuns
+        //    //       from AzureSearchProviderModel p in new List<AzureSearchProviderModel>() { provider }
+        //    //       from AzureSearchVenueModel v in venues
+        //    //       select new AzureSearchCourseDetail();
+        //    return new AzureSearchCourseDetail()
+        //    {
+        //        Course = course,
+        //        Provider = provider,
+        //        Qualification = qualification,
+        //        Venue = venue
+        //    };
+        //}
 
         public async Task<ICourse> Update(ICourse course)
         {

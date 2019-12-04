@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Dfc.ProviderPortal.FindACourse.ApiModels;
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 
 namespace Dfc.ProviderPortal.FindACourse.Controllers
 {
@@ -116,53 +118,124 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
             return new OkObjectResult(response);
         }
 
-        [Route("~/coursedetail")]
+        [Route("~/courserundetail")]
         [HttpGet]
-        [ProducesResponseType(typeof(CourseDetailResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(CourseRunDetailResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> CourseGet([FromQuery] CourseDetailRequest request)
+        public async Task<ActionResult> CourseRunDetail([FromQuery] CourseRunDetailRequest request)
         {
             var result = await _service.CourseDetail(request.CourseId, request.CourseRunId);
 
+            var courseRun = result.Course.CourseRuns.Single(r => r.id == request.CourseRunId);
+            var venue = result.CourseRunVenues.Single(v => v.id == courseRun.VenueId);
+            var providerContact = (dynamic)((JArray)result.Provider.ProviderContact).SingleOrDefault(c => c["ContactType"].ToString() == "L");
+
+            var alternativeCourseRuns = result.Course.CourseRuns.Where(r => r.id != request.CourseRunId)
+                .Select(r => new { CourseRun = r, Venue = result.CourseRunVenues.Single(v => v.id == r.VenueId) });
+
             if (result != null)
             {
-                var response = new CourseDetailResponse()
+                var response = new CourseRunDetailResponse()
                 {
-                    id = result.Course.id,
-                    QualificationCourseTitle = result.Course.QualificationCourseTitle,
-                    LearnAimRef = result.Course.LearnAimRef,
-                    NotionalNVQLevelv2 = result.Course.NotionalNVQLevelv2,
-                    AwardOrgCode = result.Course.AwardOrgCode,
-                    QualificationType = result.Course.QualificationType,
-                    CourseDescription = result.Course.CourseDescription,
-                    EntryRequirements = result.Course.EntryRequirements,
-                    WhatYoullLearn = result.Course.WhatYoullLearn,
-                    HowYoullLearn = result.Course.HowYoullLearn,
-                    WhatYoullNeed = result.Course.WhatYoullNeed,
-                    HowYoullBeAssessed = result.Course.HowYoullBeAssessed,
-                    WhereNext = result.Course.WhereNext,
-                    Provider = result.Provider, //new {
-                                             //    ProviderUKPRN = cdr.Provider.UnitedKingdomProviderReferenceNumber,
-                                             //    ProviderName = cdr.Provider.CourseDirectoryName,
-                                             //    //ProviderAddress = cdr.Provider.Address,
-                                             //    //ProviderWebsite = cdr.Provider.Website,
-                                             //    //ProviderEmail = cdr.Provider.Email,
-                                             //    //ProviderPhone = cdr.Provider.Phone,
-                                             //    //ProviderLocation = cdr.Provider.Location
-                                             //},
-                    FEChoices = new
+                    CourseRunId = courseRun.id,
+                    AttendancePattern = courseRun.AttendancePattern,
+                    Cost = courseRun.Cost,
+                    CostDescription = courseRun.CostDescription,
+                    CourseName = courseRun.CourseName,
+                    CourseURL = courseRun.CourseURL,
+                    CreatedDate = courseRun.CreatedDate,
+                    DeliveryMode = courseRun.DeliveryMode,
+                    DurationUnit = courseRun.DurationUnit,
+                    DurationValue = courseRun.DurationValue,
+                    FlexibleStartDate = courseRun.FlexibleStartDate,
+                    StartDate = courseRun.StartDate,
+                    StudyMode = courseRun.StudyMode,
+                    Course = new CourseDetailResponseCourse()
                     {
-                        //LearnerSatisfaction = cdr.Course.LearnerSatisfaction,
-                        //EmployerSatisfaction = cdr.Course.EmployerSatisfaction
+                        AdvancedLearnerLoan = result.Course.AdvancedLearnerLoan,
+                        AwardOrgCode = result.Course.AwardOrgCode,
+                        CourseDescription = result.Course.CourseDescription,
+                        CourseId = result.Course.id,
+                        EntryRequirements = result.Course.EntryRequirements,
+                        HowYoullBeAssessed = result.Course.HowYoullBeAssessed,
+                        HowYoullLearn = result.Course.HowYoullLearn,
+                        LearnAimRef = result.Course.LearnAimRef,
+                        QualificationLevel = result.Course.NotionalNVQLevelv2,
+                        WhatYoullLearn = result.Course.WhatYoullLearn,
+                        WhatYoullNeed = result.Course.WhatYoullNeed,
+                        WhereNext = result.Course.WhereNext
                     },
-                    CourseRun = result.Course
-                                   .CourseRuns
-                                   .FirstOrDefault(r => r.id == request.CourseRunId)
+                    Venue = new CourseDetailResponseVenue()
+                    {
+                        AddressLine1 = venue.ADDRESS_1,
+                        AddressLine2 = venue.ADDRESS_2,
+                        County = venue.COUNTY,
+                        Email = venue.EMAIL,
+                        Postcode = venue.POSTCODE,
+                        Telephone = venue.PHONE,
+                        Town = venue.TOWN,
+                        VenueName = venue.VENUE_NAME,
+                        Website = venue.WEBSITE
+                    },
+                    Provider = new CourseDetailResponseProvider()
+                    {
+                        ProviderName = result.Provider.ProviderName,
+                        TradingName = result.Provider.TradingName,
+                        CourseDirectoryName = result.Provider.CourseDirectoryName,
+                        Alias = result.Provider.Alias,
+                        UKPRN = result.Provider.UnitedKingdomProviderReferenceNumber,
+                        AddressLine1 = providerContact.ContactAddress?.SAON?.Description,
+                        AddressLine2 = providerContact.ContactAddress?.PAON?.Description,
+                        Town = ((JArray)providerContact.ContactAddress?.Items).FirstOrDefault()?.ToString(),
+                        Postcode = providerContact.ContactAddress?.PostCode,
+                        Telephone = providerContact.ContactTelephone1,
+                        Fax = providerContact.ContactFax,
+                        Website = providerContact.ContactWebsiteAddress
+                    },
+                    Qualification = new CourseDetailResponseQualification()
+                    {
+                        AwardOrgCode = result.Qualification.AwardOrgCode,
+                        AwardOrgName = result.Qualification.AwardOrgName,
+                        LearnAimRef = result.Qualification.LearnAimRef,
+                        LearnAimRefTitle = result.Qualification.LearnAimRefTitle,
+                        LearnAimRefTypeDesc = result.Qualification.LearnAimRefTypeDesc,
+                        QualificationLevel = result.Qualification.NotionalNVQLevelv2,
+                        SectorSubjectAreaTier1Desc = result.Qualification.SectorSubjectAreaTier1Desc,
+                        SectorSubjectAreaTier2Desc = result.Qualification.SectorSubjectAreaTier2Desc
+                    },
+                    AlternativeCourseRuns = alternativeCourseRuns.Select(ar => new CourseDetailResponseAlternativeCourseRun()
+                    {
+                        CourseRunId = ar.CourseRun.id,
+                        AttendancePattern = ar.CourseRun.AttendancePattern,
+                        Cost = ar.CourseRun.Cost,
+                        CostDescription = ar.CourseRun.CostDescription,
+                        CourseName = ar.CourseRun.CourseName,
+                        CourseURL = ar.CourseRun.CourseURL,
+                        CreatedDate = ar.CourseRun.CreatedDate,
+                        DeliveryMode = ar.CourseRun.DeliveryMode,
+                        DurationUnit = ar.CourseRun.DurationUnit,
+                        DurationValue = ar.CourseRun.DurationValue,
+                        FlexibleStartDate = ar.CourseRun.FlexibleStartDate,
+                        StartDate = ar.CourseRun.StartDate,
+                        StudyMode = ar.CourseRun.StudyMode,
+                        Venue = new CourseDetailResponseVenue()
+                        {
+                            AddressLine1 = ar.Venue.ADDRESS_1,
+                            AddressLine2 = ar.Venue.ADDRESS_2,
+                            County = ar.Venue.COUNTY,
+                            Email = ar.Venue.EMAIL,
+                            Postcode = ar.Venue.POSTCODE,
+                            Telephone = ar.Venue.PHONE,
+                            Town = ar.Venue.TOWN,
+                            VenueName = ar.Venue.Venue_NAME,
+                            Website = ar.Venue.WEBSITE
+                        }
+                    })
                 };
 
-                return new OkObjectResult(result);
+                return new OkObjectResult(response);
             }
             else
             {
