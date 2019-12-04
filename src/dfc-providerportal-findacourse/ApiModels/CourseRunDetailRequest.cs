@@ -2,7 +2,7 @@
 
 namespace Dfc.ProviderPortal.FindACourse.ApiModels
 {
-    public class CourseDetailRequest
+    public class CourseRunDetailRequest
     {
         public Guid CourseId { get; set; }
         public Guid CourseRunId { get; set; }

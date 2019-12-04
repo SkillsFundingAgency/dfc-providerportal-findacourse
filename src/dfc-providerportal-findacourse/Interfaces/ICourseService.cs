@@ -14,7 +14,7 @@ namespace Dfc.ProviderPortal.FindACourse.Interfaces
     {
         Task<ICourse> AddCourse(ICourse course);
         Task<ICourse> GetCourseById(Guid id);
-        Task<AzureSearchCourseDetail> GetCourseSearchDataById(Guid CourseId, Guid RunId);
+        //Task<AzureSearchCourseDetail> GetCourseSearchDataById(Guid CourseId, Guid RunId);
         Task<IEnumerable<ICourse>> GetCoursesByUKPRN(int UKPRN);
         Task<List<string>> DeleteCoursesByUKPRN(int UKPRN);
         Task<ICourse> Update(ICourse doc);
