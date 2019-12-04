@@ -67,7 +67,8 @@ namespace Dfc.ProviderPortal.FindACourse.Services
         {
             using (var httpClient = new HttpClient())
             {
-                var response = await httpClient.GetAsync($"{_courseServiceSettings.ApiUrl}CourseDetail?code={_courseServiceSettings.ApiKey}&CourseId={courseId}&RunId={courseRunId}");
+                httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", _courseServiceSettings.ApiKey);
+                var response = await httpClient.GetAsync($"{_courseServiceSettings.ApiUrl}CourseDetail?CourseId={courseId}&RunId={courseRunId}");
                 response.EnsureSuccessStatusCode();
 
                 var json = await response.Content.ReadAsStringAsync();
