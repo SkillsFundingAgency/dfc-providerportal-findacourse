@@ -177,7 +177,9 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                         Telephone = venue.PHONE,
                         Town = venue.TOWN,
                         VenueName = venue.VENUE_NAME,
-                        Website = venue.WEBSITE
+                        Website = venue.WEBSITE,
+                        Latitude = venue.Latitude,
+                        Longitude = venue.Longitude
                     },
                     Provider = new CourseDetailResponseProvider()
                     {
@@ -190,9 +192,11 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                         AddressLine2 = providerContact.ContactAddress?.PAON?.Description,
                         Town = ((JArray)providerContact.ContactAddress?.Items).FirstOrDefault()?.ToString(),
                         Postcode = providerContact.ContactAddress?.PostCode,
+                        County = providerContact.ContactAddress?.Locality,
                         Telephone = providerContact.ContactTelephone1,
                         Fax = providerContact.ContactFax,
-                        Website = providerContact.ContactWebsiteAddress
+                        Website = providerContact.ContactWebsiteAddress,
+                        Email = providerContact.ContactEmail
                     },
                     Qualification = new CourseDetailResponseQualification()
                     {
@@ -230,7 +234,9 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                             Telephone = ar.Venue.PHONE,
                             Town = ar.Venue.TOWN,
                             VenueName = ar.Venue.Venue_NAME,
-                            Website = ar.Venue.WEBSITE
+                            Website = ar.Venue.WEBSITE,
+                            Latitude = venue.Latitude,
+                            Longitude = venue.Longitude
                         }
                     })
                 };
