@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json.Converters;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace Dfc.ProviderPortal.FindACourse.API
@@ -37,6 +38,7 @@ namespace Dfc.ProviderPortal.FindACourse.API
         {
             services
                 .AddMvc()
+                .AddJsonOptions(jsonOptions => jsonOptions.SerializerSettings.Converters.Insert(0, new StringEnumConverter()))
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddApplicationInsightsTelemetry(Configuration);
