@@ -94,6 +94,7 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                     DurationValue = i.Course.DurationValue,
                     FlexibleStartDate = i.Course.FlexibleStartDate,
                     LearnAimRef = i.Course.LearnAimRef,
+                    National = i.Course.National,
                     QualificationLevel = i.Course.NotionalNVQLevelv2,
                     ProviderName = i.Course.ProviderName,
                     QualificationCourseTitle = i.Course.QualificationCourseTitle,

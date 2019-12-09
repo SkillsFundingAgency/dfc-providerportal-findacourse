@@ -45,5 +45,6 @@ namespace Dfc.ProviderPortal.FindACourse.ApiModels
         public bool? FlexibleStartDate { get; set; }
         public DurationUnit DurationUnit { get; set; }
         public int? DurationValue { get; set; }
+        public bool? National { get; set; }
     }
 }
