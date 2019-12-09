@@ -39,7 +39,7 @@ namespace Dfc.ProviderPortal.FindACourse.Models
         public string CourseDescription { get; set; }
         public string CourseName { get; set; }
         public bool? FlexibleStartDate { get; set; }
-        public DurationUnit DurationUnit { get; set; }
+        public DurationUnit? DurationUnit { get; set; }
         public int? DurationValue { get; set; }
     }
 }
