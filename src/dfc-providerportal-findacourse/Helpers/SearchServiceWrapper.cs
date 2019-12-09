@@ -159,7 +159,9 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
             if (geoFilterRequired)
             {
                 var distanceInKm = GeoHelper.MilesToKilometers(criteria.Distance.Value);
-                filterClauses.Add($"geo.distance(VenueLocation, geography'POINT({longitude.Value} {latitude.Value})') le {distanceInKm}");
+                filterClauses.Add(
+                    $"(geo.distance(VenueLocation, geography'POINT({longitude.Value} {latitude.Value})') le {distanceInKm}" +
+                    "or National eq true)");
             }
 
             if (!string.IsNullOrWhiteSpace(criteria.Town))
