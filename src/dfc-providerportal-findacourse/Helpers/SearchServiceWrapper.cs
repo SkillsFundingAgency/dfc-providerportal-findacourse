@@ -198,8 +198,10 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
 
             var scoringProfile = string.IsNullOrWhiteSpace(_settings.RegionBoostScoringProfile) ? "region-boost" : _settings.RegionBoostScoringProfile;
 
+            var searchText = !string.IsNullOrWhiteSpace(criteria.SubjectKeyword) ? criteria.SubjectKeyword : "*";
+
             var results = await _queryIndex.Documents.SearchAsync<AzureSearchCourse>(
-                $"{criteria.SubjectKeyword}*",
+                searchText,
                 new SearchParameters()
                 {
                     Facets = new[]
@@ -213,6 +215,11 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
                     },
                     Filter = filter,
                     IncludeTotalResultCount = true,
+                    SearchFields = new[]
+                    {
+                        "QualificationCourseTitle",
+                        "CourseName",
+                    },
                     ScoringProfile = scoringProfile,
                     SearchMode = SearchMode.All,
                     Top = limit,
