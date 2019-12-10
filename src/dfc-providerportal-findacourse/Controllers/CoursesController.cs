@@ -243,7 +243,21 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                             Latitude = venue.Latitude,
                             Longitude = venue.Longitude
                         }
-                    })
+                    }),
+                    SubRegions = from region in RegionInfo.All
+                                 from subRegion in region.SubRegions
+                                 let sr = new { subRegion, region }
+                                 join r in (courseRun.Regions ?? Enumerable.Empty<string>()) on sr.subRegion.Id equals r
+                                 select new CourseDetailResponseSubRegion()
+                                 {
+                                     SubRegionId = r,
+                                     Name = sr.subRegion.Name,
+                                     ParentRegion = new CourseDetailResponseRegion()
+                                     {
+                                         Name = sr.region.Name,
+                                         RegionId = sr.region.Id
+                                     }
+                                 }
                 };
 
                 return new OkObjectResult(response);
