@@ -132,7 +132,7 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
             var result = await _service.CourseDetail(request.CourseId, request.CourseRunId);
 
             var courseRun = result.Course.CourseRuns.Single(r => r.id == request.CourseRunId);
-            var venue = result.CourseRunVenues.Single(v => v.id == courseRun.VenueId);
+            var venue = courseRun.VenueId.HasValue ? result.CourseRunVenues.Single(v => v.id == courseRun.VenueId) : null;
             var providerContact = (dynamic)((JArray)result.Provider.ProviderContact).SingleOrDefault(c => c["ContactType"].ToString() == "L");
 
             var alternativeCourseRuns = result.Course.CourseRuns.Where(r => r.id != request.CourseRunId)
@@ -170,20 +170,22 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                         WhatYoullNeed = result.Course.WhatYoullNeed,
                         WhereNext = result.Course.WhereNext
                     },
-                    Venue = new CourseDetailResponseVenue()
-                    {
-                        AddressLine1 = venue.ADDRESS_1,
-                        AddressLine2 = venue.ADDRESS_2,
-                        County = venue.COUNTY,
-                        Email = venue.EMAIL,
-                        Postcode = venue.POSTCODE,
-                        Telephone = venue.PHONE,
-                        Town = venue.TOWN,
-                        VenueName = venue.VENUE_NAME,
-                        Website = venue.WEBSITE,
-                        Latitude = venue.Latitude,
-                        Longitude = venue.Longitude
-                    },
+                    Venue = venue != null ?
+                        new CourseDetailResponseVenue()
+                        {
+                            AddressLine1 = venue.ADDRESS_1,
+                            AddressLine2 = venue.ADDRESS_2,
+                            County = venue.COUNTY,
+                            Email = venue.EMAIL,
+                            Postcode = venue.POSTCODE,
+                            Telephone = venue.PHONE,
+                            Town = venue.TOWN,
+                            VenueName = venue.VENUE_NAME,
+                            Website = venue.WEBSITE,
+                            Latitude = venue.Latitude,
+                            Longitude = venue.Longitude
+                        } :
+                        null,
                     Provider = new CourseDetailResponseProvider()
                     {
                         ProviderName = result.Provider.ProviderName,
