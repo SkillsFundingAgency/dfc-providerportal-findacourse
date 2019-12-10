@@ -24,6 +24,7 @@ namespace Dfc.ProviderPortal.FindACourse.ApiModels
         public bool FlexibleStartDate { get; set; }
         public DateTime? StartDate { get; set; }
         public StudyMode StudyMode { get; set; }
+        public IEnumerable<CourseDetailResponseSubRegion> SubRegions { get; set; }
     }
 
     public class CourseDetailResponseProvider
@@ -105,5 +106,18 @@ namespace Dfc.ProviderPortal.FindACourse.ApiModels
         public DateTime? StartDate { get; set; }
         public StudyMode StudyMode { get; set; }
         public CourseDetailResponseVenue Venue { get; set; }
+    }
+
+    public class CourseDetailResponseRegion
+    {
+        public string RegionId { get; set; }
+        public string Name { get; set; }
+    }
+
+    public class CourseDetailResponseSubRegion
+    {
+        public string SubRegionId { get; set; }
+        public string Name { get; set; }
+        public CourseDetailResponseRegion ParentRegion { get; set; }
     }
 }
