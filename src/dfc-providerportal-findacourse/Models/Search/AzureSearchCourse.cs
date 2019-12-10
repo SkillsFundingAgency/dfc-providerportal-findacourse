@@ -10,9 +10,9 @@ namespace Dfc.ProviderPortal.FindACourse.Models
 {
     public class AzureSearchCourse : IAzureSearchCourse
     {
-        public Guid? id { get; set; }
-        public Guid? CourseId { get; set; }
-        public Guid? CourseRunId { get; set; }
+        public string id { get; set; }
+        public Guid CourseId { get; set; }
+        public Guid CourseRunId { get; set; }
         public string QualificationCourseTitle { get; set; }
         public string LearnAimRef { get; set; }
         public string NotionalNVQLevelv2 { get; set; }
