@@ -365,10 +365,6 @@
     "appInsightInstrumentationKey": {
       "type": "string",
       "value": "[reference('ppfindcourseAppInsights').outputs.InstrumentationKey.value]"
-    },
-    "apimProductInstanceName": {
-      "type": "string",
-      "value": "[reference('ppfindcourseApimProduct').outputs.ApimProductInstanceName.value]"
     }
   }
 }
