@@ -153,7 +153,7 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
 
             if (criteria.QualificationLevels?.Any() ?? false)
             {
-                filterClauses.Add($"search.in(NotionalNVQLevelv2, '{string.Join("|", criteria.QualificationLevels)}', '|')");
+                filterClauses.Add($"search.in(NotionalNVQLevelv2, '{string.Join("|", criteria.QualificationLevels.Select(Uri.EscapeDataString))}', '|')");
             }
 
             if (geoFilterRequired)
