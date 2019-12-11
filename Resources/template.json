@@ -220,6 +220,10 @@
                 "name": "AzureWebJobsStorage",
                 "value": "[parameters('storageConnectionString')]"
               },
+              { 
+                "name": "WEBSITE_RUN_FROM_PACKAGE", 
+                "value": "1" 
+              },
               {
                 "name": "CosmosDbSettings__EndpointUri",
                 "value": "[parameters('cosmosDBfqdn')]"
