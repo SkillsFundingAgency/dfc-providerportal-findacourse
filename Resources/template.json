@@ -343,61 +343,7 @@
             ]
           },
           "deployStagingSlot": {
-            "value": false
-          }
-        }
-      }
-    },
-    {
-      "name": "ppfindcourseApimProduct",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2017-05-10",
-      "resourceGroup": "[parameters('ApimResourceGroup')]",
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[concat(variables('deploymentUrlBase'), 'APIM/apim-product.json')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "allowAnonymousAccess": {
             "value": true
-          },
-          "apimServiceName": {
-            "value": "[parameters('ApimServiceName')]"
-          },
-          "productDisplayName": {
-            "value": "Find a course"
-          }
-        }
-      }
-    },
-    {
-      "name": "ppfindcourseApimApi",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2017-05-10",
-      "resourceGroup": "[parameters('ApimResourceGroup')]",
-      "dependsOn": [
-        "ppfindcourseApimProduct"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[concat(variables('deploymentUrlBase'), 'APIM/apim-api.json')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "apimProductInstanceName": {
-            "value": "[reference('ppfindcourseApimProduct').outputs.ApimProductInstanceName.value]"
-          },
-          "apimServiceName": {
-            "value": "[parameters('ApimServiceName')]"
-          },
-          "apiName": {
-            "value": "[parameters('apiName')]"
-          },
-          "apiSuffix": {
-            "value": "[parameters('apiSuffix')]"
           }
         }
       }
