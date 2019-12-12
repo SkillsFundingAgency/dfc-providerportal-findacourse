@@ -161,7 +161,8 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
                 var distanceInKm = GeoHelper.MilesToKilometers(criteria.Distance.Value);
                 filterClauses.Add(
                     $"(geo.distance(VenueLocation, geography'POINT({longitude.Value} {latitude.Value})') le {distanceInKm}" +
-                    "or National eq true)");
+                    " or National eq true" +
+                    " or DeliveryMode eq '2')");
             }
 
             if (!string.IsNullOrWhiteSpace(criteria.Town))
