@@ -207,12 +207,12 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
                 {
                     Facets = new[]
                     {
-                        "NotionalNVQLevelv2",
+                        "NotionalNVQLevelv2,count:100",
                         "VenueStudyMode",
                         "VenueAttendancePattern",
                         "DeliveryMode",
-                        "ProviderName",
-                        "Region"
+                        "ProviderName,count:100",
+                        "Region,count:100"
                     },
                     Filter = filter,
                     IncludeTotalResultCount = true,
