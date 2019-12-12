@@ -10,9 +10,9 @@ namespace Dfc.ProviderPortal.FindACourse.Models
 {
     public class AzureSearchCourse : IAzureSearchCourse
     {
-        public Guid? id { get; set; }
-        public Guid? CourseId { get; set; }
-        public Guid? CourseRunId { get; set; }
+        public string id { get; set; }
+        public Guid CourseId { get; set; }
+        public Guid CourseRunId { get; set; }
         public string QualificationCourseTitle { get; set; }
         public string LearnAimRef { get; set; }
         public string NotionalNVQLevelv2 { get; set; }
@@ -39,7 +39,8 @@ namespace Dfc.ProviderPortal.FindACourse.Models
         public string CourseDescription { get; set; }
         public string CourseName { get; set; }
         public bool? FlexibleStartDate { get; set; }
-        public DurationUnit DurationUnit { get; set; }
+        public DurationUnit? DurationUnit { get; set; }
         public int? DurationValue { get; set; }
+        public bool? National { get; set; }
     }
 }

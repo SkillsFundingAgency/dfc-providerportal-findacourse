@@ -153,13 +153,15 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
 
             if (criteria.QualificationLevels?.Any() ?? false)
             {
-                filterClauses.Add($"search.in(NotionalNVQLevelv2, '{string.Join("|", criteria.QualificationLevels)}', '|')");
+                filterClauses.Add($"search.in(NotionalNVQLevelv2, '{string.Join("|", criteria.QualificationLevels.Select(Uri.EscapeDataString))}', '|')");
             }
 
             if (geoFilterRequired)
             {
                 var distanceInKm = GeoHelper.MilesToKilometers(criteria.Distance.Value);
-                filterClauses.Add($"geo.distance(VenueLocation, geography'POINT({longitude.Value} {latitude.Value})') le {distanceInKm}");
+                filterClauses.Add(
+                    $"(geo.distance(VenueLocation, geography'POINT({longitude.Value} {latitude.Value})') le {distanceInKm}" +
+                    "or National eq true)");
             }
 
             if (!string.IsNullOrWhiteSpace(criteria.Town))
@@ -196,8 +198,10 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
 
             var scoringProfile = string.IsNullOrWhiteSpace(_settings.RegionBoostScoringProfile) ? "region-boost" : _settings.RegionBoostScoringProfile;
 
+            var searchText = !string.IsNullOrWhiteSpace(criteria.SubjectKeyword) ? criteria.SubjectKeyword : "*";
+
             var results = await _queryIndex.Documents.SearchAsync<AzureSearchCourse>(
-                $"{criteria.SubjectKeyword}*",
+                searchText,
                 new SearchParameters()
                 {
                     Facets = new[]
@@ -211,6 +215,11 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
                     },
                     Filter = filter,
                     IncludeTotalResultCount = true,
+                    SearchFields = new[]
+                    {
+                        "QualificationCourseTitle",
+                        "CourseName",
+                    },
                     ScoringProfile = scoringProfile,
                     SearchMode = SearchMode.All,
                     Top = limit,
