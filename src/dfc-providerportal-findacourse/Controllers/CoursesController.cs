@@ -115,7 +115,7 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                     VenueStudyMode = i.Course.VenueStudyMode,
                     VenueStudyModeDescription = i.Course.VenueStudyModeDescription,
                     VenueTown = i.Course.VenueTown
-                })
+                }).ToList()
             };
 
             return new OkObjectResult(response);
