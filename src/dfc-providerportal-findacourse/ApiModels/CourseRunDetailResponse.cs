@@ -83,7 +83,7 @@ namespace Dfc.ProviderPortal.FindACourse.ApiModels
         public string LearnAimRef { get; set; }
         public string LearnAimRefTitle { get; set; }
         public string LearnAimRefTypeDesc { get; set; }
-        public int? QualificationLevel { get; set; }
+        public string QualificationLevel { get; set; }
         public string AwardOrgCode { get; set; }
         public string AwardOrgName { get; set; }
         public string SectorSubjectAreaTier1Desc { get; set; }
