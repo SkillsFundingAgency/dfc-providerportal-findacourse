@@ -106,11 +106,13 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                     VenueAddress = i.Course.VenueAddress,
                     VenueAttendancePattern = i.Course.VenueAttendancePattern,
                     VenueAttendancePatternDescription = i.Course.VenueAttendancePatternDescription,
-                    VenueLocation = new Coordinates()
-                    {
-                        Latitude = i.Course.VenueLocation.Latitude,
-                        Longitude = i.Course.VenueLocation.Longitude
-                    },
+                    VenueLocation = i.Course.VenueLocation != null ?
+                        new Coordinates()
+                        {
+                            Latitude = i.Course.VenueLocation.Latitude,
+                            Longitude = i.Course.VenueLocation.Longitude
+                        } :
+                        null,
                     VenueName = i.Course.VenueName,
                     VenueStudyMode = i.Course.VenueStudyMode,
                     VenueStudyModeDescription = i.Course.VenueStudyModeDescription,
