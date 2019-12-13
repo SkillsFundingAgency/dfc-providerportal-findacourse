@@ -203,7 +203,9 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                         Telephone = providerContact.ContactTelephone1,
                         Fax = providerContact.ContactFax,
                         Website = providerContact.ContactWebsiteAddress,
-                        Email = providerContact.ContactEmail
+                        Email = providerContact.ContactEmail,
+                        EmployerSatisfaction = result.FeChoice?.EmployerSatisfaction,
+                        LearnerSatisfaction = result.FeChoice?.LearnerSatisfaction,
                     },
                     Qualification = new CourseDetailResponseQualification()
                     {
