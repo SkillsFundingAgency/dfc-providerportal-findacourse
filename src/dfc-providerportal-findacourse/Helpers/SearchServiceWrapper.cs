@@ -153,7 +153,7 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
 
             if (criteria.QualificationLevels?.Any() ?? false)
             {
-                filterClauses.Add($"search.in(NotionalNVQLevelv2, '{string.Join("|", criteria.QualificationLevels.Select(Uri.EscapeDataString))}', '|')");
+                filterClauses.Add($"search.in(NotionalNVQLevelv2, '{string.Join("|", criteria.QualificationLevels.Select(EscapeFilterValue))}', '|')");
             }
 
             if (geoFilterRequired)
@@ -167,7 +167,7 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
 
             if (!string.IsNullOrWhiteSpace(criteria.Town))
             {
-                var townEscaped = Uri.EscapeDataString(criteria.Town);
+                var townEscaped = EscapeFilterValue(criteria.Town);
                 filterClauses.Add($"search.ismatch('{townEscaped}', 'VenueTown')");
             }
 
@@ -183,7 +183,7 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
 
             if (!string.IsNullOrWhiteSpace(criteria.ProviderName))
             {
-                var providerNameEscaped = Uri.EscapeDataString(criteria.ProviderName);
+                var providerNameEscaped = EscapeFilterValue(criteria.ProviderName);
                 filterClauses.Add($"search.ismatch('{providerNameEscaped}', 'ProviderName')");
             }
 
@@ -248,6 +248,8 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
                     Score = r.Score
                 })
             };
+
+            string EscapeFilterValue(string v) => v.Replace("'", "''");
         }
 
         public async Task<ProviderSearchResult> SearchProviders(ProviderSearchCriteriaStructure criteria)
