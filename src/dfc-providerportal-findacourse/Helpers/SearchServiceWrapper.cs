@@ -184,7 +184,7 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
             if (!string.IsNullOrWhiteSpace(criteria.ProviderName))
             {
                 var providerNameEscaped = EscapeFilterValue(criteria.ProviderName);
-                filterClauses.Add($"search.ismatch('{providerNameEscaped}', 'ProviderName')");
+                filterClauses.Add($"search.ismatchscoring('{providerNameEscaped}', 'ProviderName', 'simple', 'any')");
             }
 
             var filter = string.Join(" and ", filterClauses);
@@ -222,7 +222,7 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
                         "CourseName",
                     },
                     ScoringProfile = scoringProfile,
-                    SearchMode = SearchMode.All,
+                    SearchMode = SearchMode.Any,
                     Top = limit,
                     Skip = start,
                     OrderBy = new[] { orderBy }
