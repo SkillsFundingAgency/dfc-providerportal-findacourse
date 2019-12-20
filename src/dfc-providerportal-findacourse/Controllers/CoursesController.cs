@@ -138,7 +138,7 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
             var providerContact = (dynamic)((JArray)result.Provider.ProviderContact).SingleOrDefault(c => c["ContactType"].ToString() == "L");
 
             var alternativeCourseRuns = result.Course.CourseRuns.Where(r => r.id != request.CourseRunId)
-                .Select(r => new { CourseRun = r, Venue = result.CourseRunVenues.Single(v => v.id == r.VenueId) });
+                .Select(r => new { CourseRun = r, Venue = result.CourseRunVenues.SingleOrDefault(v => v.id == r.VenueId) });
 
             if (result != null)
             {
@@ -233,20 +233,22 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                         FlexibleStartDate = ar.CourseRun.FlexibleStartDate,
                         StartDate = ar.CourseRun.StartDate,
                         StudyMode = ar.CourseRun.StudyMode,
-                        Venue = new CourseDetailResponseVenue()
-                        {
-                            AddressLine1 = ar.Venue.ADDRESS_1,
-                            AddressLine2 = ar.Venue.ADDRESS_2,
-                            County = ar.Venue.COUNTY,
-                            Email = ar.Venue.EMAIL,
-                            Postcode = ar.Venue.POSTCODE,
-                            Telephone = ar.Venue.PHONE,
-                            Town = ar.Venue.TOWN,
-                            VenueName = ar.Venue.Venue_NAME,
-                            Website = ar.Venue.WEBSITE,
-                            Latitude = venue.Latitude,
-                            Longitude = venue.Longitude
-                        }
+                        Venue = ar.Venue != null ?
+                            new CourseDetailResponseVenue()
+                            {
+                                AddressLine1 = ar.Venue.ADDRESS_1,
+                                AddressLine2 = ar.Venue.ADDRESS_2,
+                                County = ar.Venue.COUNTY,
+                                Email = ar.Venue.EMAIL,
+                                Postcode = ar.Venue.POSTCODE,
+                                Telephone = ar.Venue.PHONE,
+                                Town = ar.Venue.TOWN,
+                                VenueName = ar.Venue.Venue_NAME,
+                                Website = ar.Venue.WEBSITE,
+                                Latitude = venue.Latitude,
+                                Longitude = venue.Longitude
+                            } :
+                            null
                     }),
                     SubRegions = from region in RegionInfo.All
                                  from subRegion in region.SubRegions
