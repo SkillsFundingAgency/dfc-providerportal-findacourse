@@ -1,0 +1,81 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "webAppPrefix": {
+      "value": "__webAppPrefix__"
+    },
+    "appServicePlanName": {
+      "value": "__providerPortalAppServicePlan__"
+    },
+    "appServicePlanResourceGroup": {
+      "value": "__providerPortalResourceGroup__"
+    },
+    "storageConnectionString": {
+      "value": "__providerPortalStorageConnectionStr__"
+    },
+    "ApimServiceName": {
+      "value": "__ApimServiceName__"
+    },
+    "ApimResourceGroup": {
+      "value": "__SharedResourceGroupName__"
+    },
+    "ApiName": {
+      "value": "__ApiName__"
+    },
+    "apiSuffix": {
+      "value": "__apiSuffix__"
+    },
+    "cosmosDBfqdn": {
+      "value": "__cosmosDBConnectionStr__"
+    },
+    "cosmosDBkey": {
+      "value": "__providerPortalCosmosDBPrimaryKey__"
+    },
+    "cosmosDBdatabase": {
+      "value": "__cosmosDatabase__"
+    },
+    "cosmosDBcollection": {
+      "value": "__cosmosCollection__"
+    },
+    "venueApiUrl": {
+      "value": "__venueApiUrl__"
+    },
+    "providerApiUrl": {
+      "value": "__providerApiUrl__"
+    },
+    "searchName": {
+      "value": "__searchName__"
+    },
+    "qualIndex": {
+      "value": "__qualIndex__"
+    },
+    "searchIndex": {
+      "value": "__searchIndex__"
+    },
+    "providerIndex": {
+      "value": "__providerIndex__"
+    },
+    "onspdIndex": {
+      "value": "__onspdIndex__"
+    },
+    "larsIndex": {
+      "value": "__larsIndex__"
+    },
+    "searchAdminKey": {
+      "value": "__searchAdminKey__"
+    },
+    "searchQueryKey": {
+      "value": "__searchQueryKey__"
+    },
+    "apiPassword": {
+      "value": "__tempUserObject__"
+    },
+    "courseApiUrl": {
+      "value": "__courseApiUrl__"
+    },
+    "apimKey": {
+      "value": "__apimKey__"
+    }
+  }
+}
