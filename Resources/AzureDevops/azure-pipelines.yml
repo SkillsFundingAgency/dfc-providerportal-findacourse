@@ -7,11 +7,9 @@ variables:
   BuildPlatform: 'any cpu'
   BuildConfiguration: 'release'
   SolutionBaseName: 'dfc-providerportal-findacourse'
-
   dotNetCoreProjects: 'src/**/*.csproj'
   dotNetCorePublishProject: 'src/dfc-providerportal-findacourse/dfc-providerportal-findacourse.csproj'
   dotNetCoreTestProjects: '**/*[Tt]ests/*.csproj'
-
 
 resources:
   repositories:
@@ -46,40 +44,38 @@ jobs:
     parameters:
       ArmTemplateRoot: '$(System.DefaultWorkingDirectory)\Resources\ArmTemplates'  
 
-  # restore
+  # restore dependencies
   - task: DotNetCoreCLI@2
-    displayName: dotnet restore
+    displayName: 'dotnet restore'
     inputs:
       command: restore
-      projects: '**/*.csproj'
+      projects: $(dotNetCoreProjects)
 
   # build
   - task: DotNetCoreCLI@2
-    displayName: dotnet build
+    displayName: 'dotnet build'
     inputs:
       command: build
-      projects: '**/*.csproj'
-      configuration: ${{ variables.buildConfiguration }}
+      projects: $(dotNetCoreProjects)
+      arguments: '--configuration $(BuildConfiguration)'
 
-  # test
+  # run unit tests
   - task: DotNetCoreCLI@2
-    displayName: dotnet test
-    continueOnError: true
+    displayName: Test
     inputs:
       command: test
-      projects: '**/*.csproj'
-      configuration: ${{ variables.buildConfiguration }}
+      projects: $(dotNetCoreTestProjects)
+      arguments: '--configuration $(BuildConfiguration)'
+    continueOnError: true
 
-  # publish
+  # publish 
   - task: DotNetCoreCLI@2
-    displayName: dotnet publish
+    displayName: Publish
     inputs:
       command: publish
-      projects: 'src/${{ variables.SolutionBaseName }}/${{ variables.SolutionBaseName }}.csproj'
-      configuration: ${{ variables.buildConfiguration }}
-      arguments: '--output $(Build.ArtifactStagingDirectory)'
       publishWebProjects: false
-      zipAfterPublish: true
+      projects: $(dotNetCorePublishProject)
+      arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
 
   - task: CopyFiles@2
     displayName: 'Copy Azure folder to Staging'
