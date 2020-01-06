@@ -30,12 +30,12 @@ namespace Dfc.ProviderPortal.FindACourse.Services
         private readonly ISearchServiceSettings _searchServiceSettings;
         private readonly IQualificationServiceSettings _qualServiceSettings;
         private readonly ICourseServiceSettings _courseServiceSettings;
-        //private readonly ISearchServiceWrapper _searchServiceWrapper;
+        private readonly SearchServiceWrapper _searchServiceWrapper;
 
         public CoursesService(
             //ILogger log,
             ICosmosDbHelper cosmosDbHelper,
-            //ISearchServiceWrapper searchServiceWrapper,
+            SearchServiceWrapper searchServiceWrapper,
             IOptions<ProviderServiceSettings> providerServiceSettings,
             IOptions<VenueServiceSettings> venueServiceSettings,
             IOptions<SearchServiceSettings> searchServiceSettings,
@@ -45,7 +45,7 @@ namespace Dfc.ProviderPortal.FindACourse.Services
         {
             //Throw.IfNull(log, nameof(log));
             Throw.IfNull(cosmosDbHelper, nameof(cosmosDbHelper));
-            //Throw.IfNull(searchServiceWrapper, nameof(searchServiceWrapper));
+            Throw.IfNull(searchServiceWrapper, nameof(searchServiceWrapper));
             Throw.IfNull(settings, nameof(settings));
             Throw.IfNull(providerServiceSettings, nameof(providerServiceSettings));
             Throw.IfNull(venueServiceSettings, nameof(venueServiceSettings));
@@ -60,7 +60,7 @@ namespace Dfc.ProviderPortal.FindACourse.Services
             _qualServiceSettings = qualServiceSettings.Value;
             _searchServiceSettings = searchServiceSettings.Value;
             _courseServiceSettings = courseServiceSettings.Value;
-            //_searchServiceWrapper = searchServiceWrapper;
+            _searchServiceWrapper = searchServiceWrapper;
         }
 
         public async Task<AzureSearchCourseDetail> CourseDetail(Guid courseId, Guid courseRunId)
@@ -114,22 +114,22 @@ namespace Dfc.ProviderPortal.FindACourse.Services
 
         public Task<FACSearchResult> CourseSearch(ILogger log, SearchCriteriaStructure criteria)
         {
-            return new SearchServiceWrapper(log, _searchServiceSettings).SearchCourses(criteria);
+            return _searchServiceWrapper.SearchCourses(criteria);
         }
 
         public Task<ProviderSearchResult> ProviderSearch(ILogger log, ProviderSearchCriteriaStructure criteria)
         {
-            return new SearchServiceWrapper(log, _searchServiceSettings).SearchProviders(criteria);
+            return _searchServiceWrapper.SearchProviders(criteria);
         }
 
         public Task<LARSSearchResult> LARSSearch(ILogger log, LARSSearchCriteriaStructure criteria)
         {
-            return new SearchServiceWrapper(log, _searchServiceSettings).SearchLARS(criteria);
+            return _searchServiceWrapper.SearchLARS(criteria);
         }
 
         public Task<PostcodeSearchResult> PostcodeSearch(ILogger log, PostcodeSearchCriteriaStructure criteria)
         {
-            return new SearchServiceWrapper(log, _searchServiceSettings).SearchPostcode(criteria);
+            return _searchServiceWrapper.SearchPostcode(criteria);
         }
 
         public async Task<IEnumerable<ICourse>> GetAllCourses(ILogger log)
