@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Converters;
 using Swashbuckle.AspNetCore.Swagger;
 
@@ -58,7 +59,9 @@ namespace Dfc.ProviderPortal.FindACourse.API
                     .AddScoped<ICourseService, CoursesService>()
                     .AddScoped<ICosmosDbHelper, CosmosDbHelper>()
                     .AddScoped<IProviderServiceWrapper, ProviderServiceWrapper>()
-                    .AddScoped<IVenueServiceWrapper, VenueServiceWrapper>();
+                    .AddScoped<IVenueServiceWrapper, VenueServiceWrapper>()
+                    .AddSingleton<SearchServiceWrapper>()
+                    .AddTransient<ISearchServiceSettings>(sp => sp.GetRequiredService<IOptions<SearchServiceSettings>>().Value);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

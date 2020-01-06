@@ -44,14 +44,12 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
         private readonly Uri _larsUri;
         private readonly Uri _onspdUri;
 
-        public SearchServiceWrapper(
-            ILogger log,
-            ISearchServiceSettings settings)
+        public SearchServiceWrapper(ISearchServiceSettings settings, ILoggerFactory loggerFactory)
         {
-            Throw.IfNull(log, nameof(log));
+            Throw.IfNull(loggerFactory, nameof(loggerFactory));
             Throw.IfNull(settings, nameof(settings));
 
-            _log = log;
+            _log = loggerFactory.CreateLogger<SearchServiceWrapper>();
             _settings = settings;
 
             _queryService = new SearchServiceClient(settings.SearchService, new SearchCredentials(settings.QueryKey));
