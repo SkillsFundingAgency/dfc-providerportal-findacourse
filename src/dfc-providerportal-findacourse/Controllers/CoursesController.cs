@@ -155,7 +155,7 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                     DurationUnit = courseRun.DurationUnit,
                     DurationValue = courseRun.DurationValue,
                     FlexibleStartDate = courseRun.FlexibleStartDate,
-                    StartDate = courseRun.StartDate,
+                    StartDate = !courseRun.FlexibleStartDate ? courseRun.StartDate : null,
                     StudyMode = courseRun.StudyMode,
                     Course = new CourseDetailResponseCourse()
                     {
