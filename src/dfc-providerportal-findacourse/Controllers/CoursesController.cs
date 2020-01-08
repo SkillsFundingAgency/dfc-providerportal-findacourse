@@ -89,7 +89,7 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                     CourseText = i.Course.CourseText,
                     DeliveryMode = i.Course.DeliveryMode,
                     DeliveryModeDescription = i.Course.DeliveryModeDescription,
-                    Distance = i.Distance,
+                    Distance = !i.Course.National.GetValueOrDefault() ? i.Distance : null,
                     DurationUnit = i.Course.DurationUnit ?? DurationUnit.Undefined,
                     DurationValue = i.Course.DurationValue,
                     FlexibleStartDate = i.Course.FlexibleStartDate,
