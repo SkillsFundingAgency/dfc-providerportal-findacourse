@@ -100,7 +100,7 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                     QualificationCourseTitle = i.Course.QualificationCourseTitle,
                     Region = i.Course.Region,
                     SearchScore = i.Score,
-                    StartDate = i.Course.StartDate,
+                    StartDate = !i.Course.FlexibleStartDate.GetValueOrDefault() ? i.Course.StartDate : null,
                     UKPRN = i.Course.UKPRN,
                     UpdatedOn = i.Course.UpdatedOn,
                     VenueAddress = i.Course.VenueAddress,
