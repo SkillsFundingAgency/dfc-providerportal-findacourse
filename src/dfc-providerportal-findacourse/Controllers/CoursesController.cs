@@ -245,8 +245,8 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                                 Town = ar.Venue.TOWN,
                                 VenueName = ar.Venue.Venue_NAME,
                                 Website = ar.Venue.WEBSITE,
-                                Latitude = venue.Latitude,
-                                Longitude = venue.Longitude
+                                Latitude = ar.Venue.Latitude,
+                                Longitude = ar.Venue.Longitude
                             } :
                             null
                     }).ToList(),
