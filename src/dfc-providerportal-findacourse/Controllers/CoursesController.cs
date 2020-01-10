@@ -231,7 +231,7 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                         DurationUnit = ar.CourseRun.DurationUnit,
                         DurationValue = ar.CourseRun.DurationValue,
                         FlexibleStartDate = ar.CourseRun.FlexibleStartDate,
-                        StartDate = ar.CourseRun.StartDate,
+                        StartDate = !ar.CourseRun.FlexibleStartDate ? ar.CourseRun.StartDate : null,
                         StudyMode = ar.CourseRun.StudyMode,
                         Venue = ar.Venue != null ?
                             new CourseDetailResponseVenue()
@@ -249,8 +249,8 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                                 Longitude = venue.Longitude
                             } :
                             null
-                    }),
-                    SubRegions = from region in RegionInfo.All
+                    }).ToList(),
+                    SubRegions = (from region in RegionInfo.All
                                  from subRegion in region.SubRegions
                                  let sr = new { subRegion, region }
                                  join r in (courseRun.Regions ?? Enumerable.Empty<string>()) on sr.subRegion.Id equals r
@@ -263,7 +263,7 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                                          Name = sr.region.Name,
                                          RegionId = sr.region.Id
                                      }
-                                 }
+                                 }).ToList()
                 };
 
                 return new OkObjectResult(response);
