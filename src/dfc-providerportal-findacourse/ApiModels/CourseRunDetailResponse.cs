@@ -21,6 +21,7 @@ namespace Dfc.ProviderPortal.FindACourse.ApiModels
         public DeliveryMode DeliveryMode { get; set; }
         public DurationUnit DurationUnit { get; set; }
         public int? DurationValue { get; set; }
+        public bool? National { get; set; }
         public bool FlexibleStartDate { get; set; }
         public DateTime? StartDate { get; set; }
         public StudyMode StudyMode { get; set; }

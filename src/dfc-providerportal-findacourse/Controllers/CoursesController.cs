@@ -157,6 +157,7 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                     FlexibleStartDate = courseRun.FlexibleStartDate,
                     StartDate = !courseRun.FlexibleStartDate ? courseRun.StartDate : null,
                     StudyMode = courseRun.StudyMode,
+                    National = courseRun.National,
                     Course = new CourseDetailResponseCourse()
                     {
                         AdvancedLearnerLoan = result.Course.AdvancedLearnerLoan,
