@@ -244,7 +244,7 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                                 Postcode = ar.Venue.POSTCODE,
                                 Telephone = ar.Venue.PHONE,
                                 Town = ar.Venue.TOWN,
-                                VenueName = ar.Venue.Venue_NAME,
+                                VenueName = ar.Venue.VENUE_NAME,
                                 Website = ar.Venue.WEBSITE,
                                 Latitude = ar.Venue.Latitude,
                                 Longitude = ar.Venue.Longitude
