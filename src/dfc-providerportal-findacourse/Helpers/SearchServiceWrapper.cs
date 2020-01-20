@@ -197,7 +197,7 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
 
             var scoringProfile = string.IsNullOrWhiteSpace(_settings.RegionBoostScoringProfile) ? "region-boost" : _settings.RegionBoostScoringProfile;
 
-            var searchText = !string.IsNullOrWhiteSpace(criteria.SubjectKeyword) ? criteria.SubjectKeyword : "*";
+            var searchText = !string.IsNullOrWhiteSpace(criteria.SubjectKeyword) ? ConvertToPrefixSearch(EscapeSearchText(criteria.SubjectKeyword)) : "*";
 
             var results = await _queryIndex.Documents.SearchAsync<AzureSearchCourse>(
                 searchText,
@@ -248,6 +248,19 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
             };
 
             string EscapeFilterValue(string v) => v.Replace("'", "''");
+
+            string EscapeSearchText(string text) => text
+                .Replace("+", "\\+")
+                .Replace("|", "\\|")
+                .Replace("-", "\\-")
+                .Replace("*", "\\*")
+                .Replace("(", "\\(")
+                .Replace(")", "\\)");
+
+            string ConvertToPrefixSearch(string text) => text
+                .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                .Select(t => t + "*")
+                .Aggregate((l, r) => l + " " + r);
         }
 
         public async Task<ProviderSearchResult> SearchProviders(ProviderSearchCriteriaStructure criteria)
