@@ -145,7 +145,7 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                 var response = new CourseRunDetailResponse()
                 {
                     CourseRunId = courseRun.id,
-                    AttendancePattern = courseRun.AttendancePattern,
+                    AttendancePattern = courseRun.DeliveryMode == DeliveryMode.ClassroomBased ? (AttendancePattern?)courseRun.AttendancePattern : null,
                     Cost = courseRun.Cost,
                     CostDescription = courseRun.CostDescription,
                     CourseName = courseRun.CourseName,
@@ -222,7 +222,7 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                     AlternativeCourseRuns = alternativeCourseRuns.Select(ar => new CourseDetailResponseAlternativeCourseRun()
                     {
                         CourseRunId = ar.CourseRun.id,
-                        AttendancePattern = ar.CourseRun.AttendancePattern,
+                        AttendancePattern = ar.CourseRun.DeliveryMode == DeliveryMode.ClassroomBased ? (AttendancePattern?)ar.CourseRun.AttendancePattern : null,
                         Cost = ar.CourseRun.Cost,
                         CostDescription = ar.CourseRun.CostDescription,
                         CourseName = ar.CourseRun.CourseName,
