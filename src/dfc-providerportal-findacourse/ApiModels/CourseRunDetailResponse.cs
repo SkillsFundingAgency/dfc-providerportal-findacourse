@@ -12,7 +12,7 @@ namespace Dfc.ProviderPortal.FindACourse.ApiModels
         public CourseDetailResponseQualification Qualification { get; set; }
         public IEnumerable<CourseDetailResponseAlternativeCourseRun> AlternativeCourseRuns { get; set; }
         public Guid CourseRunId { get; set; }
-        public AttendancePattern AttendancePattern { get; set; }
+        public AttendancePattern? AttendancePattern { get; set; }
         public decimal? Cost { get; set; }
         public string CostDescription { get; set; }
         public string CourseName { get; set; }
@@ -94,7 +94,7 @@ namespace Dfc.ProviderPortal.FindACourse.ApiModels
     public class CourseDetailResponseAlternativeCourseRun
     {
         public Guid CourseRunId { get; set; }
-        public AttendancePattern AttendancePattern { get; set; }
+        public AttendancePattern? AttendancePattern { get; set; }
         public decimal? Cost { get; set; }
         public string CostDescription { get; set; }
         public string CourseName { get; set; }
