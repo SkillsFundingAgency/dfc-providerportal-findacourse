@@ -197,7 +197,7 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
 
             var scoringProfile = string.IsNullOrWhiteSpace(_settings.RegionBoostScoringProfile) ? "region-boost" : _settings.RegionBoostScoringProfile;
 
-            var searchText = !string.IsNullOrWhiteSpace(criteria.SubjectKeyword) ? ConvertToPrefixSearch(EscapeSearchText(criteria.SubjectKeyword)) : "*";
+            var searchText = TranslateCourseSearchSubjectText(criteria.SubjectKeyword);
 
             var results = await _queryIndex.Documents.SearchAsync<AzureSearchCourse>(
                 searchText,
@@ -220,7 +220,7 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
                         "CourseName",
                     },
                     ScoringProfile = scoringProfile,
-                    SearchMode = SearchMode.Any,
+                    SearchMode = SearchMode.All,
                     Top = limit,
                     Skip = start,
                     OrderBy = new[] { orderBy }
@@ -248,19 +248,6 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
             };
 
             string EscapeFilterValue(string v) => v.Replace("'", "''");
-
-            string EscapeSearchText(string text) => text
-                .Replace("+", "\\+")
-                .Replace("|", "\\|")
-                .Replace("-", "\\-")
-                .Replace("*", "\\*")
-                .Replace("(", "\\(")
-                .Replace(")", "\\)");
-
-            string ConvertToPrefixSearch(string text) => text
-                .Split(' ', StringSplitOptions.RemoveEmptyEntries)
-                .Select(t => t + "*")
-                .Aggregate((l, r) => l + " " + r);
         }
 
         public async Task<ProviderSearchResult> SearchProviders(ProviderSearchCriteriaStructure criteria)
@@ -443,6 +430,52 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
 
             PostcodeSearchResult searchResult = JsonConvert.DeserializeObject<PostcodeSearchResult>(json, settings);
             return searchResult;
+        }
+
+        public static string TranslateCourseSearchSubjectText(string subjectText)
+        {
+            if (string.IsNullOrWhiteSpace(subjectText))
+            {
+                return "*";
+            }
+
+            var terms = new List<string>();
+
+            // Find portions wrapped in quotes
+            var remaining = EscapeSearchText(subjectText.Trim());
+            var groupsRegex = new Regex("('|\")(.*?)(\\1)");
+            Match m;
+            while ((m = groupsRegex.Match(remaining)).Success)
+            {
+                var value = m.Groups[2].Value;
+
+                if (m.Groups[1].Value == "'")
+                {
+                    terms.Add($"({CombineWords(value, " + ")})");
+                }
+                else   // double quotes
+                {
+                    terms.Add($"(\"{value}\")");
+                }
+
+                remaining = remaining.Remove(m.Index, m.Length);
+            }
+
+            // Any remaining terms should be made prefix terms
+            terms.AddRange(remaining.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(t => $"{t}*"));
+
+            return string.Join(" | ", terms);
+
+            string CombineWords(string text, string sep) =>
+                string.Join(sep, text.Split(' ', StringSplitOptions.RemoveEmptyEntries));
+
+            string EscapeSearchText(string text) => text
+                .Replace("+", "\\+")
+                .Replace("|", "\\|")
+                .Replace("-", "\\-")
+                .Replace("*", "\\*")
+                .Replace("(", "\\(")
+                .Replace(")", "\\)");
         }
 
         private (int limit, int start) ResolvePagingParams(int? limit, int? start)
