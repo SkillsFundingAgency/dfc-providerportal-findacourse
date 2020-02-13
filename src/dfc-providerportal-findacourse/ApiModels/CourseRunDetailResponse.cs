@@ -12,7 +12,7 @@ namespace Dfc.ProviderPortal.FindACourse.ApiModels
         public CourseDetailResponseQualification Qualification { get; set; }
         public IEnumerable<CourseDetailResponseAlternativeCourseRun> AlternativeCourseRuns { get; set; }
         public Guid CourseRunId { get; set; }
-        public AttendancePattern AttendancePattern { get; set; }
+        public AttendancePattern? AttendancePattern { get; set; }
         public decimal? Cost { get; set; }
         public string CostDescription { get; set; }
         public string CourseName { get; set; }
@@ -21,6 +21,7 @@ namespace Dfc.ProviderPortal.FindACourse.ApiModels
         public DeliveryMode DeliveryMode { get; set; }
         public DurationUnit DurationUnit { get; set; }
         public int? DurationValue { get; set; }
+        public bool? National { get; set; }
         public bool FlexibleStartDate { get; set; }
         public DateTime? StartDate { get; set; }
         public StudyMode StudyMode { get; set; }
@@ -83,7 +84,7 @@ namespace Dfc.ProviderPortal.FindACourse.ApiModels
         public string LearnAimRef { get; set; }
         public string LearnAimRefTitle { get; set; }
         public string LearnAimRefTypeDesc { get; set; }
-        public int? QualificationLevel { get; set; }
+        public string QualificationLevel { get; set; }
         public string AwardOrgCode { get; set; }
         public string AwardOrgName { get; set; }
         public string SectorSubjectAreaTier1Desc { get; set; }
@@ -93,7 +94,7 @@ namespace Dfc.ProviderPortal.FindACourse.ApiModels
     public class CourseDetailResponseAlternativeCourseRun
     {
         public Guid CourseRunId { get; set; }
-        public AttendancePattern AttendancePattern { get; set; }
+        public AttendancePattern? AttendancePattern { get; set; }
         public decimal? Cost { get; set; }
         public string CostDescription { get; set; }
         public string CourseName { get; set; }

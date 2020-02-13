@@ -89,7 +89,7 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                     CourseText = i.Course.CourseText,
                     DeliveryMode = i.Course.DeliveryMode,
                     DeliveryModeDescription = i.Course.DeliveryModeDescription,
-                    Distance = i.Distance,
+                    Distance = !i.Course.National.GetValueOrDefault() ? i.Distance : null,
                     DurationUnit = i.Course.DurationUnit ?? DurationUnit.Undefined,
                     DurationValue = i.Course.DurationValue,
                     FlexibleStartDate = i.Course.FlexibleStartDate,
@@ -100,22 +100,24 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                     QualificationCourseTitle = i.Course.QualificationCourseTitle,
                     Region = i.Course.Region,
                     SearchScore = i.Score,
-                    StartDate = i.Course.StartDate,
+                    StartDate = !i.Course.FlexibleStartDate.GetValueOrDefault() ? i.Course.StartDate : null,
                     UKPRN = i.Course.UKPRN,
                     UpdatedOn = i.Course.UpdatedOn,
                     VenueAddress = i.Course.VenueAddress,
                     VenueAttendancePattern = i.Course.VenueAttendancePattern,
                     VenueAttendancePatternDescription = i.Course.VenueAttendancePatternDescription,
-                    VenueLocation = new Coordinates()
-                    {
-                        Latitude = i.Course.VenueLocation.Latitude,
-                        Longitude = i.Course.VenueLocation.Longitude
-                    },
+                    VenueLocation = i.Course.VenueLocation != null ?
+                        new Coordinates()
+                        {
+                            Latitude = i.Course.VenueLocation.Latitude,
+                            Longitude = i.Course.VenueLocation.Longitude
+                        } :
+                        null,
                     VenueName = i.Course.VenueName,
                     VenueStudyMode = i.Course.VenueStudyMode,
                     VenueStudyModeDescription = i.Course.VenueStudyModeDescription,
                     VenueTown = i.Course.VenueTown
-                })
+                }).ToList()
             };
 
             return new OkObjectResult(response);
@@ -136,14 +138,14 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
             var providerContact = (dynamic)((JArray)result.Provider.ProviderContact).SingleOrDefault(c => c["ContactType"].ToString() == "L");
 
             var alternativeCourseRuns = result.Course.CourseRuns.Where(r => r.id != request.CourseRunId)
-                .Select(r => new { CourseRun = r, Venue = result.CourseRunVenues.Single(v => v.id == r.VenueId) });
+                .Select(r => new { CourseRun = r, Venue = result.CourseRunVenues.SingleOrDefault(v => v.id == r.VenueId) });
 
             if (result != null)
             {
                 var response = new CourseRunDetailResponse()
                 {
                     CourseRunId = courseRun.id,
-                    AttendancePattern = courseRun.AttendancePattern,
+                    AttendancePattern = courseRun.DeliveryMode == DeliveryMode.ClassroomBased ? (AttendancePattern?)courseRun.AttendancePattern : null,
                     Cost = courseRun.Cost,
                     CostDescription = courseRun.CostDescription,
                     CourseName = courseRun.CourseName,
@@ -153,8 +155,9 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                     DurationUnit = courseRun.DurationUnit,
                     DurationValue = courseRun.DurationValue,
                     FlexibleStartDate = courseRun.FlexibleStartDate,
-                    StartDate = courseRun.StartDate,
+                    StartDate = !courseRun.FlexibleStartDate ? courseRun.StartDate : null,
                     StudyMode = courseRun.StudyMode,
+                    National = courseRun.National,
                     Course = new CourseDetailResponseCourse()
                     {
                         AdvancedLearnerLoan = result.Course.AdvancedLearnerLoan,
@@ -201,7 +204,9 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                         Telephone = providerContact.ContactTelephone1,
                         Fax = providerContact.ContactFax,
                         Website = providerContact.ContactWebsiteAddress,
-                        Email = providerContact.ContactEmail
+                        Email = providerContact.ContactEmail,
+                        EmployerSatisfaction = result.FeChoice?.EmployerSatisfaction,
+                        LearnerSatisfaction = result.FeChoice?.LearnerSatisfaction,
                     },
                     Qualification = new CourseDetailResponseQualification()
                     {
@@ -217,7 +222,7 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                     AlternativeCourseRuns = alternativeCourseRuns.Select(ar => new CourseDetailResponseAlternativeCourseRun()
                     {
                         CourseRunId = ar.CourseRun.id,
-                        AttendancePattern = ar.CourseRun.AttendancePattern,
+                        AttendancePattern = ar.CourseRun.DeliveryMode == DeliveryMode.ClassroomBased ? (AttendancePattern?)ar.CourseRun.AttendancePattern : null,
                         Cost = ar.CourseRun.Cost,
                         CostDescription = ar.CourseRun.CostDescription,
                         CourseName = ar.CourseRun.CourseName,
@@ -227,24 +232,26 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                         DurationUnit = ar.CourseRun.DurationUnit,
                         DurationValue = ar.CourseRun.DurationValue,
                         FlexibleStartDate = ar.CourseRun.FlexibleStartDate,
-                        StartDate = ar.CourseRun.StartDate,
+                        StartDate = !ar.CourseRun.FlexibleStartDate ? ar.CourseRun.StartDate : null,
                         StudyMode = ar.CourseRun.StudyMode,
-                        Venue = new CourseDetailResponseVenue()
-                        {
-                            AddressLine1 = ar.Venue.ADDRESS_1,
-                            AddressLine2 = ar.Venue.ADDRESS_2,
-                            County = ar.Venue.COUNTY,
-                            Email = ar.Venue.EMAIL,
-                            Postcode = ar.Venue.POSTCODE,
-                            Telephone = ar.Venue.PHONE,
-                            Town = ar.Venue.TOWN,
-                            VenueName = ar.Venue.Venue_NAME,
-                            Website = ar.Venue.WEBSITE,
-                            Latitude = venue.Latitude,
-                            Longitude = venue.Longitude
-                        }
-                    }),
-                    SubRegions = from region in RegionInfo.All
+                        Venue = ar.Venue != null ?
+                            new CourseDetailResponseVenue()
+                            {
+                                AddressLine1 = ar.Venue.ADDRESS_1,
+                                AddressLine2 = ar.Venue.ADDRESS_2,
+                                County = ar.Venue.COUNTY,
+                                Email = ar.Venue.EMAIL,
+                                Postcode = ar.Venue.POSTCODE,
+                                Telephone = ar.Venue.PHONE,
+                                Town = ar.Venue.TOWN,
+                                VenueName = ar.Venue.VENUE_NAME,
+                                Website = ar.Venue.WEBSITE,
+                                Latitude = ar.Venue.Latitude,
+                                Longitude = ar.Venue.Longitude
+                            } :
+                            null
+                    }).ToList(),
+                    SubRegions = (from region in RegionInfo.All
                                  from subRegion in region.SubRegions
                                  let sr = new { subRegion, region }
                                  join r in (courseRun.Regions ?? Enumerable.Empty<string>()) on sr.subRegion.Id equals r
@@ -257,7 +264,7 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                                          Name = sr.region.Name,
                                          RegionId = sr.region.Id
                                      }
-                                 }
+                                 }).ToList()
                 };
 
                 return new OkObjectResult(response);

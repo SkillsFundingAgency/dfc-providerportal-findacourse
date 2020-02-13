@@ -44,14 +44,12 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
         private readonly Uri _larsUri;
         private readonly Uri _onspdUri;
 
-        public SearchServiceWrapper(
-            ILogger log,
-            ISearchServiceSettings settings)
+        public SearchServiceWrapper(ISearchServiceSettings settings, ILoggerFactory loggerFactory)
         {
-            Throw.IfNull(log, nameof(log));
+            Throw.IfNull(loggerFactory, nameof(loggerFactory));
             Throw.IfNull(settings, nameof(settings));
 
-            _log = log;
+            _log = loggerFactory.CreateLogger<SearchServiceWrapper>();
             _settings = settings;
 
             _queryService = new SearchServiceClient(settings.SearchService, new SearchCredentials(settings.QueryKey));
@@ -153,7 +151,7 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
 
             if (criteria.QualificationLevels?.Any() ?? false)
             {
-                filterClauses.Add($"search.in(NotionalNVQLevelv2, '{string.Join("|", criteria.QualificationLevels.Select(Uri.EscapeDataString))}', '|')");
+                filterClauses.Add($"search.in(NotionalNVQLevelv2, '{string.Join("|", criteria.QualificationLevels.Select(EscapeFilterValue))}', '|')");
             }
 
             if (geoFilterRequired)
@@ -161,12 +159,13 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
                 var distanceInKm = GeoHelper.MilesToKilometers(criteria.Distance.Value);
                 filterClauses.Add(
                     $"(geo.distance(VenueLocation, geography'POINT({longitude.Value} {latitude.Value})') le {distanceInKm}" +
-                    "or National eq true)");
+                    " or National eq true" +
+                    " or DeliveryMode eq '2')");
             }
 
             if (!string.IsNullOrWhiteSpace(criteria.Town))
             {
-                var townEscaped = Uri.EscapeDataString(criteria.Town);
+                var townEscaped = EscapeFilterValue(criteria.Town);
                 filterClauses.Add($"search.ismatch('{townEscaped}', 'VenueTown')");
             }
 
@@ -182,8 +181,8 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
 
             if (!string.IsNullOrWhiteSpace(criteria.ProviderName))
             {
-                var providerNameEscaped = Uri.EscapeDataString(criteria.ProviderName);
-                filterClauses.Add($"search.ismatch('{providerNameEscaped}', 'ProviderName')");
+                var providerNameEscaped = EscapeFilterValue(criteria.ProviderName);
+                filterClauses.Add($"search.ismatchscoring('{providerNameEscaped}', 'ProviderName', 'simple', 'any')");
             }
 
             var filter = string.Join(" and ", filterClauses);
@@ -198,7 +197,7 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
 
             var scoringProfile = string.IsNullOrWhiteSpace(_settings.RegionBoostScoringProfile) ? "region-boost" : _settings.RegionBoostScoringProfile;
 
-            var searchText = !string.IsNullOrWhiteSpace(criteria.SubjectKeyword) ? criteria.SubjectKeyword : "*";
+            var searchText = TranslateCourseSearchSubjectText(criteria.SubjectKeyword);
 
             var results = await _queryIndex.Documents.SearchAsync<AzureSearchCourse>(
                 searchText,
@@ -206,12 +205,12 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
                 {
                     Facets = new[]
                     {
-                        "NotionalNVQLevelv2",
+                        "NotionalNVQLevelv2,count:100",
                         "VenueStudyMode",
                         "VenueAttendancePattern",
                         "DeliveryMode",
-                        "ProviderName",
-                        "Region"
+                        "ProviderName,count:100",
+                        "Region,count:100"
                     },
                     Filter = filter,
                     IncludeTotalResultCount = true,
@@ -247,6 +246,8 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
                     Score = r.Score
                 })
             };
+
+            string EscapeFilterValue(string v) => v.Replace("'", "''");
         }
 
         public async Task<ProviderSearchResult> SearchProviders(ProviderSearchCriteriaStructure criteria)
@@ -429,6 +430,52 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
 
             PostcodeSearchResult searchResult = JsonConvert.DeserializeObject<PostcodeSearchResult>(json, settings);
             return searchResult;
+        }
+
+        public static string TranslateCourseSearchSubjectText(string subjectText)
+        {
+            if (string.IsNullOrWhiteSpace(subjectText))
+            {
+                return "*";
+            }
+
+            var terms = new List<string>();
+
+            // Find portions wrapped in quotes
+            var remaining = EscapeSearchText(subjectText.Trim());
+            var groupsRegex = new Regex("('|\")(.*?)(\\1)");
+            Match m;
+            while ((m = groupsRegex.Match(remaining)).Success)
+            {
+                var value = m.Groups[2].Value;
+
+                if (m.Groups[1].Value == "'")
+                {
+                    terms.Add($"({CombineWords(value, " + ")})");
+                }
+                else   // double quotes
+                {
+                    terms.Add($"(\"{value}\")");
+                }
+
+                remaining = remaining.Remove(m.Index, m.Length);
+            }
+
+            // Any remaining terms should be made prefix terms
+            terms.AddRange(remaining.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(t => $"{t}*"));
+
+            return string.Join(" | ", terms);
+
+            string CombineWords(string text, string sep) =>
+                string.Join(sep, text.Split(' ', StringSplitOptions.RemoveEmptyEntries));
+
+            string EscapeSearchText(string text) => text
+                .Replace("+", "\\+")
+                .Replace("|", "\\|")
+                .Replace("-", "\\-")
+                .Replace("*", "\\*")
+                .Replace("(", "\\(")
+                .Replace(")", "\\)");
         }
 
         private (int limit, int start) ResolvePagingParams(int? limit, int? start)

@@ -1,15 +1,24 @@
-# dotnet code build
+# dotnet core build
+
+pool:
+  name: NCS - CI and CD
+
+variables:
+  BuildPlatform: 'any cpu'
+  BuildConfiguration: 'release'
+  SolutionBaseName: 'dfc-providerportal-findacourse'
+  dotNetCoreProjects: 'src/**/*.csproj'
+  dotNetCorePublishProject: 'src/dfc-providerportal-findacourse/dfc-providerportal-findacourse.csproj'
+  dotNetCoreTestProjects: '**/*[Tt]ests/*.csproj'
 
 resources:
   repositories:
   - repository: self
-
-variables:
-  BuildConfiguration: release
-  BuildPlatform: 'any cpu'
-  dotNetCoreProjects: 'src/**/*.csproj'
-  dotNetCorePublishProject: 'src/dfc-providerportal-findacourse/dfc-providerportal-findacourse.csproj'
-  dotNetCoreTestProjects: '**/*[Tt]ests/*.csproj'
+  - repository: dfc-devops
+    type: github
+    name: SkillsFundingAgency/dfc-devops
+    endpoint: 'GitHub (ESFA)'
+    ref: refs/tags/v1.9.1
 
 trigger:
   batch: true # batch if multiple checkins while build in progress
@@ -27,20 +36,13 @@ jobs:
 # Full build
 - job: BuildDotNetCore
   displayName: Build dot net core project
-  pool:
-    name: Continuous Integration 02 - SSD - 160ACU
-    demands:
-    - msbuild
-    - visualstudio
 
   steps:
 
-  # Zip up resources
-  - task: PublishBuildArtifacts@1
-    displayName: 'Publish Artifact: drop'
-    inputs:
-      pathtoPublish: 'Resources'
-      artifactName: resources
+  # ARM template
+  - template: AzureDevOpsTemplates/Build/StepTemplates/dfc-arm-build.yml@dfc-devops
+    parameters:
+      ArmTemplateRoot: '$(System.DefaultWorkingDirectory)\Resources\ArmTemplates'  
 
   # restore dependencies
   - task: DotNetCoreCLI@2
@@ -75,8 +77,14 @@ jobs:
       projects: $(dotNetCorePublishProject)
       arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
 
-  # publish
-  - task: PublishBuildArtifacts@1
-    displayName: 'Publish Artifact: drop'
+  - task: CopyFiles@2
+    displayName: 'Copy Azure folder to Staging'
     inputs:
-      artifactName: dfc-providerportal-findacourse
+      SourceFolder: $(System.DefaultWorkingDirectory)\Resources\ArmTemplates
+      TargetFolder: $(build.artifactstagingdirectory)\Azure\Azure
+
+  - task: PublishBuildArtifacts@1
+    displayName: Publish Artifact
+    inputs:
+      pathtoPublish: $(Build.ArtifactStagingDirectory)
+      artifactName: '${{ variables.SolutionBaseName }}'
