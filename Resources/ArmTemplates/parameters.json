@@ -14,18 +14,6 @@
     "storageConnectionString": {
       "value": "__providerPortalStorageConnectionStr__"
     },
-    "ApimServiceName": {
-      "value": "__ApimServiceName__"
-    },
-    "ApimResourceGroup": {
-      "value": "__SharedResourceGroupName__"
-    },
-    "ApiName": {
-      "value": "__ApiName__"
-    },
-    "apiSuffix": {
-      "value": "__apiSuffix__"
-    },
     "cosmosDBfqdn": {
       "value": "__cosmosDBConnectionStr__"
     },
@@ -41,8 +29,14 @@
     "venueApiUrl": {
       "value": "__venueApiUrl__"
     },
+    "venueApiKey": {
+      "value": "__ApimPublishCourseDirectoryKey__"
+    },
     "providerApiUrl": {
       "value": "__providerApiUrl__"
+    },
+    "providerApiKey": {
+      "value": "__ApimPublishCourseDirectoryKey__"
     },
     "searchName": {
       "value": "__searchName__"
@@ -74,8 +68,8 @@
     "courseApiUrl": {
       "value": "__courseApiUrl__"
     },
-    "apimKey": {
-      "value": "__apimKey__"
+    "courseApiKey": {
+      "value": "__ApimPublishCourseDirectoryKey__"
     }
   }
 }
