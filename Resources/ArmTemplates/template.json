@@ -26,31 +26,6 @@
         "description": "Connection string for the storage account to store function app files"
       }
     },
-    "ApimServiceName": {
-      "type": "string",
-      "metadata": {
-        "description": "APIM name"
-      }
-    },
-    "ApimResourceGroup": {
-      "type": "string",
-      "metadata": {
-        "description": "Resource group where the APIM is located"
-      }
-    },
-    "ApiName": {
-      "type": "string",
-      "metadata": {
-        "description": "API name"
-      }
-    },
-    "apiSuffix": {
-      "type": "string",
-      "defaultValue": "",
-      "metadata": {
-        "description": "Suffix uniquely identifying this API and all of its resource paths within APIM, defaults to apiName"
-      }
-    },
     "cosmosDBfqdn": {
       "type": "string",
       "metadata": {
@@ -81,10 +56,22 @@
         "description": "API URL for the venue search"
       }
     },
+    "venueApiKey": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Subscription key for accessing the venues API via APIM"
+      }
+    },
     "providerApiUrl": {
       "type": "string",
       "metadata": {
         "description": "API URL for the provider (ukrlp) search"
+      }
+    },
+    "providerApiKey": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Subscription key for accessing the providers API via APIM"
       }
     },
     "searchName": {
@@ -148,16 +135,16 @@
         "description": "Boost Scoring Profile to be used in on Azure search"
       }
     },
-    "apimKey": {
-      "type": "securestring",
-      "metadata": {
-        "description": "Subscription key for accessing the API via APIM"
-      }
-    },
     "courseApiUrl": {
       "type":  "string",
       "metadata": {
         "description": "URL to the Courses API"
+      }
+    },
+    "courseApiKey": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Subscription key for accessing the courses API via APIM"
       }
     }
   },
@@ -246,7 +233,7 @@
               },
               {
                 "name": "VenueServiceSettings__ApiKey",
-                "value": "[parameters('apimKey')]"
+                "value": "[parameters('venueApiKey')]"
               },
               {
                 "name": "ProviderServiceSettings__ApiUrl",
@@ -254,7 +241,7 @@
               },
               {
                 "name": "ProviderServiceSettings__ApiKey",
-                "value": "[parameters('apimKey')]"
+                "value": "[parameters('providerApiKey')]"
               },
               {
                 "name": "QualificationServiceSettings__SearchService",
@@ -342,7 +329,7 @@
               },
               {
                 "name": "CourseServiceSettings__ApiKey",
-                "value": "[parameters('apimKey')]"
+                "value": "[parameters('courseApiKey')]"
               }
             ]
           },
