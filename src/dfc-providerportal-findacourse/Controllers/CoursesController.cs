@@ -135,7 +135,9 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
 
             var courseRun = result.Course.CourseRuns.Single(r => r.id == request.CourseRunId);
             var venue = courseRun.VenueId.HasValue ? result.CourseRunVenues.Single(v => v.id == courseRun.VenueId) : null;
-            var providerContact = (dynamic)((JArray)result.Provider.ProviderContact).SingleOrDefault(c => c["ContactType"].ToString() == "L");
+            var providerContact = ((JArray)result.Provider.ProviderContact)
+                .Select(t => t.ToObject<Providercontact>())
+                .SingleOrDefault(c => c.ContactType == "P");
 
             var alternativeCourseRuns = result.Course.CourseRuns.Where(r => r.id != request.CourseRunId)
                 .Select(r => new { CourseRun = r, Venue = result.CourseRunVenues.SingleOrDefault(v => v.id == r.VenueId) });
@@ -196,15 +198,15 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                         CourseDirectoryName = result.Provider.CourseDirectoryName,
                         Alias = result.Provider.Alias,
                         UKPRN = result.Provider.UnitedKingdomProviderReferenceNumber,
-                        AddressLine1 = providerContact.ContactAddress?.SAON?.Description,
-                        AddressLine2 = providerContact.ContactAddress?.PAON?.Description,
-                        Town = ((JArray)providerContact.ContactAddress?.Items).FirstOrDefault()?.ToString(),
-                        Postcode = providerContact.ContactAddress?.PostCode,
-                        County = providerContact.ContactAddress?.Locality,
-                        Telephone = providerContact.ContactTelephone1,
-                        Fax = providerContact.ContactFax,
-                        Website = providerContact.ContactWebsiteAddress,
-                        Email = providerContact.ContactEmail,
+                        AddressLine1 = providerContact?.ContactAddress?.SAON?.Description,
+                        AddressLine2 = providerContact?.ContactAddress?.PAON?.Description,
+                        Town = providerContact?.ContactAddress?.Items?.FirstOrDefault()?.ToString(),
+                        Postcode = providerContact?.ContactAddress?.PostCode,
+                        County = providerContact?.ContactAddress?.Locality,
+                        Telephone = providerContact?.ContactTelephone1,
+                        Fax = providerContact?.ContactFax,
+                        Website = providerContact?.ContactWebsiteAddress,
+                        Email = providerContact?.ContactEmail,
                         EmployerSatisfaction = result.FeChoice?.EmployerSatisfaction,
                         LearnerSatisfaction = result.FeChoice?.LearnerSatisfaction,
                     },
