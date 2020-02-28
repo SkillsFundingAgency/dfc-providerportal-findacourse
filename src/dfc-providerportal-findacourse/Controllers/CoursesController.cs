@@ -133,17 +133,17 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
         {
             var result = await _service.CourseDetail(request.CourseId, request.CourseRunId);
 
-            var courseRun = result.Course.CourseRuns.Single(r => r.id == request.CourseRunId);
-            var venue = courseRun.VenueId.HasValue ? result.CourseRunVenues.Single(v => v.id == courseRun.VenueId) : null;
-            var providerContact = ((JArray)result.Provider.ProviderContact)
-                .Select(t => t.ToObject<Providercontact>())
-                .SingleOrDefault(c => c.ContactType == "P");
-
-            var alternativeCourseRuns = result.Course.CourseRuns.Where(r => r.id != request.CourseRunId)
-                .Select(r => new { CourseRun = r, Venue = result.CourseRunVenues.SingleOrDefault(v => v.id == r.VenueId) });
-
             if (result != null)
             {
+                var courseRun = result.Course.CourseRuns.Single(r => r.id == request.CourseRunId);
+                var venue = courseRun.VenueId.HasValue ? result.CourseRunVenues.Single(v => v.id == courseRun.VenueId) : null;
+                var providerContact = ((JArray)result.Provider.ProviderContact)
+                    .Select(t => t.ToObject<Providercontact>())
+                    .SingleOrDefault(c => c.ContactType == "P");
+
+                var alternativeCourseRuns = result.Course.CourseRuns.Where(r => r.id != request.CourseRunId)
+                    .Select(r => new { CourseRun = r, Venue = result.CourseRunVenues.SingleOrDefault(v => v.id == r.VenueId) });
+
                 var response = new CourseRunDetailResponse()
                 {
                     CourseRunId = courseRun.id,
