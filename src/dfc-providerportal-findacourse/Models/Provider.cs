@@ -62,4 +62,51 @@ namespace Dfc.ProviderPortal.FindACourse.Models
         [Description("Both")]
         Both = FE | Apprenticeship
     }
+
+    public class Providercontact
+    {
+        public string ContactType { get; set; }
+        public Contactaddress ContactAddress { get; set; }
+        public Contactpersonaldetails ContactPersonalDetails { get; set; }
+        public object ContactRole { get; set; }
+        public string ContactTelephone1 { get; set; }
+        public object ContactTelephone2 { get; set; }
+        public string ContactFax { get; set; }
+        public string ContactWebsiteAddress { get; set; }
+        public string ContactEmail { get; set; }
+        public DateTime LastUpdated { get; set; }
+    }
+
+    public class Contactaddress
+    {
+        public SAON SAON { get; set; }
+        public PAON PAON { get; set; }
+        public string StreetDescription { get; set; }
+        public object UniqueStreetReferenceNumber { get; set; }
+        public string Locality { get; set; }
+        public string[] Items { get; set; }
+        public int[] ItemsElementName { get; set; }
+        public object PostTown { get; set; }
+        public string PostCode { get; set; }
+        public object UniquePropertyReferenceNumber { get; set; }
+    }
+
+    public class SAON
+    {
+        public string Description { get; set; }
+    }
+
+    public class PAON
+    {
+        public string Description { get; set; }
+    }
+
+    public class Contactpersonaldetails
+    {
+        public string[] PersonNameTitle { get; set; }
+        public string[] PersonGivenName { get; set; }
+        public string PersonFamilyName { get; set; }
+        public object PersonNameSuffix { get; set; }
+        public object PersonRequestedName { get; set; }
+    }
 }
