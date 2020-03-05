@@ -70,6 +70,9 @@
     },
     "courseApiKey": {
       "value": "__ApimPublishCourseDirectoryKey__"
+    },
+    "searchDefaultReturnCount": {
+      "value": __SearchDefaultTop__
     }
   }
 }
