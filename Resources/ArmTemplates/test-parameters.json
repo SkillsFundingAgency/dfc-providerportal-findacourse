@@ -70,6 +70,9 @@
     },
     "courseApiKey": {
       "value": "not-a-real-api-key"
+    },
+    "searchDefaultReturnCount": {
+      "value": 100
     }
   }
 }
