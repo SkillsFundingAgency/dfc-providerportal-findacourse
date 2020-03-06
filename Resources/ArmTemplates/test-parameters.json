@@ -73,6 +73,9 @@
     },
     "searchDefaultReturnCount": {
       "value": 100
+    },
+    "searchMaxReturnCount": {
+      "value": 200
     }
   }
 }
