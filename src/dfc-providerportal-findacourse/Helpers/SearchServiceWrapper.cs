@@ -480,15 +480,28 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
 
         private (int limit, int start) ResolvePagingParams(int? limit, int? start)
         {
-            if (limit.HasValue && limit.Value <= 0)
+            if (limit.HasValue)
             {
-                throw new ProblemDetailsException(
-                    new ProblemDetails()
-                    {
-                        Detail = "limit parameter is invalid.",
-                        Status = 400,
-                        Title = "InvalidPagingParameters"
-                    });
+                if (limit.Value <= 0)
+                {
+                    throw new ProblemDetailsException(
+                        new ProblemDetails()
+                        {
+                            Detail = "limit parameter is invalid.",
+                            Status = 400,
+                            Title = "InvalidPagingParameters"
+                        });
+                }
+                else if (limit.Value > _settings.MaxTop)
+                {
+                    throw new ProblemDetailsException(
+                        new ProblemDetails()
+                        {
+                            Detail = $"limit parameter cannot be greater than {_settings.MaxTop}.",
+                            Status = 400,
+                            Title = "InvalidPagingParameters"
+                        });
+                }
             }
 
             if (start.HasValue && start.Value < 0)
