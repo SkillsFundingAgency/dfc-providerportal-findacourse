@@ -73,6 +73,9 @@
     },
     "searchDefaultReturnCount": {
       "value": __SearchDefaultTop__
+    },
+    "searchMaxReturnCount": {
+      "value": __SearchMaxTop__
     }
   }
 }

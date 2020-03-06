@@ -152,7 +152,13 @@
       "metadata": {
         "description": "The default number of items returned from the azure search service"
       }
-    } 
+    },
+    "searchMaxReturnCount": {
+      "type": "int",
+      "metadata": {
+        "description": "The maximum number of items returned from the azure search service"
+      }
+    }
   },
   "variables": {
     "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/dfc-devops/master/ArmTemplates/",
@@ -336,6 +342,10 @@
               {
                 "name": "CourseServiceSettings__ApiKey",
                 "value": "[parameters('courseApiKey')]"
+              },
+              {
+                "name": "SearchServiceSettings__MaxTop",
+                "value": "[parameters('searchMaxReturnCount')]"
               }
             ]
           },
