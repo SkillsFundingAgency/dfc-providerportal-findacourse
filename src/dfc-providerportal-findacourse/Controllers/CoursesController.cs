@@ -186,7 +186,7 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                             Telephone = venue.PHONE,
                             Town = venue.TOWN,
                             VenueName = venue.VENUE_NAME,
-                            Website = venue.WEBSITE,
+                            Website = UrlUtil.EnsureHttpPrefixed(venue.WEBSITE),
                             Latitude = venue.Latitude,
                             Longitude = venue.Longitude
                         } :
@@ -205,7 +205,7 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                         County = providerContact?.ContactAddress?.Locality,
                         Telephone = providerContact?.ContactTelephone1,
                         Fax = providerContact?.ContactFax,
-                        Website = providerContact?.ContactWebsiteAddress,
+                        Website = UrlUtil.EnsureHttpPrefixed(providerContact?.ContactWebsiteAddress),
                         Email = providerContact?.ContactEmail,
                         EmployerSatisfaction = result.FeChoice?.EmployerSatisfaction,
                         LearnerSatisfaction = result.FeChoice?.LearnerSatisfaction,
@@ -247,7 +247,7 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                                 Telephone = ar.Venue.PHONE,
                                 Town = ar.Venue.TOWN,
                                 VenueName = ar.Venue.VENUE_NAME,
-                                Website = ar.Venue.WEBSITE,
+                                Website = UrlUtil.EnsureHttpPrefixed(ar.Venue.WEBSITE),
                                 Latitude = ar.Venue.Latitude,
                                 Longitude = ar.Venue.Longitude
                             } :
