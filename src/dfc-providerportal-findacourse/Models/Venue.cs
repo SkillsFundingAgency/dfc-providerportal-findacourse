@@ -16,10 +16,11 @@ namespace Dfc.ProviderPortal.FindACourse.Models
         Uknown = 99
     }
 
-    public class Venue : IVenue
+    public class Venue
     {
         //[JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-        public string ID { get; }
+        [JsonProperty("id")]
+        public Guid ID { get; }
         public int UKPRN { get; }
         [JsonProperty("PROVIDER_ID", Required = Required.AllowNull)]
         //[JsonIgnore]
@@ -45,9 +46,9 @@ namespace Dfc.ProviderPortal.FindACourse.Models
         [JsonProperty("POSTCODE")]
         public string PostCode { get; }
         [JsonProperty("LATITUDE")]
-        public decimal Latitude { get; set; }
+        public double? Latitude { get; set; }
         [JsonProperty("LONGITUDE")]
-        public decimal Longitude { get; set; }
+        public double? Longitude { get; set; }
         public VenueStatus Status { get; set; }
         public DateTime DateAdded { get; }
         public DateTime DateUpdated { get; }
