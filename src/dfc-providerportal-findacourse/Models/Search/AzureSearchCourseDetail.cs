@@ -12,7 +12,7 @@ namespace Dfc.ProviderPortal.FindACourse.Models
     {
         public Course Course { get; set; }
         public dynamic Provider { get; set; }
-        public IEnumerable<dynamic> CourseRunVenues { get; set; }
+        public IEnumerable<Venue> CourseRunVenues { get; set; }
         public dynamic Qualification { get; set; }
         public FeChoice FeChoice { get; set; }
 
