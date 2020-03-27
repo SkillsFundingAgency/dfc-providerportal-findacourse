@@ -18,50 +18,48 @@ namespace Dfc.ProviderPortal.FindACourse.Models
 
     public class Venue
     {
-        //[JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-        [JsonProperty("id")]
-        public Guid ID { get; }
-        public int UKPRN { get; }
-        [JsonProperty("PROVIDER_ID", Required = Required.AllowNull)]
-        //[JsonIgnore]
-        public int ProviderID { get; }
-        [JsonProperty("VENUE_ID", Required = Required.AllowNull)]
-        //[JsonIgnore]
-        public int VenueID { get; }
-        [JsonProperty("VENUE_NAME")]
-        public string VenueName { get; }
-        [JsonProperty("PROV_VENUE_ID", Required = Required.AllowNull)]
-        //[JsonIgnore]
-        public string ProvVenueID { get; }
-        [JsonProperty("ADDRESS_1")]
-        public string Address1 { get; }
-        [JsonProperty("ADDRESS_2")]
-        public string Address2 { get; }
-        [JsonProperty("ADDRESS_3")]
-        public string Address3 { get; }
-        [JsonProperty("TOWN")]
-        public string Town { get; }
-        [JsonProperty("COUNTY")]
-        public string County { get; }
-        [JsonProperty("POSTCODE")]
-        public string PostCode { get; }
-        [JsonProperty("LATITUDE")]
-        public double? Latitude { get; set; }
-        [JsonProperty("LONGITUDE")]
-        public double? Longitude { get; set; }
+        public Guid id { get; set; }
+        public int UKPRN { get; set; }
+        public int PROVIDER_ID { get; set; }
+        public int VENUE_ID { get; set; }
+        public string VENUE_NAME { get; set; }
+        public string PROV_VENUE_ID { get; set; }
+        public string PHONE { get; set; }
+        public string ADDRESS_1 { get; set; }
+        public string ADDRESS_2 { get; set; }
+        public string TOWN { get; set; }
+        public string COUNTY { get; set; }
+        public string POSTCODE { get; set; }
+        public string EMAIL { get; set; }
+        public string WEBSITE { get; set; }
+        //public string FAX { get; set; }
+        //public string FACILITIES { get; set; }
+        //public string DATE_CREATED { get; set; }
+        //public string DATE_UPDATE { get; set; }
+        //public string STATUS { get; set; }
+        //public string UPDATED_BY { get; set; }
+        //public string CREATED_BY { get; set; }
+        //public string X_COORD { get; set; }
+        //public string Y_COORD { get; set; }
+        //public string SEARCH_REGION { get; set; }
+        //public string SYS_DATA_SOURCE { get; set; }
+        //public string DATE_UPDATED_COPY_OVER { get; set; }
+        //public string DATE_CREATED_COPY_OVER { get; set; }
+
         public VenueStatus Status { get; set; }
-        public DateTime DateAdded { get; }
-        public DateTime DateUpdated { get; }
-        public string UpdatedBy { get; }
+        public DateTime DateUpdated { get; set; }
+        public string UpdatedBy { get; set; }
+        public decimal Latitude { get; set; }
+        public decimal Longitude { get; set; }
 
         // Apprenticeship related
+        // Except for LocationId, these fields are duplicates of above PHONE, EMAIL and WEBSITE
+        // fields from the up_VenueListForCsvExport procedure in Tribal DB
+        // Do not use fields below, they will soon be replaced with the above
         public int? LocationId { get; set; }
         public int? TribalLocationId { get; set; }
-        [JsonProperty("PHONE")]
-        public string Telephone { get; set; }
-        [JsonProperty("EMAIL")]
-        public string Email { get; set; }
-        [JsonProperty("WEBSITE")]
-        public string Website { get; set; }
+        public string Telephone { get { return PHONE; } set { PHONE = value; } }
+        public string Email { get { return EMAIL; } set { EMAIL = value; } }
+        public string Website { get { return WEBSITE; } set { WEBSITE = value; } }
     }
 }

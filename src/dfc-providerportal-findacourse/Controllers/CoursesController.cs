@@ -136,13 +136,13 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
             if (result != null)
             {
                 var courseRun = result.Course.CourseRuns.Single(r => r.id == request.CourseRunId);
-                var venue = courseRun.VenueId.HasValue ? result.CourseRunVenues.Single(v => v.ID == courseRun.VenueId) : null;
+                var venue = courseRun.VenueId.HasValue ? result.CourseRunVenues.Single(v => v.id == courseRun.VenueId) : null;
                 var providerContact = ((JArray)result.Provider.ProviderContact)
                     .Select(t => t.ToObject<Providercontact>())
                     .SingleOrDefault(c => c.ContactType == "P");
 
                 var alternativeCourseRuns = result.Course.CourseRuns.Where(r => r.id != request.CourseRunId)
-                    .Select(r => new { CourseRun = r, Venue = result.CourseRunVenues.SingleOrDefault(v => v.ID == r.VenueId) });
+                    .Select(r => new { CourseRun = r, Venue = result.CourseRunVenues.SingleOrDefault(v => v.id == r.VenueId) });
 
                 var response = new CourseRunDetailResponse()
                 {
@@ -178,15 +178,15 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                     Venue = venue != null ?
                         new CourseDetailResponseVenue()
                         {
-                            AddressLine1 = venue.Address1,
-                            AddressLine2 = venue.Address2,
-                            County = venue.County,
+                            AddressLine1 = venue.ADDRESS_1,
+                            AddressLine2 = venue.ADDRESS_2,
+                            County = venue.COUNTY,
                             Email = venue.Email,
-                            Postcode = venue.PostCode,
+                            Postcode = venue.POSTCODE,
                             Telephone = venue.Telephone,
-                            Town = venue.Town,
-                            VenueName = venue.VenueName,
-                            Website = UrlUtil.EnsureHttpPrefixed(venue.Website),
+                            Town = venue.TOWN,
+                            VenueName = venue.VENUE_NAME,
+                            Website = UrlUtil.EnsureHttpPrefixed(venue.WEBSITE),
                             Latitude = venue.Latitude,
                             Longitude = venue.Longitude
                         } :
@@ -239,15 +239,15 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                         Venue = ar.Venue != null ?
                             new CourseDetailResponseVenue()
                             {
-                                AddressLine1 = ar.Venue.Address1,
-                                AddressLine2 = ar.Venue.Address2,
-                                County = ar.Venue.County,
+                                AddressLine1 = ar.Venue.ADDRESS_1,
+                                AddressLine2 = ar.Venue.ADDRESS_2,
+                                County = ar.Venue.COUNTY,
                                 Email = ar.Venue.Email,
-                                Postcode = ar.Venue.PostCode,
+                                Postcode = ar.Venue.POSTCODE,
                                 Telephone = ar.Venue.Telephone,
-                                Town = ar.Venue.Town,
-                                VenueName = ar.Venue.VenueName,
-                                Website = UrlUtil.EnsureHttpPrefixed(ar.Venue.Website),
+                                Town = ar.Venue.TOWN,
+                                VenueName = ar.Venue.VENUE_NAME,
+                                Website = UrlUtil.EnsureHttpPrefixed(ar.Venue.WEBSITE),
                                 Latitude = ar.Venue.Latitude,
                                 Longitude = ar.Venue.Longitude
                             } :
