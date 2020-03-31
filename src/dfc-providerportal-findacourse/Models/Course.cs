@@ -7,7 +7,7 @@ using Dfc.ProviderPortal.FindACourse.Interfaces;
 
 namespace Dfc.ProviderPortal.FindACourse.Models
 {
-    public class Course : ICourse 
+    public class Course : ICourse
     {
         public Guid id { get; set; }
         public int? CourseId { get; set; }
@@ -27,7 +27,7 @@ namespace Dfc.ProviderPortal.FindACourse.Models
         public bool AdultEducationBudget { get; set; }
         public bool AdvancedLearnerLoan { get; set; }
         public IEnumerable<CourseRun> CourseRuns { get; set; }
-        public RecordStatus RecordStatus { get; set; }
+        public RecordStatus CourseStatus { get; set; }
         public DateTime CreatedDate { get; set; }
         public string CreatedBy { get; set; }
         public DateTime? UpdatedDate { get; set; }
