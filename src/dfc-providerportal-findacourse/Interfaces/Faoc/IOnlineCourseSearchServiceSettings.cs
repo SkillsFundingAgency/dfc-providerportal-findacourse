@@ -1,4 +1,4 @@
-﻿namespace Dfc.ProviderPortal.FindACourse.Interfaces
+﻿namespace Dfc.ProviderPortal.FindACourse.Interfaces.Faoc
 {
     public interface IOnlineCourseSearchServiceSettings
     {

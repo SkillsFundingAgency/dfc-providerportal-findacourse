@@ -4,7 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Dfc.ProviderPortal.FindACourse.Interfaces;
+using Dfc.ProviderPortal.FindACourse.Interfaces.Faoc;
 using Dfc.ProviderPortal.FindACourse.Models;
 using Dfc.ProviderPortal.FindACourse.Models.Search.Faoc;
 using Dfc.ProviderPortal.Packages;

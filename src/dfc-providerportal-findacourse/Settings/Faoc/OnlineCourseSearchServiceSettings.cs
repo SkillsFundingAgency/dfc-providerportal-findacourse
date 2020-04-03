@@ -1,9 +1,6 @@
-﻿
-using System;
-using Dfc.ProviderPortal.FindACourse.Interfaces;
+﻿using Dfc.ProviderPortal.FindACourse.Interfaces.Faoc;
 
-
-namespace Dfc.ProviderPortal.FindACourse.Settings
+namespace Dfc.ProviderPortal.FindACourse.Settings.Faoc
 {
     public class OnlineCourseSearchServiceSettings : IOnlineCourseSearchServiceSettings
     {
