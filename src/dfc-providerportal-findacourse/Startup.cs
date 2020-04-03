@@ -1,6 +1,8 @@
 ﻿using System;
 using Dfc.ProviderPortal.FindACourse.Helpers;
+using Dfc.ProviderPortal.FindACourse.Helpers.Faoc;
 using Dfc.ProviderPortal.FindACourse.Interfaces;
+using Dfc.ProviderPortal.FindACourse.Interfaces.Faoc;
 using Dfc.ProviderPortal.FindACourse.Services;
 using Dfc.ProviderPortal.FindACourse.Settings;
 using Microsoft.AspNetCore.Builder;
@@ -55,13 +57,17 @@ namespace Dfc.ProviderPortal.FindACourse.API
                     .Configure<VenueServiceSettings>(Configuration.GetSection(nameof(VenueServiceSettings)))
                     .Configure<CourseServiceSettings>(Configuration.GetSection(nameof(CourseServiceSettings)))
                     .Configure<SearchServiceSettings>(Configuration.GetSection(nameof(SearchServiceSettings)))
+                    .Configure<OnlineCourseSearchServiceSettings>(Configuration.GetSection(nameof(OnlineCourseSearchServiceSettings)))
                     .Configure<QualificationServiceSettings>(Configuration.GetSection(nameof(QualificationServiceSettings)))
                     .AddScoped<ICourseService, CoursesService>()
+                    .AddScoped<IOnlineCourseService, OnlineCoursesService>()
                     .AddScoped<ICosmosDbHelper, CosmosDbHelper>()
                     .AddScoped<IProviderServiceWrapper, ProviderServiceWrapper>()
                     .AddScoped<IVenueServiceWrapper, VenueServiceWrapper>()
                     .AddSingleton<SearchServiceWrapper>()
-                    .AddTransient<ISearchServiceSettings>(sp => sp.GetRequiredService<IOptions<SearchServiceSettings>>().Value);
+                    .AddSingleton<OnlineSearchServiceWrapper>()
+                    .AddTransient<ISearchServiceSettings>(sp => sp.GetRequiredService<IOptions<SearchServiceSettings>>().Value)
+                    .AddTransient<IOnlineCourseSearchServiceSettings>(sp => sp.GetRequiredService<IOptions<OnlineCourseSearchServiceSettings>>().Value);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
