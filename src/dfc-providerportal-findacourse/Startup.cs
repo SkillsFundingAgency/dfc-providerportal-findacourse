@@ -5,6 +5,7 @@ using Dfc.ProviderPortal.FindACourse.Interfaces;
 using Dfc.ProviderPortal.FindACourse.Interfaces.Faoc;
 using Dfc.ProviderPortal.FindACourse.Services;
 using Dfc.ProviderPortal.FindACourse.Settings;
+using Dfc.ProviderPortal.FindACourse.Settings.Faoc;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -65,7 +66,7 @@ namespace Dfc.ProviderPortal.FindACourse.API
                     .AddScoped<IProviderServiceWrapper, ProviderServiceWrapper>()
                     .AddScoped<IVenueServiceWrapper, VenueServiceWrapper>()
                     .AddSingleton<SearchServiceWrapper>()
-                    .AddSingleton<OnlineSearchServiceWrapper>()
+                    .AddSingleton<OnlineCourseSearchServiceWrapper>()
                     .AddTransient<ISearchServiceSettings>(sp => sp.GetRequiredService<IOptions<SearchServiceSettings>>().Value)
                     .AddTransient<IOnlineCourseSearchServiceSettings>(sp => sp.GetRequiredService<IOptions<OnlineCourseSearchServiceSettings>>().Value);
         }

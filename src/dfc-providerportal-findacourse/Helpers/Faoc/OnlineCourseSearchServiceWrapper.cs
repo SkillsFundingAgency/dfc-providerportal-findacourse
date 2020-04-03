@@ -15,7 +15,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Dfc.ProviderPortal.FindACourse.Helpers.Faoc
 {
-    public class OnlineSearchServiceWrapper
+    public class OnlineCourseSearchServiceWrapper
     {
         private readonly ILogger _log;
         private readonly IOnlineCourseSearchServiceSettings _settings;
@@ -24,12 +24,12 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers.Faoc
         private readonly HttpClient _httpClient;
         private readonly Uri _uri;
 
-        public OnlineSearchServiceWrapper(IOnlineCourseSearchServiceSettings settings, ILoggerFactory loggerFactory)
+        public OnlineCourseSearchServiceWrapper(IOnlineCourseSearchServiceSettings settings, ILoggerFactory loggerFactory)
         {
             Throw.IfNull(loggerFactory, nameof(loggerFactory));
             Throw.IfNull(settings, nameof(settings));
 
-            _log = loggerFactory.CreateLogger<OnlineSearchServiceWrapper>();
+            _log = loggerFactory.CreateLogger<OnlineCourseSearchServiceWrapper>();
             _settings = settings;
 
             _queryService = new SearchServiceClient(settings.SearchService, new SearchCredentials(settings.QueryKey));

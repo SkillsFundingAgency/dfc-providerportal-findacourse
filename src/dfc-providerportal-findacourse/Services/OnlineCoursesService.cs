@@ -14,11 +14,11 @@ namespace Dfc.ProviderPortal.FindACourse.Services
     public class OnlineCoursesService : IOnlineCourseService
     {
         //private readonly ILogger _log;
-        private readonly OnlineSearchServiceWrapper _searchServiceWrapper;
+        private readonly OnlineCourseSearchServiceWrapper _courseSearchServiceWrapper;
 
         public OnlineCoursesService(
             ICosmosDbHelper cosmosDbHelper,
-            OnlineSearchServiceWrapper searchServiceWrapper,
+            OnlineCourseSearchServiceWrapper courseSearchServiceWrapper,
             IOptions<ProviderServiceSettings> providerServiceSettings,
             IOptions<VenueServiceSettings> venueServiceSettings,
             IOptions<SearchServiceSettings> searchServiceSettings,
@@ -27,19 +27,19 @@ namespace Dfc.ProviderPortal.FindACourse.Services
             IOptions<CourseServiceSettings> courseServiceSettings)
         {
             Throw.IfNull(cosmosDbHelper, nameof(cosmosDbHelper));
-            Throw.IfNull(searchServiceWrapper, nameof(searchServiceWrapper));
+            Throw.IfNull(courseSearchServiceWrapper, nameof(courseSearchServiceWrapper));
             Throw.IfNull(settings, nameof(settings));
             Throw.IfNull(providerServiceSettings, nameof(providerServiceSettings));
             Throw.IfNull(venueServiceSettings, nameof(venueServiceSettings));
             Throw.IfNull(qualServiceSettings, nameof(qualServiceSettings));
             Throw.IfNull(searchServiceSettings, nameof(searchServiceSettings));
 
-            _searchServiceWrapper = searchServiceWrapper;
+            _courseSearchServiceWrapper = courseSearchServiceWrapper;
         }
         
         public Task<FaocSearchResult> OnlineCourseSearch(ILogger log, OnlineCourseSearchCriteria criteria)
         {
-            return _searchServiceWrapper.SearchOnlineCourses(criteria);
+            return _courseSearchServiceWrapper.SearchOnlineCourses(criteria);
         }
     }
 }
