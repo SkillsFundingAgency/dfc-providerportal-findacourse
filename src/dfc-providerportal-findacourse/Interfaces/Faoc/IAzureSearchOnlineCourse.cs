@@ -17,8 +17,8 @@ namespace Dfc.ProviderPortal.FindACourse.Interfaces.Faoc
         string WhatYoullNeed { get; set; }
         string HowYoullBeAssessed { get; set; }
         string WhereNext { get; set; }
-        string AdultEducationBudget { get; set; }
-        string AdvancedLearnerLoan { get; set; }
+        bool AdultEducationBudget { get; set; }
+        bool AdvancedLearnerLoan { get; set; }
         string CourseName { get; set; }
         DateTime? StartDate { get; set; }
         bool FlexibleStartDate { get; set; } // Mandatory

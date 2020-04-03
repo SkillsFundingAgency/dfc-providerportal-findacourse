@@ -18,8 +18,8 @@ namespace Dfc.ProviderPortal.FindACourse.Models.Search.Faoc
         public string WhatYoullNeed { get; set; }
         public string HowYoullBeAssessed { get; set; }
         public string WhereNext { get; set; }
-        public string AdultEducationBudget { get; set; }
-        public string AdvancedLearnerLoan { get; set; }
+        public bool AdultEducationBudget { get; set; }
+        public bool AdvancedLearnerLoan { get; set; }
         public string CourseName { get; set; }
         public DateTime? StartDate { get; set; }
         public bool FlexibleStartDate { get; set; }  // Mandatory
