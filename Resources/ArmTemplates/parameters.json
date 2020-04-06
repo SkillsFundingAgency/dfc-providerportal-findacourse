@@ -72,10 +72,10 @@
       "value": "__ApimPublishCourseDirectoryKey__"
     },
     "searchDefaultReturnCount": {
-      "value": "__SearchDefaultTop__"
+      "value": __SearchDefaultTop__
     },
     "searchMaxReturnCount": {
-      "value": "__SearchMaxTop__"
+      "value": __SearchMaxTop__
     },
     "onlineCourseSearchName": {
       "value": "__onlineCourseSearchName__"
