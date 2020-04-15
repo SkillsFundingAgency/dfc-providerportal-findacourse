@@ -39,11 +39,11 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
 
         [Route("~/onlinecoursesearch")]
         [HttpPost]
-        [ProducesResponseType(typeof(CourseSearchResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(OnlineCourseSearchResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> OnlineCourseSearch([FromBody]CourseSearchRequest request)
+        public async Task<ActionResult> OnlineCourseSearch([FromBody]OnlineCourseSearchRequest request)
         {
             var criteria = new OnlineCourseSearchCriteria()
             {
