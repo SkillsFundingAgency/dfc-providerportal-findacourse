@@ -280,7 +280,7 @@
     },
     {
       "name": "ProviderUKPRN",
-      "type": "Edm.String",
+      "type": "Edm.Int64",
       "facetable": true,
       "filterable": true,
       "retrievable": true,
