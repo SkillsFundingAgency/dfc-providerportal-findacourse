@@ -52,10 +52,7 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers.Faoc
 
             var sortBy = criteria.SortBy ?? CourseSearchSortBy.Relevance;
 
-            var filterClauses = new List<string>()
-            {
-                "Status eq 1"  // only search live courses
-            };
+            var filterClauses = new List<string>();
 
             if (criteria.StartDateFrom.HasValue)
             {
