@@ -25,6 +25,7 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers.Faoc
         private readonly Uri _uri;
 
         public OnlineCourseSearchServiceWrapper(IOnlineCourseSearchServiceSettings settings, ILoggerFactory loggerFactory)
+        public OnlineCourseSearchServiceWrapper(IOnlineCourseSearchServiceSettings settings, ILoggerFactory loggerFactory)
         {
             Throw.IfNull(loggerFactory, nameof(loggerFactory));
             Throw.IfNull(settings, nameof(settings));
@@ -52,10 +53,7 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers.Faoc
 
             var sortBy = criteria.SortBy ?? CourseSearchSortBy.Relevance;
 
-            var filterClauses = new List<string>()
-            {
-                "Status eq 1"  // only search live courses
-            };
+            var filterClauses = new List<string>();
 
             if (criteria.StartDateFrom.HasValue)
             {
