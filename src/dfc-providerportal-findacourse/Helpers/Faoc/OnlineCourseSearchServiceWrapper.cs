@@ -25,7 +25,6 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers.Faoc
         private readonly Uri _uri;
 
         public OnlineCourseSearchServiceWrapper(IOnlineCourseSearchServiceSettings settings, ILoggerFactory loggerFactory)
-        public OnlineCourseSearchServiceWrapper(IOnlineCourseSearchServiceSettings settings, ILoggerFactory loggerFactory)
         {
             Throw.IfNull(loggerFactory, nameof(loggerFactory));
             Throw.IfNull(settings, nameof(settings));
