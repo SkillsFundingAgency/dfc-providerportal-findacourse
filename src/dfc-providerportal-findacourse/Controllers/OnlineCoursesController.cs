@@ -73,6 +73,7 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                     })),
                 Results = result.Items.Select(i => new OnlineCourseSearchResponseItem()
                 {
+                    Id = i.Course.Id,
                     QualificationCourseTitle = i.Course.QualificationCourseTitle,
                     LearnAimRef = i.Course.LearnAimRef,
                     NotionalNVQLevelv2 = i.Course.NotionalNVQLevelv2,
