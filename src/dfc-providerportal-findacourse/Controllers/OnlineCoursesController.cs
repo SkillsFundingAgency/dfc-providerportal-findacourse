@@ -47,6 +47,7 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
         {
             var criteria = new OnlineCourseSearchCriteria()
             {
+                Limit = request.Limit,
                 ProviderName = request.ProviderName,
                 QualificationLevels = request.QualificationLevels,
                 SortBy = request.SortBy,
