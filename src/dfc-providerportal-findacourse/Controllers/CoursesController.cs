@@ -142,6 +142,7 @@ namespace Dfc.ProviderPortal.FindACourse.Controllers
                     .SingleOrDefault(c => c.ContactType == "P");
 
                 var alternativeCourseRuns = result.Course.CourseRuns.Where(r => r.id != request.CourseRunId)
+                    .Where(r => r.RecordStatus == RecordStatus.Live)
                     .Select(r => new { CourseRun = r, Venue = result.CourseRunVenues.SingleOrDefault(v => v.id == r.VenueId) });
 
                 var response = new CourseRunDetailResponse()
