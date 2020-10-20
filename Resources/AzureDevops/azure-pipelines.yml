@@ -10,6 +10,10 @@ variables:
   dotNetCoreProjects: 'src/**/*.csproj'
   dotNetCorePublishProject: 'src/dfc-providerportal-findacourse/dfc-providerportal-findacourse.csproj'
   dotNetCoreTestProjects: '**/*[Tt]ests/*.csproj'
+  ArmTemplateRoot: '$(System.DefaultWorkingDirectory)\Resources\ArmTemplates'
+  GitVersionConfigFilePath: Resources/AzureDevOps/GitVersion.yml
+
+
 
 resources:
   repositories:
@@ -18,7 +22,7 @@ resources:
     type: github
     name: SkillsFundingAgency/dfc-devops
     endpoint: 'GitHub (ESFA)'
-    ref: refs/tags/v1.9.1
+    ref: refs/tags/v1.11.2
 
 trigger:
   batch: true # batch if multiple checkins while build in progress
@@ -33,60 +37,57 @@ pr:
     - master
     - dev
 
-jobs:
 
-# Full build
-- job: BuildDotNetCore
-  displayName: Build dot net core project
+steps:
 
-  steps:
+- task: UseGitVersion@5
+  displayName: GitVersion
+  inputs:
+    useConfigFile: true
+    configFilePath: ${{ variables.GitVersionConfigFilePath }}
+    versionSpec: '5.3.x'
 
   # ARM template
-  - template: AzureDevOpsTemplates/Build/StepTemplates/dfc-arm-build.yml@dfc-devops
-    parameters:
-      ArmTemplateRoot: '$(System.DefaultWorkingDirectory)\Resources\ArmTemplates'  
+- template: AzureDevOpsTemplates\Build\StepTemplates\dfc-arm-build.yml@dfc-devops
+  parameters:
+    ArmTemplateRoot: '${{ variables.ArmTemplateRoot }}'
+    SolutionBaseName: '${{ variables.SolutionBaseName }}'
 
-  # restore dependencies
-  - task: DotNetCoreCLI@2
-    displayName: 'dotnet restore'
-    inputs:
-      command: restore
-      projects: $(dotNetCoreProjects)
+# restore dependencies
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet restore'
+  inputs:
+    command: restore
+    projects: $(dotNetCoreProjects)
 
-  # build
-  - task: DotNetCoreCLI@2
-    displayName: 'dotnet build'
-    inputs:
-      command: build
-      projects: $(dotNetCoreProjects)
-      arguments: '--configuration $(BuildConfiguration)'
+# build
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet build'
+  inputs:
+    command: build
+    projects: $(dotNetCoreProjects)
+    arguments: '--configuration $(BuildConfiguration)'
 
-  # run unit tests
-  - task: DotNetCoreCLI@2
-    displayName: Test
-    inputs:
-      command: test
-      projects: $(dotNetCoreTestProjects)
-      arguments: '--configuration $(BuildConfiguration)'
-    continueOnError: true
+# run unit tests
+- task: DotNetCoreCLI@2
+  displayName: Test
+  inputs:
+    command: test
+    projects: $(dotNetCoreTestProjects)
+    arguments: '--configuration $(BuildConfiguration)'
+  continueOnError: true
 
-  # publish 
-  - task: DotNetCoreCLI@2
-    displayName: Publish
-    inputs:
-      command: publish
-      publishWebProjects: false
-      projects: $(dotNetCorePublishProject)
-      arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
+# publish 
+- task: DotNetCoreCLI@2
+  displayName: Publish
+  inputs:
+    command: publish
+    publishWebProjects: false
+    projects: $(dotNetCorePublishProject)
+    arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
 
-  - task: CopyFiles@2
-    displayName: 'Copy Azure folder to Staging'
-    inputs:
-      SourceFolder: $(System.DefaultWorkingDirectory)\Resources\ArmTemplates
-      TargetFolder: $(build.artifactstagingdirectory)\Azure\Azure
-
-  - task: PublishBuildArtifacts@1
-    displayName: Publish Artifact
-    inputs:
-      pathtoPublish: $(Build.ArtifactStagingDirectory)
-      artifactName: '${{ variables.SolutionBaseName }}'
+- task: PublishBuildArtifacts@1
+  displayName: Publish Artifact
+  inputs:
+    pathtoPublish: $(Build.ArtifactStagingDirectory)
+    artifactName: '${{ variables.SolutionBaseName }}'

@@ -1,2 +1,2 @@
-*       		@gunndabad @soharadesign @MTSarwar @MrKevJoy @javeedESyn
-/Resources/ 	@rivoric @thelious1974
+#Requires review from DevOps when making changes to any files in the Resources folder or it's subfolders
+/Resources/    @SkillsFundingAgency/dfc-devops
