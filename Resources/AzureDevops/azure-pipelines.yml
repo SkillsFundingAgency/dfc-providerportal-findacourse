@@ -86,12 +86,6 @@ steps:
     projects: $(dotNetCorePublishProject)
     arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
 
-- task: CopyFiles@2
-  displayName: 'Copy Azure folder to Staging'
-  inputs:
-    SourceFolder: $(System.DefaultWorkingDirectory)\Resources\ArmTemplates
-    TargetFolder: $(build.artifactstagingdirectory)\Azure\Azure
-
 - task: PublishBuildArtifacts@1
   displayName: Publish Artifact
   inputs:
