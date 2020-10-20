@@ -37,13 +37,8 @@ pr:
     - master
     - dev
 
-jobs:
 
-# Full build
-- job: BuildDotNetCore
-  displayName: Build dot net core project
-
-  steps:
+steps:
 
 - task: UseGitVersion@5
   displayName: GitVersion
@@ -58,47 +53,47 @@ jobs:
     ArmTemplateRoot: '${{ variables.ArmTemplateRoot }}'
     SolutionBaseName: '${{ variables.SolutionBaseName }}'
 
-  # restore dependencies
-  - task: DotNetCoreCLI@2
-    displayName: 'dotnet restore'
-    inputs:
-      command: restore
-      projects: $(dotNetCoreProjects)
+# restore dependencies
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet restore'
+  inputs:
+    command: restore
+    projects: $(dotNetCoreProjects)
 
-  # build
-  - task: DotNetCoreCLI@2
-    displayName: 'dotnet build'
-    inputs:
-      command: build
-      projects: $(dotNetCoreProjects)
-      arguments: '--configuration $(BuildConfiguration)'
+# build
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet build'
+  inputs:
+    command: build
+    projects: $(dotNetCoreProjects)
+    arguments: '--configuration $(BuildConfiguration)'
 
-  # run unit tests
-  - task: DotNetCoreCLI@2
-    displayName: Test
-    inputs:
-      command: test
-      projects: $(dotNetCoreTestProjects)
-      arguments: '--configuration $(BuildConfiguration)'
-    continueOnError: true
+# run unit tests
+- task: DotNetCoreCLI@2
+  displayName: Test
+  inputs:
+    command: test
+    projects: $(dotNetCoreTestProjects)
+    arguments: '--configuration $(BuildConfiguration)'
+  continueOnError: true
 
-  # publish 
-  - task: DotNetCoreCLI@2
-    displayName: Publish
-    inputs:
-      command: publish
-      publishWebProjects: false
-      projects: $(dotNetCorePublishProject)
-      arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
+# publish 
+- task: DotNetCoreCLI@2
+  displayName: Publish
+  inputs:
+    command: publish
+    publishWebProjects: false
+    projects: $(dotNetCorePublishProject)
+    arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
 
-  - task: CopyFiles@2
-    displayName: 'Copy Azure folder to Staging'
-    inputs:
-      SourceFolder: $(System.DefaultWorkingDirectory)\Resources\ArmTemplates
-      TargetFolder: $(build.artifactstagingdirectory)\Azure\Azure
+- task: CopyFiles@2
+  displayName: 'Copy Azure folder to Staging'
+  inputs:
+    SourceFolder: $(System.DefaultWorkingDirectory)\Resources\ArmTemplates
+    TargetFolder: $(build.artifactstagingdirectory)\Azure\Azure
 
-  - task: PublishBuildArtifacts@1
-    displayName: Publish Artifact
-    inputs:
-      pathtoPublish: $(Build.ArtifactStagingDirectory)
-      artifactName: '${{ variables.SolutionBaseName }}'
+- task: PublishBuildArtifacts@1
+  displayName: Publish Artifact
+  inputs:
+    pathtoPublish: $(Build.ArtifactStagingDirectory)
+    artifactName: '${{ variables.SolutionBaseName }}'
