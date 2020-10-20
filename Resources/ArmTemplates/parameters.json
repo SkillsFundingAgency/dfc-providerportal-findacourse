@@ -85,6 +85,9 @@
     },
     "onlineCourseSearchQueryKey": {
       "value": "__onlineCourseSearchQueryKey__"
+    },
+    "providerPortalApplicationInsights": {
+      "value": "__providerportalApplicationInsights__"
     }
   }
 }
