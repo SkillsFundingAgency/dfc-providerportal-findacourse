@@ -85,6 +85,9 @@
     },
     "onlineCourseSearchQueryKey": {
       "value": "not-a-real-key"
+    },
+    "providerPortalApplicationInsights":{
+      "value": "dfc-dev-prov-as-ai"
     }
   }
 }
