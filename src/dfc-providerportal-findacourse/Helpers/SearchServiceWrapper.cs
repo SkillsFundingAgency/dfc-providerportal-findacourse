@@ -29,6 +29,8 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
             public AzureSearchVenueModel Venue { get; set; }
         }
 
+        private static readonly HashSet<char> _luceneSyntaxEscapeChars = new HashSet<char>("+-&|!(){}[]^\"~*?:\\/");
+
         private static readonly Regex _postcode = new Regex("^([A-PR-UWYZ0-9][A-HK-Y0-9][AEHMNPRTVXY0-9]?[ABEHMNPRVWXY0-9]? {1,2}[0-9][ABD-HJLN-UW-Z]{2}|GIR 0AA)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private readonly ILogger _log;
@@ -221,6 +223,7 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
                     },
                     ScoringProfile = scoringProfile,
                     SearchMode = SearchMode.All,
+                    QueryType = QueryType.Full,
                     Top = limit,
                     Skip = start,
                     OrderBy = new[] { orderBy }
@@ -442,16 +445,16 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
             var terms = new List<string>();
 
             // Find portions wrapped in quotes
-            var remaining = EscapeSearchText(subjectText.Trim());
+            var remaining = subjectText.Trim();
             var groupsRegex = new Regex("('|\")(.*?)(\\1)");
             Match m;
             while ((m = groupsRegex.Match(remaining)).Success)
             {
-                var value = m.Groups[2].Value;
+                var value = EscapeSearchText(m.Groups[2].Value);
 
                 if (m.Groups[1].Value == "'")
                 {
-                    terms.Add($"({CombineWords(value, " + ")})");
+                    terms.Add($"({CombineWords(value, " && ")})");
                 }
                 else   // double quotes
                 {
@@ -461,21 +464,33 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
                 remaining = remaining.Remove(m.Index, m.Length);
             }
 
-            // Any remaining terms should be made prefix terms
-            terms.AddRange(remaining.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(t => $"{t}*"));
+            // Any remaining terms should be made prefix terms or fuzzy terms
+            terms
+                .AddRange(remaining.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                .Select(EscapeSearchText)
+                .SelectMany(t => new[] { $"{t}*", $"{t}~" }));
 
-            return string.Join(" | ", terms);
+            return string.Join(" || ", terms);
 
             string CombineWords(string text, string sep) =>
                 string.Join(sep, text.Split(' ', StringSplitOptions.RemoveEmptyEntries));
 
-            string EscapeSearchText(string text) => text
-                .Replace("+", "\\+")
-                .Replace("|", "\\|")
-                .Replace("-", "\\-")
-                .Replace("*", "\\*")
-                .Replace("(", "\\(")
-                .Replace(")", "\\)");
+            string EscapeSearchText(string text)
+            {
+                var sb = new StringBuilder();
+
+                foreach (var c in text)
+                {
+                    if (_luceneSyntaxEscapeChars.Contains(c))
+                    {
+                        sb.Append("\\");
+                    }
+
+                    sb.Append(c);
+                }
+
+                return sb.ToString();
+            }
         }
 
         private (int limit, int start) ResolvePagingParams(int? limit, int? start)
