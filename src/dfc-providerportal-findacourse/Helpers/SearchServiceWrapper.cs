@@ -477,6 +477,15 @@ namespace Dfc.ProviderPortal.FindACourse.Helpers
 
             string EscapeSearchText(string text)
             {
+                if (text.Equals("and", StringComparison.OrdinalIgnoreCase))
+                {
+                    return "\\and";
+                }
+                else if (text.Equals("or", StringComparison.OrdinalIgnoreCase))
+                {
+                    return "\\or";
+                }
+
                 var sb = new StringBuilder();
 
                 foreach (var c in text)
