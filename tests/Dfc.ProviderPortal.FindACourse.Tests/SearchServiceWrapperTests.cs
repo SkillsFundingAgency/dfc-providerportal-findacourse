@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Dfc.ProviderPortal.FindACourse.Helpers;
-using Dfc.ProviderPortal.FindACourse.Helpers.Faoc;
 using Xunit;
 
 namespace Dfc.ProviderPortal.FindACourse.Tests
@@ -24,19 +23,16 @@ namespace Dfc.ProviderPortal.FindACourse.Tests
             yield return new object[] { "   ", "*" };
 
             // Input is trimmed
-            yield return new object[] { " foo  ", "foo*" };
+            yield return new object[] { " foo  ", "foo* || foo~" };
 
-            // Terms are logically ORed
-            yield return new object[] { "foo bar", "foo* | bar*" };
-
-            // Add wildcard to end of each word
-            yield return new object[] { "foo bar", "foo* | bar*" };
+            // Add wildcard and fuzzy modifier to end of each word
+            yield return new object[] { "foo bar", "foo* || foo~ || bar* || bar~" };
 
             // Terms in single quotes should not be prefix searches
             yield return new object[] { "'foo'", "(foo)" };
 
             // Single quote grouping
-            yield return new object[] { "'foo' 'bar baz'", "(foo) | (bar + baz)" };
+            yield return new object[] { "'foo' 'bar baz'", "(foo) || (bar && baz)" };
 
             // Double quotes
             yield return new object[] { "\"foo\"", "(\"foo\")" };
@@ -51,7 +47,7 @@ namespace Dfc.ProviderPortal.FindACourse.Tests
             yield return new object[] { "'foo)bar'", "(foo\\)bar)" };
 
             // Combinations...
-            yield return new object[] { "foo 'bar baz' \"qux qu|ux\"", "(bar + baz) | (\"qux qu\\|ux\") | foo*" };
+            yield return new object[] { "foo 'bar baz' \"qux qu|ux\"", "(bar && baz) || (\"qux qu\\|ux\") || foo* || foo~" };
         }
     }
 }
