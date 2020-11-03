@@ -28,14 +28,12 @@ trigger:
   batch: true # batch if multiple checkins while build in progress
   branches:
     include:
-    - master
-    - dev
+    - main
 
 pr:
   branches:
     include:
-    - master
-    - dev
+    - main
 
 
 steps:

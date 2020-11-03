@@ -182,7 +182,7 @@
       "metadata": {
         "description": "Application Insights Reference for Course Directory i.e. dfc-<env>-prov-as-ai"
       }
-    }
+    } 
   },
   "variables": {
     "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/dfc-devops/master/ArmTemplates/",
@@ -243,9 +243,9 @@
                 "name": "AzureWebJobsStorage",
                 "value": "[parameters('storageConnectionString')]"
               },
-              {
-                "name": "WEBSITE_RUN_FROM_PACKAGE",
-                "value": "1"
+              { 
+                "name": "WEBSITE_RUN_FROM_PACKAGE", 
+                "value": "1" 
               },
               {
                 "name": "CosmosDbSettings__EndpointUri",
