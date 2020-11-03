@@ -136,7 +136,7 @@
       }
     },
     "courseApiUrl": {
-      "type":  "string",
+      "type": "string",
       "metadata": {
         "description": "URL to the Courses API"
       }
@@ -157,6 +157,30 @@
       "type": "int",
       "metadata": {
         "description": "The maximum number of items returned from the azure search service"
+      }
+    },
+    "onlineCourseSearchName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of online course search resource"
+      }
+    },
+    "onlineCourseSearchIndex": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of online course search index"
+      }
+    },
+    "onlineCourseSearchQueryKey": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Query key for accessing online course search"
+      }
+    },
+    "providerPortalApplicationInsights": {
+      "type": "string",
+      "metadata": {
+        "description": "Application Insights Reference for Course Directory i.e. dfc-<env>-prov-as-ai"
       }
     } 
   },
@@ -213,7 +237,7 @@
             "value": [
               {
                 "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                "value": "[reference('ppfindcourseAppInsights').outputs.InstrumentationKey.value]"
+                "value": "[reference(resourceId(parameters('appServicePlanResourceGroup'), 'Microsoft.Insights/components', parameters('providerPortalApplicationInsights')), '2015-05-01', 'Full').properties.InstrumentationKey]"
               },
               {
                 "name": "AzureWebJobsStorage",
@@ -324,28 +348,56 @@
                 "value": "100"
               },
               {
-                "name": "FACAuthenticationSettings__UserName",
-                "value": "APIUser"
-              },
-              {
-                "name": "FACAuthenticationSettings__Password",
-                "value": "[parameters('apiPassword')]"
-              },
-              {
                 "name": "SearchServiceSettings__RegionBoostScoringProfile",
                 "value": "[parameters('boostScoringProfile')]"
               },
               {
-                  "name": "CourseServiceSettings__ApiUrl",
-                  "value": "[parameters('courseApiUrl')]"
+                "name": "SearchServiceSettings__MaxTop",
+                "value": "[parameters('searchMaxReturnCount')]"
+              },
+              {
+                "name": "OnlineCourseSearchServiceSettings__SearchService",
+                "value": "[parameters('onlineCourseSearchName')]"
+              },
+              {
+                "name": "OnlineCourseSearchServiceSettings__ApiUrl",
+                "value": "[concat('https://', parameters('onlineCourseSearchName'), '.search.windows.net/indexes/', parameters('onlineCourseSearchIndex'), '/docs/search')]"
+              },
+              {
+                "name": "OnlineCourseSearchServiceSettings__ApiVersion",
+                "value": "2017-11-11"
+              },
+              {
+                "name": "OnlineCourseSearchServiceSettings__QueryKey",
+                "value": "[parameters('onlineCourseSearchQueryKey')]"
+              },
+              {
+                "name": "OnlineCourseSearchServiceSettings__Index",
+                "value": "[parameters('onlineCourseSearchIndex')]"
+              },
+              {
+                "name": "OnlineCourseSearchServiceSettings__DefaultTop",
+                "value": "[parameters('searchDefaultReturnCount')]"
+              },
+              {
+                "name": "OnlineCourseSearchServiceSettings__MaxTop",
+                "value": "[parameters('searchMaxReturnCount')]"
+              },
+              {
+                "name": "CourseServiceSettings__ApiUrl",
+                "value": "[parameters('courseApiUrl')]"
               },
               {
                 "name": "CourseServiceSettings__ApiKey",
                 "value": "[parameters('courseApiKey')]"
               },
               {
-                "name": "SearchServiceSettings__MaxTop",
-                "value": "[parameters('searchMaxReturnCount')]"
+                "name": "FACAuthenticationSettings__UserName",
+                "value": "APIUser"
+              },
+              {
+                "name": "FACAuthenticationSettings__Password",
+                "value": "[parameters('apiPassword')]"
               }
             ]
           },

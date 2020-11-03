@@ -76,6 +76,18 @@
     },
     "searchMaxReturnCount": {
       "value": 200
+    },
+    "onlineCourseSearchName": {
+      "value": "dfc-foo-online-course-sch"
+    },
+    "onlineCourseSearchIndex": {
+      "value": "online-course"
+    },
+    "onlineCourseSearchQueryKey": {
+      "value": "not-a-real-key"
+    },
+    "providerPortalApplicationInsights":{
+      "value": "dfc-dev-prov-as-ai"
     }
   }
 }

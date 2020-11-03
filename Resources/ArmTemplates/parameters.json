@@ -76,6 +76,18 @@
     },
     "searchMaxReturnCount": {
       "value": __SearchMaxTop__
+    },
+    "onlineCourseSearchName": {
+      "value": "__onlineCourseSearchName__"
+    },
+    "onlineCourseSearchIndex": {
+      "value": "__onlineCourseSearchIndex__"
+    },
+    "onlineCourseSearchQueryKey": {
+      "value": "__onlineCourseSearchQueryKey__"
+    },
+    "providerPortalApplicationInsights": {
+      "value": "__providerportalApplicationInsights__"
     }
   }
 }

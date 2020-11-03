@@ -58,9 +58,7 @@ namespace Dfc.ProviderPortal.FindACourse.Models
         [Description("F.E.")]
         FE = 1,
         [Description("Apprenticeships")]
-        Apprenticeship = 2,
-        [Description("Both")]
-        Both = FE | Apprenticeship
+        Apprenticeship = 2
     }
 
     public class Providercontact
