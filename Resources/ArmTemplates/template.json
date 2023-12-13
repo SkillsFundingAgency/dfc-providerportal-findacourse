@@ -26,30 +26,6 @@
         "description": "Connection string for the storage account to store function app files"
       }
     },
-    "cosmosDBfqdn": {
-      "type": "string",
-      "metadata": {
-        "description": "Cosmos DB account name in the format https://dfc-xxx-xxx-cdb.documents.azure.com/ for app settings"
-      }
-    },
-    "cosmosDBkey": {
-      "type": "securestring",
-      "metadata": {
-        "description": "Cosmos DB access key for app settings"
-      }
-    },
-    "cosmosDBdatabase": {
-      "type": "string",
-      "metadata": {
-        "description": "Cosmos DB database name for app settings"
-      }
-    },
-    "cosmosDBcollection": {
-      "type": "string",
-      "metadata": {
-        "description": "Cosmos DB collection name for app settings"
-      }
-    },
     "venueApiUrl": {
       "type": "string",
       "metadata": {
@@ -248,22 +224,6 @@
                 "value": "1" 
               },
               {
-                "name": "CosmosDbSettings__EndpointUri",
-                "value": "[parameters('cosmosDBfqdn')]"
-              },
-              {
-                "name": "CosmosDbSettings__PrimaryKey",
-                "value": "[parameters('cosmosDBkey')]"
-              },
-              {
-                "name": "CosmosDbSettings__DatabaseId",
-                "value": "[parameters('cosmosDBdatabase')]"
-              },
-              {
-                "name": "CosmosDbCollectionSettings__CoursesCollectionId",
-                "value": "[parameters('cosmosDBcollection')]"
-              },
-              {
                 "name": "VenueServiceSettings__ApiUrl",
                 "value": "[parameters('venueApiUrl')]"
               },
@@ -338,10 +298,6 @@
               {
                 "name": "SearchServiceSettings__DefaultTop",
                 "value": "[parameters('searchDefaultReturnCount')]"
-              },
-              {
-                "name": "SearchServiceSettings__CoursesConnectionString",
-                "value": "[concat('AccountEndpoint=', parameters('cosmosDBfqdn'), ';AccountKey=', parameters('cosmosDBkey'), ';Database=', parameters('cosmosDBdatabase'), ';')]"
               },
               {
                 "name": "SearchServiceSettings__ThresholdVenueCount",

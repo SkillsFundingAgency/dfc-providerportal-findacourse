@@ -14,18 +14,6 @@
     "storageConnectionString": {
       "value": "__providerPortalStorageConnectionStr__"
     },
-    "cosmosDBfqdn": {
-      "value": "__cosmosDBConnectionStr__"
-    },
-    "cosmosDBkey": {
-      "value": "__providerPortalCosmosDBPrimaryKey__"
-    },
-    "cosmosDBdatabase": {
-      "value": "__cosmosDatabase__"
-    },
-    "cosmosDBcollection": {
-      "value": "__cosmosCollection__"
-    },
     "venueApiUrl": {
       "value": "__venueApiUrl__"
     },
